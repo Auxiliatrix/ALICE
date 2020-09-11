@@ -1,1 +1,24 @@
+# Compiled class files
+*.class
+
+# Package Files
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Binaries
 /bin/
+
+# Eclipse Files
+,classpath
+.project
+.settings
+
+# Gradle Files
+.gradle/
+.gradletasknamecache
+build/
+bin/
+gen/
