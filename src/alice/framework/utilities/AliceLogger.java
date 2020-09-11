@@ -14,6 +14,30 @@ public class AliceLogger {
 	private static boolean echo = false;
 	private static int threshold = -1;
 	
+	public static void setVerbose(boolean v) {
+		verbose = v;
+	}
+	
+	public static void setEcho(boolean e) {
+		echo = e;
+	}
+	
+	public static void setThreshold(int t) {
+		threshold = t;
+	}
+	
+	public static boolean getVerbose() {
+		return verbose;
+	}
+	
+	public static boolean getEcho() {
+		return echo;
+	}
+	
+	public static int getThreshold() {
+		return threshold;
+	}
+	
 	public static void say(String message, String guildName, String channelName) {
 		String prefix = buildPrefixStringBuilder("AL|CE", guildName, channelName).toString();
 		System.out.println(buildLogStringBuilder(message, 0, prefix).toString());
