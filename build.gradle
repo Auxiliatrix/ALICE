@@ -16,11 +16,13 @@ repositories {
 	maven {
 		url  "https://jitpack.io"
 	}
+	mavenCentral()
 }
 
 dependencies {
 	compile "com.github.austinv11:Discord4J:3.1.0"
 	compile 'org.reflections:reflections:0.9.11'
+	compile group: 'org.json', name: 'json', version: '20200518'
 }
 
 sourceSets {
