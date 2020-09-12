@@ -1,6 +1,7 @@
 package alice.framework.main;
 
 import alice.framework.utilities.AliceLogger;
+import alice.modular.handlers.ProtoHandler;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 
@@ -21,7 +22,7 @@ public class Brain {
 		AliceLogger.info("Logging in...");
 		client = DiscordClientBuilder.create(token).build().login().block();
 		
-		// put reflections here
+		ProtoHandler ph = new ProtoHandler();
 		
 		client.onDisconnect().block();
 	}
