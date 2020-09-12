@@ -9,16 +9,16 @@
 *.rar
 
 # Binaries
-/bin/
+bin/
 
 # Eclipse Files
 .classpath
 .project
-/.settings/
+.settings/*
 
 # Gradle Files
-/.gradle/
+.gradle/*
 .gradletasknamecache
-/build/
-/bin/
-/gen/
+build/*
+bin/*
+gen/*
