@@ -1,5 +1,6 @@
 package alice.modular.handlers;
 
+import alice.framework.actions.ActionBuilder;
 import alice.framework.main.Brain;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
@@ -19,7 +20,9 @@ public class ProtoHandler {
 	
 	public Mono<?> execute(MessageCreateEvent event) {
 		//return event.getMessage().getChannel().flatMap(channel -> channel.createMessage("Pong!")).then(); // Reactive
-		return event.getMessage().getChannel().block().createMessage("Pong!"); // Imperative
+		//return event.getMessage().getChannel().block().createMessage("Pong!"); // Imperative
+		return ActionBuilder.create()
+				.addCreateMessageAction(event.getMessage().getChannel(), "Pong!").build();
 	}
 	
 }
