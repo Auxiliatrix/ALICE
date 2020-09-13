@@ -1,7 +1,8 @@
-package alice.framework.actions;
+package alice.modular.actions;
 
 import java.util.Optional;
 
+import alice.framework.actions.VoidAction;
 import alice.framework.utilities.AliceLogger;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
