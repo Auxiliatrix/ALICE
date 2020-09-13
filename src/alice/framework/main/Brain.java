@@ -1,7 +1,8 @@
 package alice.framework.main;
 
 import alice.framework.utilities.AliceLogger;
-import alice.modular.handlers.ProtoHandler;
+import alice.modular.handlers.EavesdropPassiveHandler;
+import alice.modular.handlers.PingCommandHandler;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 
@@ -22,7 +23,8 @@ public class Brain {
 		AliceLogger.info("Logging in...");
 		client = DiscordClientBuilder.create(token).build().login().block();
 		
-		ProtoHandler ph = new ProtoHandler();
+		PingCommandHandler ph = new PingCommandHandler();
+		EavesdropPassiveHandler eph = new EavesdropPassiveHandler();
 		
 		client.onDisconnect().block();
 	}

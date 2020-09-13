@@ -1,17 +1,21 @@
 package alice.framework.utilities;
 
+import alice.framework.main.Brain;
+
 public class AliceLogger {
 	
 	public static final String INDENT_FILLER = "..";
 	public static final String INDENT_HEADER = "> ";
 	
-	public static final String ERROR_PREFIX = "[Err]";
-	public static final String DEBUG_PREFIX = "[Dbg]";
-	public static final String INFO_PREFIX =  "[Inf]";
-	public static final String ECHO_PREFIX =  "(Ech)";
+	public static final String ERROR_PREFIX =  "[Err]";
+	public static final String DEBUG_PREFIX =  "[Dbg]";
+	public static final String INFO_PREFIX =   "[Inf]";
+	public static final String ECHO_PREFIX =   "(Ech)";
+	public static final String DMSAY_PREFIX =  "{>>}";
+	public static final String DMECHO_PREFIX = "{<<}";
 	
 	private static boolean verbose = false;
-	private static boolean echo = false;
+	private static boolean echo = true;
 	private static int threshold = -1;
 	
 	public static void setVerbose(boolean v) {
@@ -38,15 +42,23 @@ public class AliceLogger {
 		return threshold;
 	}
 	
+	public static void DMSay(String message, String userName) {
+		System.out.println(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMSAY_PREFIX, Brain.client.getSelf().block().getUsername(), userName)).toString());
+	}
+	
+	public static void DMEcho(String message, String userName) {
+		System.out.println(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMECHO_PREFIX, userName, Brain.client.getSelf().block().getUsername())).toString());
+	}
+	
 	public static void say(String message, String guildName, String channelName) {
 		String prefix = buildPrefixStringBuilder("AL|CE", guildName, channelName).toString();
 		System.out.println(buildLogStringBuilder(message, 0, prefix).toString());
 	}
 	
-	public static void echo(String message, String authorName, String guildName, String channelName) {
+	public static void echo(String message, String userName, String guildName, String channelName) {
 		if( echo ) {
 			StringBuilder extendedPrefix = new StringBuilder();
-			String prefix = buildPrefixStringBuilder(authorName, guildName, channelName).toString();
+			String prefix = buildPrefixStringBuilder(userName, guildName, channelName).toString();
 			extendedPrefix.append(ECHO_PREFIX);
 			extendedPrefix.append(" ");
 			extendedPrefix.append(prefix);
