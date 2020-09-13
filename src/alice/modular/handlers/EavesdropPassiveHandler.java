@@ -1,12 +1,12 @@
 package alice.modular.handlers;
 
 import alice.framework.actions.Action;
-import alice.framework.actions.DMEchoAction;
-import alice.framework.actions.DMSayAction;
-import alice.framework.actions.EchoAction;
-import alice.framework.actions.SayAction;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
+import alice.modular.actions.DMEchoAction;
+import alice.modular.actions.DMSayAction;
+import alice.modular.actions.EchoAction;
+import alice.modular.actions.SayAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.Channel.Type;
 
