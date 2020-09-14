@@ -13,10 +13,12 @@ public abstract class CommandHandler extends Handler<MessageCreateEvent> {
 		this.restrictions = null;
 	}
 	
+	/* Handler Specific Function */
 	protected boolean invoked(MessageCreateEvent event) {
 		return event.getMessage().getContent().toLowerCase().startsWith(String.format("%s%s", Constants.COMMAND_PREFIX, name).toLowerCase());
 	}
 	
+	/* Overriden Template */
 	@Override
 	protected boolean filter(MessageCreateEvent event) {
 		return super.filter(event) && invoked(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthorAsMember()));
