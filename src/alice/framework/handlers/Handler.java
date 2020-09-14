@@ -1,7 +1,5 @@
 package alice.framework.handlers;
 
-import java.lang.reflect.ParameterizedType;
-
 import alice.framework.actions.Action;
 import alice.framework.main.Brain;
 import discord4j.core.event.domain.Event;
@@ -12,14 +10,12 @@ public abstract class Handler<E extends Event> {
 	protected String name;
 	protected String category;
 	protected boolean enableWhitelist;
-		
-	protected Handler(String name, String category, boolean enableWhitelist) {
+
+	protected Handler(String name, String category, boolean enableWhitelist, Class<E> type) {
 		this.name = name;
 		this.category = category;
 		this.enableWhitelist = enableWhitelist;
 		
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Class<E> type = ((Class) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);	// Incredibly janky way to get E.class
 		Brain.client.on(type)
 		.filter(event -> filter(event))
 		.flatMap(event -> payload(event))

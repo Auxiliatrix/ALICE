@@ -18,7 +18,7 @@ public class PingCommandHandler extends CommandHandler {
 	
 	public Action execute(MessageCreateEvent event) {
 		return new Action()
-				.addCreateMessageAction(event.getMessage().getChannel(), "Pong");
+				.addCreateMessageAction(event.getMessage().getChannel(), "Pong!");
 	}
 	
 }
