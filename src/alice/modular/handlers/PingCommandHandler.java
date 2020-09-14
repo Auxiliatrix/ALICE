@@ -1,24 +1,24 @@
 package alice.modular.handlers;
 
 import alice.framework.actions.Action;
-import alice.framework.handlers.Handler;
+import alice.framework.handlers.CommandHandler;
+import alice.framework.structures.PermissionProfile;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
-public class PingCommandHandler extends Handler<MessageCreateEvent> {
+public class PingCommandHandler extends CommandHandler {
 	
 	public PingCommandHandler() {
-		super();
+		super("Ping", "Default", false);
+		this.restrictions = PermissionProfile.getAnyonePreset();
 	}
 	
 	public boolean trigger(MessageCreateEvent event) {
-		return event.getMessage().getContent().equals("%ping");
+		return true;
 	}
 	
 	public Action execute(MessageCreateEvent event) {
-		long received = event.getMessage().getTimestamp().toEpochMilli();
-		long lag = System.currentTimeMillis() - received;
 		return new Action()
-				.addCreateMessageAction(event.getMessage().getChannel(), String.format("Pong! (%d) milis", lag));
+				.addCreateMessageAction(event.getMessage().getChannel(), "Pong");
 	}
 	
 }

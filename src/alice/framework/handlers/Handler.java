@@ -4,7 +4,6 @@ import java.lang.reflect.ParameterizedType;
 
 import alice.framework.actions.Action;
 import alice.framework.main.Brain;
-import alice.framework.structures.PermissionProfile;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
@@ -13,16 +12,11 @@ public abstract class Handler<E extends Event> {
 	protected String name;
 	protected String category;
 	protected boolean enableWhitelist;
-	
-	protected boolean allowBots;
-	protected PermissionProfile restrictions;
-	
-	protected Handler() {
-		name = "Handler";
-		category = "Default";
-		allowBots = false;
-		enableWhitelist = false;
-		restrictions = null;
+		
+	protected Handler(String name, String category, boolean enableWhitelist) {
+		this.name = name;
+		this.category = category;
+		this.enableWhitelist = enableWhitelist;
 		
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		Class<E> type = ((Class) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);	// Incredibly janky way to get E.class
@@ -30,31 +24,6 @@ public abstract class Handler<E extends Event> {
 		.filter(event -> filter(event))
 		.flatMap(event -> payload(event))
 		.subscribe();
-	}
-	
-	public Handler<E> withName(String name) {
-		this.name = name;
-		return this;
-	}
-	
-	public Handler<E> withCategory(String category) {
-		this.category = category;
-		return this;
-	}
-	
-	public Handler<E> withAllowBots() {
-		this.allowBots = true;
-		return this;
-	}
-	
-	public Handler<E> withEnableWhitelist() {
-		this.enableWhitelist = true;
-		return this;
-	}
-	
-	public Handler<E> withRestrictions(PermissionProfile restrictions) {
-		this.restrictions = restrictions;
-		return this;
 	}
 	
 	protected abstract boolean trigger(E event);
@@ -66,5 +35,17 @@ public abstract class Handler<E extends Event> {
 	
 	protected Mono<?> payload(E event) {
 		return execute(event).toMono();
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public String getCategory() {
+		return category;
+	}
+	
+	public boolean getEnableWhitelist() {
+		return enableWhitelist;
 	}
 }
