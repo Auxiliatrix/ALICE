@@ -3,6 +3,7 @@ package alice.framework.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import alice.framework.handlers.EverythingHandler;
 import alice.framework.handlers.Handler;
 import alice.framework.utilities.AliceLogger;
 import alice.modular.handlers.EavesdropPassiveHandler;
@@ -24,17 +25,20 @@ public class Brain {
 			System.exit(0);
 		}
 		
+		AliceLogger.info("Logging in...");
 		login(args[0]);
+		AliceLogger.info("Log in successful.");
 	}
 	
 	private static void login(String token) {
-		AliceLogger.info("Logging in...");
+		AliceLogger.info("Establishing connection...", 1);
 		client = DiscordClientBuilder.create(token).build().login().block();
 		
 		//updateAvatar("https://i.imgur.com/SBaq6Br.png");
-		AliceLogger.info("Initializing modules...");
+		AliceLogger.info("Initializing modules...", 1);
 		handlers.add(new PingCommandHandler());
 		handlers.add(new EavesdropPassiveHandler());
+		handlers.add(new EverythingHandler());
 		
 		client.onDisconnect().block();
 	}

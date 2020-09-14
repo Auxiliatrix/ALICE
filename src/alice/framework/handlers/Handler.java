@@ -2,6 +2,7 @@ package alice.framework.handlers;
 
 import alice.framework.actions.Action;
 import alice.framework.main.Brain;
+import alice.framework.utilities.AliceLogger;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
@@ -20,6 +21,7 @@ public abstract class Handler<E extends Event> {
 		.filter(event -> filter(event))
 		.flatMap(event -> payload(event))
 		.subscribe();
+		AliceLogger.info(String.format("%s Module initialized.", name), 2);
 	}
 	
 	protected abstract boolean trigger(E event);
