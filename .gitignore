@@ -11,6 +11,10 @@
 # Binaries
 bin/
 
+# Local Data Files
+tmp/
+test/
+
 # Eclipse Files
 .classpath
 .project
