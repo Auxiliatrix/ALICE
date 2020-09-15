@@ -1,6 +1,7 @@
 package alice.modular.handlers;
 
 import alice.framework.actions.Action;
+import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.structures.PermissionProfile;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -17,7 +18,7 @@ public class PingCommandHandler extends CommandHandler {
 	}
 	
 	public Action execute(MessageCreateEvent event) {
-		return new Action()
+		return new NullAction()
 				.addCreateMessageAction(event.getMessage().getChannel(), "Pong!");
 	}
 	

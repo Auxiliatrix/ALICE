@@ -1,9 +1,11 @@
 package alice.framework.actions;
 
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 
-public class Action {
+public abstract class Action {
 	
 	protected Mono<?> mono;
 	
@@ -14,13 +16,13 @@ public class Action {
 	public final Mono<?> toMono() {
 		return mono;
 	}
-	
+		
 	public Action addCreateMessageAction(Mono<MessageChannel> channel, String content) {
 		addMono(channel.block().createMessage(content)); // Imperative
 		//addMono(channel.flatMap(c -> c.createMessage(content))); // Reactive
 		return this;
 	}
-
+	
 	public Action addAction(Action action) {
 		mono = (mono == null) ? action.toMono() : mono.and(action.toMono());
 		return this;

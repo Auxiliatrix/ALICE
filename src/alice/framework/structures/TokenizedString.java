@@ -39,6 +39,10 @@ public class TokenizedString {
 		return this;
 	}
 	
+	public List<String> getTokens() {
+		return new ArrayList<String>(activeTokens);
+	}
+	
 	public boolean equals(String string) {
 		return originalString.equals(string);
 	}

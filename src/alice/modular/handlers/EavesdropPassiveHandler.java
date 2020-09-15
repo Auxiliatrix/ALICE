@@ -1,6 +1,7 @@
 package alice.modular.handlers;
 
 import alice.framework.actions.Action;
+import alice.framework.actions.NullAction;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
 import alice.modular.actions.DMEchoAction;
@@ -23,6 +24,9 @@ public class EavesdropPassiveHandler extends Handler<MessageCreateEvent> {
 
 	@Override
 	protected Action execute(MessageCreateEvent event) {
+		if( event.getMessage().getAuthor().isEmpty() ) {
+			return new NullAction();
+		}
 		if( event.getMessage().getChannel().block().getType() == Type.DM ) {
 			if( event.getMessage().getAuthor().get().equals(Brain.client.getSelf().block()) ) {
 				return new DMSayAction(event.getMessage().getContent(), event.getMessage().getChannel());

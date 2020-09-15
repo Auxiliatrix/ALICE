@@ -1,9 +1,12 @@
 package alice.framework.actions;
 
-public class NullAction extends VoidAction {
+import reactor.core.publisher.Mono;
+
+public class NullAction extends Action {
 
 	public NullAction() {
-		super(() -> {});
+		super();
+		this.mono = Mono.fromRunnable(() -> {});
 	}
 	
 }

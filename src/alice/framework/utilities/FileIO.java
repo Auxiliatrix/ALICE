@@ -34,10 +34,12 @@ public class FileIO {
 			infile.getParentFile().mkdirs();
 		}
 		try {
-			infile.createNewFile();
-			FileWriter fileWriter = new FileWriter(fileName);
-			fileWriter.write(defaultContent);
-			fileWriter.close();
+			if( !infile.exists() ) {
+				infile.createNewFile();
+				FileWriter fileWriter = new FileWriter(fileName);
+				fileWriter.write(defaultContent);
+				fileWriter.close();
+			}
 		} catch (IOException e) {}
 		
 		StringBuilder content = new StringBuilder();

@@ -25,4 +25,11 @@ public class AtomicSaveFile {
 	public Object get(String key) {
 		return saveData.get().get(key);
 	}
+	
+	public Object getOrDefault(String key, Object defaultObject) {
+		if( !saveData.get().has(key) ) {
+			put(key, defaultObject);
+		}
+		return get(key);
+	}
 }
