@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.json.JSONObject;
-
 import alice.framework.handlers.EverythingHandler;
 import alice.framework.handlers.Handler;
+import alice.framework.structures.AtomicSaveFile;
 import alice.framework.utilities.AliceLogger;
 import alice.modular.handlers.EavesdropPassiveHandler;
 import alice.modular.handlers.GuildLoadHandler;
@@ -25,7 +24,7 @@ public class Brain {
 	@SuppressWarnings("rawtypes")
 	public static AtomicReference<List<Handler>> handlers = new AtomicReference<List<Handler>>(new ArrayList<Handler>()); // This is disgusting
 	
-	public static AtomicReference<Map<String, JSONObject>> guildIndex = new AtomicReference<Map<String, JSONObject>>(new HashMap<String, JSONObject>());
+	public static AtomicReference<Map<String, AtomicSaveFile>> guildIndex = new AtomicReference<Map<String, AtomicSaveFile>>(new HashMap<String, AtomicSaveFile>());
 	
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {
