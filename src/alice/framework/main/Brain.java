@@ -1,18 +1,18 @@
 package alice.framework.main;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import alice.framework.handlers.EverythingHandler;
+import org.reflections.Reflections;
+
+import alice.configuration.calibration.Constants;
 import alice.framework.handlers.Handler;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.utilities.AliceLogger;
-import alice.modular.handlers.EavesdropPassiveHandler;
-import alice.modular.handlers.GuildLoadHandler;
-import alice.modular.handlers.PingCommandHandler;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.rest.util.Image;
@@ -42,13 +42,37 @@ public class Brain {
 		client = DiscordClientBuilder.create(token).build().login().block();
 		
 		//updateAvatar("https://i.imgur.com/SBaq6Br.png");
+		
 		AliceLogger.info("Initializing modules...", 1);
-		handlers.getAndUpdate( c -> { c.add(new PingCommandHandler()); return c; } );
-		handlers.getAndUpdate( c -> { c.add(new EavesdropPassiveHandler()); return c; } );
-		handlers.getAndUpdate( c -> { c.add(new EverythingHandler()); return c; });
-		handlers.getAndUpdate( c -> { c.add(new GuildLoadHandler()); return c; } );
+		loadModules(Constants.INCLUDED_MODULES, Constants.EXCLUDED_MODULES);
+		for( String modules : Constants.ADDITIONAL_MODULES ) {
+			loadModules(modules);
+		}
 		
 		client.onDisconnect().block();
+	}
+	
+	public static void loadModules(String includePrefix) {
+		loadModules(includePrefix, "");
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private static void loadModules(String includePrefix, String excludePrefix) {
+		Reflections include = new Reflections(includePrefix);
+		Reflections exclude = excludePrefix.isEmpty() ? null : new Reflections(excludePrefix);
+		for( Class<?> c : include.getSubTypesOf(alice.framework.handlers.Handler.class) ) {
+			if( exclude != null && exclude.getSubTypesOf(alice.framework.handlers.Handler.class).contains(c) ) {
+				continue;
+			}
+			handlers.updateAndGet( h -> { 
+				try {
+					h.add( (Handler) c.getConstructor().newInstance() );
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					AliceLogger.error(String.format("An error occured while instantiating %s.", c.getName() ), 2);
+				}
+				return h;
+			} );
+		}
 	}
 	
 	@SuppressWarnings("unused")

@@ -14,6 +14,7 @@ bin/
 # Local Data Files
 tmp/
 test/
+*Exp.java
 
 # Eclipse Files
 .classpath

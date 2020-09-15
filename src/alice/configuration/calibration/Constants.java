@@ -7,4 +7,10 @@ public class Constants {
 			Long.parseLong("246562987651891200"),
 			Long.parseLong("365715538166415362"),
 	};
+	
+	public static final String INCLUDED_MODULES = "alice.modular.handlers";
+	public static final String EXCLUDED_MODULES = "alice.framework.handlers";
+	public static final String[] ADDITIONAL_MODULES = new String[] {
+			
+	};
 }
