@@ -1,12 +1,18 @@
 package alice.framework.main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.json.JSONObject;
 
 import alice.framework.handlers.EverythingHandler;
 import alice.framework.handlers.Handler;
 import alice.framework.utilities.AliceLogger;
 import alice.modular.handlers.EavesdropPassiveHandler;
+import alice.modular.handlers.GuildLoadHandler;
 import alice.modular.handlers.PingCommandHandler;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
@@ -17,7 +23,9 @@ public class Brain {
 	public static GatewayDiscordClient client = null;
 	
 	@SuppressWarnings("rawtypes")
-	public static List<Handler> handlers = new ArrayList<Handler>();
+	public static AtomicReference<List<Handler>> handlers = new AtomicReference<List<Handler>>(new ArrayList<Handler>()); // This is disgusting
+	
+	public static AtomicReference<Map<String, JSONObject>> guildIndex = new AtomicReference<Map<String, JSONObject>>(new HashMap<String, JSONObject>());
 	
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {
@@ -36,9 +44,10 @@ public class Brain {
 		
 		//updateAvatar("https://i.imgur.com/SBaq6Br.png");
 		AliceLogger.info("Initializing modules...", 1);
-		handlers.add(new PingCommandHandler());
-		handlers.add(new EavesdropPassiveHandler());
-		handlers.add(new EverythingHandler());
+		handlers.getAndUpdate( c -> { c.add(new PingCommandHandler()); return c; } );
+		handlers.getAndUpdate( c -> { c.add(new EavesdropPassiveHandler()); return c; } );
+		handlers.getAndUpdate( c -> { c.add(new EverythingHandler()); return c; });
+		handlers.getAndUpdate( c -> { c.add(new GuildLoadHandler()); return c; } );
 		
 		client.onDisconnect().block();
 	}

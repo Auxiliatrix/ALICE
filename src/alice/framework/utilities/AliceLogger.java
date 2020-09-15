@@ -14,9 +14,14 @@ public class AliceLogger {
 	public static final String DMSAY_PREFIX =  "{>>}";
 	public static final String DMECHO_PREFIX = "{<<}";
 	
-	private static boolean verbose = false;
+	private static boolean verbose = true;
 	private static boolean echo = true;
 	private static int threshold = -1;
+	
+	public static synchronized void log(String message) {
+		// TODO: Add other channels
+		System.out.println(message);
+	}
 	
 	public static void setVerbose(boolean v) {
 		verbose = v;
@@ -43,16 +48,16 @@ public class AliceLogger {
 	}
 	
 	public static void DMSay(String message, String userName) {
-		System.out.println(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMSAY_PREFIX, Brain.client.getSelf().block().getUsername(), userName)).toString());
+		log(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMSAY_PREFIX, Brain.client.getSelf().block().getUsername(), userName)).toString());
 	}
 	
 	public static void DMEcho(String message, String userName) {
-		System.out.println(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMECHO_PREFIX, userName, Brain.client.getSelf().block().getUsername())).toString());
+		log(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMECHO_PREFIX, userName, Brain.client.getSelf().block().getUsername())).toString());
 	}
 	
 	public static void say(String message, String guildName, String channelName) {
 		String prefix = buildPrefixStringBuilder("AL|CE", guildName, channelName).toString();
-		System.out.println(buildLogStringBuilder(message, 0, prefix).toString());
+		log(buildLogStringBuilder(message, 0, prefix).toString());
 	}
 	
 	public static void echo(String message, String userName, String guildName, String channelName) {
@@ -62,7 +67,7 @@ public class AliceLogger {
 			extendedPrefix.append(ECHO_PREFIX);
 			extendedPrefix.append(" ");
 			extendedPrefix.append(prefix);
-			System.out.println(buildLogStringBuilder(message, 0, extendedPrefix.toString()).toString());
+			log(buildLogStringBuilder(message, 0, extendedPrefix.toString()).toString());
 		}
 	}
 	
@@ -72,7 +77,7 @@ public class AliceLogger {
 	
 	public static void debug(String message, int level) {
 		if( verbose && (threshold == -1 || level < threshold) ) {
-			System.out.println(buildLogStringBuilder(message, level, DEBUG_PREFIX).toString());
+			log(buildLogStringBuilder(message, level, DEBUG_PREFIX).toString());
 		}
 	}
 
@@ -82,7 +87,7 @@ public class AliceLogger {
 	
 	public static void error(String message, int level) {
 		if( threshold == -1 || level < threshold ) {
-			System.out.println(buildLogStringBuilder(message, level, ERROR_PREFIX).toString());
+			log(buildLogStringBuilder(message, level, ERROR_PREFIX).toString());
 		}
 	}
 	
@@ -92,7 +97,7 @@ public class AliceLogger {
 	
 	public static void info(String message, int level) {
 		if( threshold == -1 || level < threshold ) {
-			System.out.println(buildLogStringBuilder(message, level, INFO_PREFIX).toString());
+			log(buildLogStringBuilder(message, level, INFO_PREFIX).toString());
 		}
 	}
 	

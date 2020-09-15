@@ -8,24 +8,38 @@ import java.io.IOException;
 
 public class FileIO {
 	
-	public static void writeToFile(String fileName, String content) {
+	public static synchronized void writeToFile(String fileName, String content) {
 		File outfile = new File(fileName);
-		try ( FileWriter fileWriter = new FileWriter(outfile) ) {
+		if( outfile.getParentFile() != null ) {
 			outfile.getParentFile().mkdirs();
+		}
+		try {
 			outfile.createNewFile();
+		} catch (IOException e) {}
+		
+		try ( FileWriter fileWriter = new FileWriter(outfile) ) {
 			fileWriter.write(content);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static String readFromFile(String fileName) {
+	public static synchronized String readFromFile(String fileName) {
+		return readFromFile(fileName, "");
+	}
+	
+	public static synchronized String readFromFile(String fileName, String defaultContent) {
 		File infile = new File(fileName);
+		if( infile.getParentFile() != null ) {
+			infile.getParentFile().mkdirs();
+		}
+		try {
+			infile.createNewFile();
+			return defaultContent;
+		} catch (IOException e) {}
+		
 		StringBuilder content = new StringBuilder();
 		try ( BufferedReader br = new BufferedReader(new FileReader(infile)) ) {
-			infile.getParentFile().mkdirs();
-			infile.createNewFile();
-			
 			String line;
 			while( (line = br.readLine()) != null ) {
 				content.append(line).append('\n');
