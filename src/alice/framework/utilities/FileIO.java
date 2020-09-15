@@ -35,7 +35,9 @@ public class FileIO {
 		}
 		try {
 			infile.createNewFile();
-			return defaultContent;
+			FileWriter fileWriter = new FileWriter(fileName);
+			fileWriter.write(defaultContent);
+			fileWriter.close();
 		} catch (IOException e) {}
 		
 		StringBuilder content = new StringBuilder();
