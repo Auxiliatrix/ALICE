@@ -10,6 +10,7 @@ import alice.configuration.calibration.Constants;
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
+import alice.framework.handlers.Documentable;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
@@ -24,16 +25,10 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
-public class RoleRuleCommandHandler extends CommandHandler {
-
-	private static final String USAGE = "Proper usage:\n"
-			+ "%rr allow <pattern>\n"
-			+ "%rr disallow <pattern>\n"
-			+ "%rr rules\n"
-			+ "%rr remove <index>\n";
+public class RoleRuleCommandHandler extends CommandHandler implements Documentable {
 	
 	public RoleRuleCommandHandler() {
-		super("RoleRules", "Admin", false, PermissionProfile.getAdminPreset());
+		super("RoleRules", false, PermissionProfile.getAdminPreset());
 		this.aliases.add("rr");
 	}
 
@@ -45,10 +40,13 @@ public class RoleRuleCommandHandler extends CommandHandler {
 	@Override
 	protected Action execute(MessageCreateEvent event) {
 		Action response = new NullAction();
+		Mono<MessageChannel> channel = event.getMessage().getChannel();
+		Optional<User> user = event.getMessage().getAuthor();
+		
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		List<String> tokens = ts.getTokens();
 		if( tokens.size() == 1 || tokens.size() == 2 && !tokens.get(1).equals("rules") ) {
-			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), USAGE));
+			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getHelpConstructor(user, this)));
 			return response;
 		}
 		
@@ -56,9 +54,6 @@ public class RoleRuleCommandHandler extends CommandHandler {
 		
 		JSONArray allowRules = (JSONArray) guildData.optJSONArray("role_rules_allow", new JSONArray());
 		JSONArray disallowRules = (JSONArray) guildData.optJSONArray("role_rules_disallow", new JSONArray());
-
-		Mono<MessageChannel> channel = event.getMessage().getChannel();
-		Optional<User> user = event.getMessage().getAuthor();
 		
 		switch( tokens.get(1) ) {
 			case "rules":
@@ -109,11 +104,40 @@ public class RoleRuleCommandHandler extends CommandHandler {
 				}
 				break;
 			default:
-				response.addAction(new MessageCreateAction(channel, USAGE));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));
 				return response;
 		}
 		
 		return response;
+	}
+	
+	@Override
+	public String getCategory() {
+		return Documentable.ADMIN.name();
+	}
+
+	@Override
+	public String getDescription() {
+		return "Allows server admins to determine which roles users can assign/unassign for themselves.\nThe rules are regex friendly, and can be done as regex patterns, if you know how!";
+	}
+
+	@Override
+	public DocumentationPair[] getUsage() {
+		return new DocumentationPair[] {
+			new DocumentationPair(String.format("%s allow \"<pattern>\"", invocation), "Adds the given pattern to the list of allowable roles."),
+			new DocumentationPair(String.format("%s disallow \"<pattern>\"", invocation), "Adds the given pattern to the list of disallowed roles."),
+			new DocumentationPair(String.format("%s rules", invocation), "Displays the current rules established for role assignments."),
+			new DocumentationPair(String.format("%s remove <index>", invocation), "Removes the given rule from the list of rules, if possible.")
+		};
+	}
+	
+	@Override
+	public DocumentationPair[] getExamples() {
+		return new DocumentationPair[] {
+			new DocumentationPair(String.format("%s allow \"Color.*\"", invocation), "Allows users to assign/unassign for themselves any role starting with \"Color\"."),
+			new DocumentationPair(String.format("%s disallow \"Admin\"", invocation), "Disallows users from assigning/unassigning for themselves any role matching the phrase \"Admin\"."),
+			new DocumentationPair(String.format("%s remove A2", invocation), "Removes the rule indexed as A2 from the list of rules.")
+		};
 	}
 	
 	public static synchronized Consumer<EmbedCreateSpec> getRulesConstructor(JSONArray allowRules, JSONArray disallowRules) {
@@ -137,4 +161,5 @@ public class RoleRuleCommandHandler extends CommandHandler {
 		spec.addField("Disallowed Patterns", disallowList.length() == 0 ? "No rules set!" : disallowList.toString(), false);
 		return spec;
 	}
+	
 }

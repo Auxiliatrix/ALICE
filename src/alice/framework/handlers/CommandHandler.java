@@ -12,23 +12,22 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 public abstract class CommandHandler extends Handler<MessageCreateEvent> {
 
 	protected PermissionProfile restrictions;
-	protected List<String> aliases;
+	protected String invocation;
 	
-	protected CommandHandler(String name, String category, boolean enableWhitelist) {
-		this(name, category, enableWhitelist, null);
+	protected CommandHandler(String name, boolean enableWhitelist) {
+		this(name, enableWhitelist, null);
 	}
 	
-	protected CommandHandler(String name, String category, boolean enableWhitelist, PermissionProfile restrictions) {
-		super(name, category, enableWhitelist, MessageCreateEvent.class);
+	protected CommandHandler(String name, boolean enableWhitelist, PermissionProfile restrictions) {
+		super(name, enableWhitelist, MessageCreateEvent.class);
 		this.restrictions = restrictions;
-		this.aliases = new ArrayList<String>();
-		this.aliases.add(name);
+		this.invocation = String.format("%s%s", Constants.COMMAND_PREFIX, name);
 	}
 	
 	/* Handler Specific Function */
 	protected boolean invoked(MessageCreateEvent event) {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
-		List<String> prefixedAliases = new ArrayList<String>(aliases);
+		List<String> prefixedAliases = new ArrayList<String>();
 		aliases.forEach( s -> prefixedAliases.add(String.format("%s%s", Constants.COMMAND_PREFIX, s)) );
 		return ts.startsWithAnyIgnoreCase(prefixedAliases.toArray(new String[] {}));
 	}

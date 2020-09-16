@@ -46,6 +46,10 @@ public class TokenizedString {
 		return new ArrayList<String>(activeTokens);
 	}
 	
+	public String get(int index) {
+		return activeTokens.get(index);
+	}
+	
 	public int size() {
 		return activeTokens.size();
 	}

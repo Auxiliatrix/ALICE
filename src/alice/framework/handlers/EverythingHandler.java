@@ -8,7 +8,7 @@ import discord4j.core.event.domain.Event;
 public class EverythingHandler extends Handler<Event> {
 
 	public EverythingHandler() {
-		super("Report", "Root", false, Event.class);
+		super("Report", false, Event.class);
 	}
 
 	@Override

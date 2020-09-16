@@ -1,5 +1,8 @@
 package alice.framework.handlers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import alice.framework.actions.Action;
 import alice.framework.main.Brain;
 import alice.framework.utilities.AliceLogger;
@@ -9,13 +12,15 @@ import reactor.core.publisher.Mono;
 public abstract class Handler<E extends Event> {
 	
 	protected String name;
-	protected String category;
 	protected boolean enableWhitelist;
+	
+	protected List<String> aliases;
 
-	protected Handler(String name, String category, boolean enableWhitelist, Class<E> type) {
+	protected Handler(String name, boolean enableWhitelist, Class<E> type) {
 		this.name = name;
-		this.category = category;
 		this.enableWhitelist = enableWhitelist;
+		this.aliases = new ArrayList<String>();
+		this.aliases.add(name);
 		
 		Brain.client.on(type)
 		.filter(event -> filter(event))
@@ -39,11 +44,11 @@ public abstract class Handler<E extends Event> {
 		return name;
 	}
 	
-	public String getCategory() {
-		return category;
-	}
-	
 	public boolean getEnableWhitelist() {
 		return enableWhitelist;
+	}
+	
+	public List<String> getAliases() {
+		return new ArrayList<String>(aliases);
 	}
 }

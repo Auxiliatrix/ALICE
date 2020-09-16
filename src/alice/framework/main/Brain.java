@@ -37,6 +37,15 @@ public class Brain {
 		AliceLogger.info("Shutting down...");
 	}
 	
+	public static Handler<?> getModuleByName(String name) {
+		for( Handler<?> h : handlers.get() ) {
+			if( h.getName().equalsIgnoreCase(name) || h.getAliases().contains(name.toLowerCase()) ) {
+				return h;
+			}
+		}
+		return null;
+	}
+	
 	private static void login(String token) {
 		AliceLogger.info("Establishing connection...", 1);
 		client = DiscordClientBuilder.create(token).build().login().block();
@@ -53,7 +62,7 @@ public class Brain {
 		client.onDisconnect().block();
 	}
 	
-	public static void loadModules(String includePrefix) {
+	private static void loadModules(String includePrefix) {
 		loadModules(includePrefix, "");
 	}
 	

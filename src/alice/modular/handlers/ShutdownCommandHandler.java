@@ -3,12 +3,13 @@ package alice.modular.handlers;
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
+import alice.framework.handlers.Documentable;
 import alice.framework.structures.PermissionProfile;
 import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.ShutdownAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
-public class ShutdownCommandHandler extends CommandHandler {
+public class ShutdownCommandHandler extends CommandHandler implements Documentable {
 	
 	public static final String[] SHUTDOWN_MESSAGES = new String[] {
 			"Shutting down.",
@@ -27,7 +28,7 @@ public class ShutdownCommandHandler extends CommandHandler {
 	};
 	
 	public ShutdownCommandHandler() {
-		super("Shutdown", "Root", false, PermissionProfile.getDeveloperPreset());
+		super("Shutdown", false, PermissionProfile.getDeveloperPreset());
 	}
 
 	@Override
@@ -41,6 +42,23 @@ public class ShutdownCommandHandler extends CommandHandler {
 		return new NullAction()
 				.addAction(new MessageCreateAction(event.getMessage().getChannel(), message))
 				.addAction(new ShutdownAction());
+	}
+
+	@Override
+	public String getCategory() {
+		return Documentable.DEVELOPER.name();
+	}
+
+	@Override
+	public String getDescription() {
+		return "An override command to shut down this bot.";
+	}
+
+	@Override
+	public DocumentationPair[] getUsage() {
+		return new DocumentationPair[] {
+			new DocumentationPair(invocation, "Shuts down this bot across all servers.")	
+		};
 	}
 	
 }

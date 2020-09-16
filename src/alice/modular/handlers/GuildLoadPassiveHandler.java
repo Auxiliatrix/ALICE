@@ -14,7 +14,7 @@ import discord4j.core.event.domain.guild.GuildCreateEvent;
 public class GuildLoadPassiveHandler extends Handler<GuildCreateEvent> {
 	
 	public GuildLoadPassiveHandler() {
-		super("GuildLoader", "Root", false, GuildCreateEvent.class);
+		super("GuildLoader", false, GuildCreateEvent.class);
 	}
 	
 	protected boolean trigger(GuildCreateEvent event) {

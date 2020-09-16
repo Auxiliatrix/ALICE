@@ -2,13 +2,14 @@ package alice.modular.handlers;
 
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
+import alice.framework.handlers.Documentable;
 import alice.framework.handlers.MentionHandler;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
-public class GreetingHandler extends MentionHandler {
+public class GreetingHandler extends MentionHandler implements Documentable {
 
 	public static final String[] GREETINGS_IN = new String[] {
 			"Hello",
@@ -48,7 +49,7 @@ public class GreetingHandler extends MentionHandler {
 	};
 	
 	public GreetingHandler() {
-		super("Greet", "Default", false, PermissionProfile.getAnyonePreset());
+		super("Greet", false, PermissionProfile.getAnyonePreset());
 	}
 
 	@Override
@@ -63,6 +64,23 @@ public class GreetingHandler extends MentionHandler {
 		String reference = event.getMessage().getAuthorAsMember().block() != null ? event.getMessage().getAuthorAsMember().block().getDisplayName() : event.getMessage().getAuthor().get().getUsername();
 		return new NullAction()
 				.addAction(new MessageCreateAction(event.getMessage().getChannel(), String.format("%s %s!", chosenGreeting, reference)));
+	}
+
+	@Override
+	public String getCategory() {
+		return Documentable.DEFAULT.name();
+	}
+
+	@Override
+	public String getDescription() {
+		return "Allows this bot to greet you back!";
+	}
+
+	@Override
+	public DocumentationPair[] getUsage() {
+		return new DocumentationPair[] {
+			new DocumentationPair("Hey, Alice!", "Causes AL | CE to greet you")
+		};
 	}
 
 }

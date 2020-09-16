@@ -28,7 +28,7 @@ public class PermissionProfile {
 		if( user.isEmpty() ) {
 			return false;
 		}
-		return isDeveloper(user) || verification.test(user, guild);
+		return verification.test(user, guild) || isDeveloper(user);
 	}
 	
 	/* Factory Methods */
@@ -109,7 +109,7 @@ public class PermissionProfile {
 		return user.get().isBot();
 	}
 	
-	private static boolean isDeveloper( Optional<User> user ) {
+	public static synchronized boolean isDeveloper( Optional<User> user ) {
 		if( user.isEmpty() ) {
 			return false;
 		}

@@ -14,7 +14,7 @@ import discord4j.core.object.entity.channel.Channel.Type;
 public class EavesdropPassiveHandler extends Handler<MessageCreateEvent> {
 
 	public EavesdropPassiveHandler() {
-		super("Eavesdrop", "Root", false, MessageCreateEvent.class);
+		super("Eavesdrop", false, MessageCreateEvent.class);
 	}
 	
 	@Override
