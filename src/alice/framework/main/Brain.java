@@ -2,16 +2,14 @@ package alice.framework.main;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.reflections.Reflections;
 
 import alice.configuration.calibration.Constants;
 import alice.framework.handlers.Handler;
-import alice.framework.structures.AtomicSaveFile;
+import alice.framework.structures.AtomicSaveFolder;
 import alice.framework.utilities.AliceLogger;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
@@ -24,7 +22,7 @@ public class Brain {
 	@SuppressWarnings("rawtypes")
 	public static AtomicReference<List<Handler>> handlers = new AtomicReference<List<Handler>>(new ArrayList<Handler>()); // This is disgusting
 	
-	public static AtomicReference<Map<String, AtomicSaveFile>> guildIndex = new AtomicReference<Map<String, AtomicSaveFile>>(new HashMap<String, AtomicSaveFile>());
+	public static AtomicSaveFolder guildIndex = new AtomicSaveFolder();
 	
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {
@@ -41,7 +39,7 @@ public class Brain {
 		AliceLogger.info("Establishing connection...", 1);
 		client = DiscordClientBuilder.create(token).build().login().block();
 		
-		//updateAvatar("https://i.imgur.com/SBaq6Br.png");
+		updateAvatar("https://i.imgur.com/SrBlNua.png");
 		
 		AliceLogger.info("Initializing modules...", 1);
 		loadModules(Constants.INCLUDED_MODULES, Constants.EXCLUDED_MODULES);

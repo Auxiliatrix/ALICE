@@ -33,7 +33,7 @@ public class EavesdropPassiveHandler extends Handler<MessageCreateEvent> {
 			} else {
 				return new DMEchoAction(event.getMessage().getContent(), event.getMessage().getChannel());
 			}
-		} else { 
+		} else {
 			if( event.getMessage().getAuthor().get().equals(Brain.client.getSelf().block()) ) {
 				return new SayAction(event.getMessage().getContent(), event.getMessage().getGuild(), event.getMessage().getChannel());
 			} else {

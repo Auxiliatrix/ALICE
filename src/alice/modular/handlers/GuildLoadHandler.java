@@ -28,7 +28,7 @@ public class GuildLoadHandler extends Handler<GuildCreateEvent> {
 	private void loadGuildData(GuildCreateEvent event) {
 		Snowflake guildId = event.getGuild().getId();
 		String guildFile = String.format("%s%s%s%s%s.json", "tmp", File.separator, "guilds", File.separator, guildId.asString());
-		Brain.guildIndex.updateAndGet( (gd) -> { gd.put(guildId.asString(), new AtomicSaveFile(guildFile)); return gd; } );
+		Brain.guildIndex.put(guildId.asString(), new AtomicSaveFile(guildFile));
 		AliceLogger.info(String.format("Loaded guild data for %s.", event.getGuild().getName()));
 	}
 	

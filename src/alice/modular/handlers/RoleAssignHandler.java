@@ -9,8 +9,10 @@ import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.main.Brain;
+import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
+import alice.framework.utilities.MessageUtilities;
 import alice.modular.actions.AssignRoleAction;
 import alice.modular.actions.UnassignRoleAction;
 import discord4j.common.util.Snowflake;
@@ -78,8 +80,10 @@ public class RoleAssignHandler extends CommandHandler {
 			return response;
 		}
 		
-		JSONArray allowRules = (JSONArray) Brain.guildIndex.get().get(event.getGuild().block().getId().asString()).getOrDefault("role_rules_allow", new JSONArray());
-		JSONArray disallowRules = (JSONArray) Brain.guildIndex.get().get(event.getGuild().block().getId().asString()).getOrDefault("role_rules_disallow", new JSONArray());
+		AtomicSaveFile guildData = Brain.guildIndex.get(MessageUtilities.getGuildId(event));
+		
+		JSONArray allowRules = (JSONArray) guildData.optJSONArray("role_rules_allow", new JSONArray());
+		JSONArray disallowRules = (JSONArray) guildData.optJSONArray("role_rules_disallow", new JSONArray());
 
 		switch( tokens.get(1) ) {
 			case "get":
@@ -133,7 +137,7 @@ public class RoleAssignHandler extends CommandHandler {
 				}
 				
 				allowRules.put(tokens.get(2));
-				Brain.guildIndex.get().get(event.getGuild().block().getId().asString()).put("role_rules_allow", allowRules);
+				guildData.put("role_rules_allow", allowRules);
 				response.addCreateMessageAction(event.getMessage().getChannel(), "Rule added successfully.");
 				break;
 			case "disallow":
@@ -143,7 +147,7 @@ public class RoleAssignHandler extends CommandHandler {
 				}
 				
 				disallowRules.put(tokens.get(2));
-				Brain.guildIndex.get().get(event.getGuild().block().getId().asString()).put("role_rules_disallow", disallowRules);
+				guildData.put("role_rules_disallow", disallowRules);
 				response.addCreateMessageAction(event.getMessage().getChannel(), "Rule added successfully.");
 				break;
 			case "removeRule":
@@ -166,7 +170,7 @@ public class RoleAssignHandler extends CommandHandler {
 						}
 						
 						allowRules.remove(index);
-						Brain.guildIndex.get().get(event.getGuild().block().getId().asString()).put("role_rules_allow", allowRules);
+						guildData.put("role_rules_allow", allowRules);
 						response.addCreateMessageAction(event.getMessage().getChannel(), "Rule removed successfully.");
 						break;
 					case 'D':
@@ -177,7 +181,7 @@ public class RoleAssignHandler extends CommandHandler {
 						}
 						
 						disallowRules.remove(index);
-						Brain.guildIndex.get().get(event.getGuild().block().getId().asString()).put("role_rules_disallow", disallowRules);
+						guildData.put("role_rules_disallow", disallowRules);
 						response.addCreateMessageAction(event.getMessage().getChannel(), "Rule removed successfully.");
 						break;
 					default:
