@@ -11,9 +11,9 @@ import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 
-public class GuildLoadHandler extends Handler<GuildCreateEvent> {
+public class GuildLoadPassiveHandler extends Handler<GuildCreateEvent> {
 	
-	public GuildLoadHandler() {
+	public GuildLoadPassiveHandler() {
 		super("GuildLoader", "Root", false, GuildCreateEvent.class);
 	}
 	

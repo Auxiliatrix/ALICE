@@ -32,21 +32,21 @@ public class Brain {
 		
 		AliceLogger.info("Logging in...");
 		login(args[0]);
-		AliceLogger.info("Log in successful.");
+		AliceLogger.info("Shutting down...");
 	}
 	
 	private static void login(String token) {
 		AliceLogger.info("Establishing connection...", 1);
 		client = DiscordClientBuilder.create(token).build().login().block();
 		
-		updateAvatar("https://i.imgur.com/SrBlNua.png");
+		//updateAvatar("https://i.imgur.com/grVaLEQ.png");
 		
 		AliceLogger.info("Initializing modules...", 1);
 		loadModules(Constants.INCLUDED_MODULES, Constants.EXCLUDED_MODULES);
 		for( String modules : Constants.ADDITIONAL_MODULES ) {
 			loadModules(modules);
 		}
-		
+		AliceLogger.info("Log in successful.");
 		client.onDisconnect().block();
 	}
 	
@@ -66,6 +66,7 @@ public class Brain {
 				try {
 					h.add( (Handler) c.getConstructor().newInstance() );
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					//e.printStackTrace();
 					AliceLogger.error(String.format("An error occured while instantiating %s.", c.getName() ), 2);
 				}
 				return h;

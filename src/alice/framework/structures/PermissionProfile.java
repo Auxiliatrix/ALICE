@@ -2,6 +2,7 @@ package alice.framework.structures;
 
 import java.util.function.Predicate;
 
+import alice.configuration.calibration.Constants;
 import discord4j.core.object.entity.Member;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
@@ -22,7 +23,7 @@ public class PermissionProfile {
 	
 	/* Primary Use Function */
 	public boolean verify(Mono<Member> member) {
-		return verification.test(member);
+		return isDeveloper(member) || verification.test(member);
 	}
 	
 	/* Factory Methods */
@@ -36,6 +37,10 @@ public class PermissionProfile {
 	
 	public static PermissionProfile getNotBotPreset() {
 		return new PermissionProfile(member -> !isBot(member));
+	}
+	
+	public static PermissionProfile getDeveloperPreset() {
+		return new PermissionProfile(member -> isDeveloper(member)) ;
 	}
 	
 	/* Builder Methods */
@@ -67,8 +72,17 @@ public class PermissionProfile {
 		return this;
 	}
 	
-	public PermissionProfile invert() {
-		verification = member -> !verification.test(member);
+	public PermissionProfile andDeveloper() {
+		verification = verification == null
+						? member -> isDeveloper(member)
+						: member -> verification.test(member) && isDeveloper(member);
+		return this;
+	}
+	
+	public PermissionProfile orDeveloper() {
+		verification = verification == null
+						? member -> isDeveloper(member)
+						: member -> verification.test(member) || isDeveloper(member);
 		return this;
 	}
 	
@@ -79,6 +93,15 @@ public class PermissionProfile {
 	
 	private static boolean isBot( Mono<Member> member ) {
 		return member.block().isBot();
+	}
+	
+	private static boolean isDeveloper( Mono<Member> member ) {
+		for( long id : Constants.DEVELOPER_IDS ) {
+			if( id == member.block().getId().asLong() ) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

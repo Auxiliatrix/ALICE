@@ -20,7 +20,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
 
-public class RoleAssignHandler extends CommandHandler {
+public class RoleAssignCommandHandler extends CommandHandler {
 
 	private static final String USAGE = "Proper usage:\n"
 			+ "%role allow <pattern>\n"
@@ -30,7 +30,7 @@ public class RoleAssignHandler extends CommandHandler {
 			+ "%role get <role>\n"
 			+ "%role unget <role>";
 	
-	public RoleAssignHandler() {
+	public RoleAssignCommandHandler() {
 		super("Role", "Default", false);
 	}
 
