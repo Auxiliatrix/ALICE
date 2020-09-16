@@ -77,7 +77,8 @@ public class EmbedBuilders {
 	
 	private static synchronized EmbedCreateSpec helpConstructor( EmbedCreateSpec spec ) {
 		spec.setColor(Color.of(63, 79, 95));
-		spec.setAuthor(String.format("[%s] :grey_question: Help -- Categories", Constants.NAME, Constants.FULL_NAME), null, Brain.client.getSelf().block().getAvatarUrl());
+		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
+		spec.setTitle(":grey_question: Help -- Categories");
 		Map<String, List<String>> categories = new HashMap<String, List<String>>();
 		for( Handler<?> h : Brain.handlers.get() ) {
 			String category = h.getCategory();

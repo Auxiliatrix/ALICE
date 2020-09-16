@@ -13,6 +13,8 @@ import alice.framework.structures.AtomicSaveFolder;
 import alice.framework.utilities.AliceLogger;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.object.presence.Activity;
+import discord4j.core.object.presence.Presence;
 import discord4j.rest.util.Image;
 
 public class Brain {
@@ -38,6 +40,7 @@ public class Brain {
 	private static void login(String token) {
 		AliceLogger.info("Establishing connection...", 1);
 		client = DiscordClientBuilder.create(token).build().login().block();
+		client.updatePresence(Presence.online(Activity.listening("%help"))).block();
 		
 		//updateAvatar("https://i.imgur.com/grVaLEQ.png");
 		
