@@ -13,9 +13,9 @@ import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.MessageUtilities;
-import alice.modular.actions.AssignRoleAction;
-import alice.modular.actions.CreateMessageAction;
-import alice.modular.actions.UnassignRoleAction;
+import alice.modular.actions.RoleAssignAction;
+import alice.modular.actions.MessageCreateAction;
+import alice.modular.actions.RoleUnassignAction;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -77,7 +77,7 @@ public class RoleAssignCommandHandler extends CommandHandler {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		List<String> tokens = ts.getTokens();
 		if( tokens.size() == 1 || tokens.size() == 2 && !tokens.get(1).equals("rules") ) {
-			response.addAction(new CreateMessageAction(event.getMessage().getChannel(), USAGE));
+			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), USAGE));
 			return response;
 		}
 		
@@ -89,33 +89,33 @@ public class RoleAssignCommandHandler extends CommandHandler {
 		switch( tokens.get(1) ) {
 			case "get":
 				if( !roleAllowed(tokens.get(2), allowRules, disallowRules) ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "You do not have permission to modify that role."));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "You do not have permission to modify that role."));
 					return response;
 				}
 				
 				Role foundRole = getRoleByName(event.getGuild().block(), tokens.get(2));
 				if( foundRole == null ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "That role does not exist!"));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "That role does not exist!"));
 					return response;
 				}
 				
-				response.addAction(new AssignRoleAction(event.getMessage().getAuthorAsMember(), foundRole));
-				response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "Role assigned successfully!"));
+				response.addAction(new RoleAssignAction(event.getMessage().getAuthorAsMember(), foundRole));
+				response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "Role assigned successfully!"));
 				break;
 			case "unget":
 				if( !roleAllowed(tokens.get(2), allowRules, disallowRules) ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "You do not have permission to modify that role."));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "You do not have permission to modify that role."));
 					return response;
 				}
 				
 				foundRole = getRoleByName(event.getGuild().block(), tokens.get(2));
 				if( foundRole == null ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "That role does not exist!"));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "That role does not exist!"));
 					return response;
 				}
 				
-				response.addAction(new UnassignRoleAction(event.getMessage().getAuthorAsMember(), foundRole));
-				response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "Role unassigned successfully!"));
+				response.addAction(new RoleUnassignAction(event.getMessage().getAuthorAsMember(), foundRole));
+				response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "Role unassigned successfully!"));
 				break;
 			case "rules":
 				String rulesString = "";
@@ -129,36 +129,36 @@ public class RoleAssignCommandHandler extends CommandHandler {
 					rulesString += "D" + f + ": " + (String) disallowRules.get(f) + "\n";
 				}
 				
-				response.addAction(new CreateMessageAction(event.getMessage().getChannel(), rulesString));
+				response.addAction(new MessageCreateAction(event.getMessage().getChannel(), rulesString));
 				return response;
 			case "allow":
 				if( !PermissionProfile.getAdminPreset().verify(event.getMessage().getAuthor(), event.getGuild()) ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "You must be an administrator to perform this action."));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "You must be an administrator to perform this action."));
 					return response;
 				}
 				
 				allowRules.put(tokens.get(2));
 				guildData.put("role_rules_allow", allowRules);
-				response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "Rule added successfully."));
+				response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "Rule added successfully."));
 				break;
 			case "disallow":
 				if( !PermissionProfile.getAdminPreset().verify(event.getMessage().getAuthor(), event.getGuild()) ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "You must be an administrator to perform this action."));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "You must be an administrator to perform this action."));
 					return response;
 				}
 				
 				disallowRules.put(tokens.get(2));
 				guildData.put("role_rules_disallow", disallowRules);
-				response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "Rule added successfully."));
+				response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "Rule added successfully."));
 				break;
 			case "removeRule":
 				if( !PermissionProfile.getAdminPreset().verify(event.getMessage().getAuthor(), event.getGuild()) ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "You must be an administrator to perform this action."));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "You must be an administrator to perform this action."));
 					return response;
 				}
 				
 				if( tokens.get(2).length() < 2 ) {
-					response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "That rule doesn't exist."));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "That rule doesn't exist."));
 					return response;
 				}
 				
@@ -166,32 +166,32 @@ public class RoleAssignCommandHandler extends CommandHandler {
 					case 'A':
 						int index = Integer.parseInt(tokens.get(2).substring(1));
 						if( index >= allowRules.length() ) {
-							response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "That rule doesn't exist."));
+							response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "That rule doesn't exist."));
 							return response;
 						}
 						
 						allowRules.remove(index);
 						guildData.put("role_rules_allow", allowRules);
-						response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "Rule removed successfully."));
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "Rule removed successfully."));
 						break;
 					case 'D':
 						index = Integer.parseInt(tokens.get(2).substring(1));
 						if( index >= allowRules.length() ) {
-							response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "That rule doesn't exist."));
+							response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "That rule doesn't exist."));
 							return response;
 						}
 						
 						disallowRules.remove(index);
 						guildData.put("role_rules_disallow", disallowRules);
-						response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "Rule removed successfully."));
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "Rule removed successfully."));
 						break;
 					default:
-						response.addAction(new CreateMessageAction(event.getMessage().getChannel(), "That rule doesn't exist."));
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), "That rule doesn't exist."));
 						return response;
 				}
 				break;
 			default:
-				response.addAction(new CreateMessageAction(event.getMessage().getChannel(), USAGE));
+				response.addAction(new MessageCreateAction(event.getMessage().getChannel(), USAGE));
 				return response;
 		}
 		

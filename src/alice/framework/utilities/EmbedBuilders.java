@@ -1,13 +1,19 @@
-package alice.framework.embedbuilders;
+package alice.framework.utilities;
+
+import java.util.function.Consumer;
 
 import alice.configuration.calibration.Constants;
 import alice.framework.main.Brain;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 
-public class CreditsBuilder {
-		
-	public static synchronized EmbedCreateSpec constructCredits( EmbedCreateSpec spec ) {
+public class EmbedBuilders {
+	
+	public static synchronized Consumer<EmbedCreateSpec> getCreditsConstructor() {
+		return c -> creditsConstructor(c);
+	}
+	
+	private static synchronized EmbedCreateSpec creditsConstructor( EmbedCreateSpec spec ) {
 		spec.setColor(Color.of(253, 185, 200));
 		spec.setAuthor(Constants.NAME, Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
 		spec.setTitle("Developed by Alina Kim");

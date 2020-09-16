@@ -5,9 +5,9 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import reactor.core.publisher.Mono;
 
-public class AssignRoleAction extends Action {
+public class RoleAssignAction extends Action {
 	
-	public AssignRoleAction(Mono<Member> target, Role role) {
+	public RoleAssignAction(Mono<Member> target, Role role) {
 		super();
 		this.mono = target.block().addRole(role.getId());
 	}

@@ -7,14 +7,14 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
-public class CreateMessageAction extends Action {
+public class MessageCreateAction extends Action {
 		
-	public CreateMessageAction(Mono<MessageChannel> channel, String content) {
+	public MessageCreateAction(Mono<MessageChannel> channel, String content) {
 		super();
 		this.mono = channel.block().createMessage(content);
 	}
 	
-	public CreateMessageAction(Mono<MessageChannel> channel, Consumer<? super EmbedCreateSpec> spec) {
+	public MessageCreateAction(Mono<MessageChannel> channel, Consumer<? super EmbedCreateSpec> spec) {
 		super();
 		this.mono = channel.block().createEmbed(spec);
 	}

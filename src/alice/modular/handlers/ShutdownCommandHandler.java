@@ -4,7 +4,7 @@ import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.structures.PermissionProfile;
-import alice.modular.actions.CreateMessageAction;
+import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.ShutdownAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
@@ -40,7 +40,7 @@ public class ShutdownCommandHandler extends CommandHandler {
 	protected Action execute(MessageCreateEvent event) {
 		String message = SHUTDOWN_MESSAGES[(int) (Math.random() * SHUTDOWN_MESSAGES.length)];
 		return new NullAction()
-				.addAction(new CreateMessageAction(event.getMessage().getChannel(), message))
+				.addAction(new MessageCreateAction(event.getMessage().getChannel(), message))
 				.addAction(new ShutdownAction());
 	}
 	

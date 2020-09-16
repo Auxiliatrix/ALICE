@@ -5,9 +5,9 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import reactor.core.publisher.Mono;
 
-public class UnassignRoleAction extends Action {
+public class RoleUnassignAction extends Action {
 	
-	public UnassignRoleAction(Mono<Member> target, Role role) {
+	public RoleUnassignAction(Mono<Member> target, Role role) {
 		super();
 		this.mono = target.block().removeRole(role.getId());
 	}
