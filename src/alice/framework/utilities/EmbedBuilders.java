@@ -15,7 +15,7 @@ public class EmbedBuilders {
 	
 	private static synchronized EmbedCreateSpec creditsConstructor( EmbedCreateSpec spec ) {
 		spec.setColor(Color.of(253, 185, 200));
-		spec.setAuthor(Constants.NAME, Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
+		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
 		spec.setTitle("Developed by Alina Kim");
 		spec.setDescription("Built using the [Java Discord4j Framework](https://github.com/Discord4J/Discord4J)");
 		spec.addField("Alina Kim (Developer)", "https://www.github.com/Auxiliatrix", false);

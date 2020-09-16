@@ -3,6 +3,7 @@ package alice.configuration.calibration;
 public class Constants {
 	public static final String COMMAND_PREFIX = "%";
 	public static final String NAME = "AL | CE";
+	public static final String FULL_NAME = "Assistive Logistics | Communicative Entity";
 	public static final String LINK = "https://github.com/Auxiliatrix/ALICE";
 	public static final String[] ALIASES = new String[] {
 			"AL|CE",
