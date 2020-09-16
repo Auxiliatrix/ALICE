@@ -5,6 +5,7 @@ import alice.framework.actions.NullAction;
 import alice.framework.handlers.MentionHandler;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
+import alice.modular.actions.CreateMessageAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
 public class GreetingHandler extends MentionHandler {
@@ -60,8 +61,9 @@ public class GreetingHandler extends MentionHandler {
 	@Override
 	protected Action execute(MessageCreateEvent event) {
 		String chosenGreeting = GREETINGS_OUT[(int) (Math.random()*GREETINGS_OUT.length)];
+		String reference = event.getMessage().getAuthorAsMember().block() != null ? event.getMessage().getAuthorAsMember().block().getDisplayName() : event.getMessage().getAuthor().get().getUsername();
 		return new NullAction()
-				.addCreateMessageAction(event.getMessage().getChannel(), String.format("%s %s!", chosenGreeting, event.getMessage().getAuthorAsMember().block().getDisplayName()));
+				.addAction(new CreateMessageAction(event.getMessage().getChannel(), String.format("%s %s!", chosenGreeting, reference)));
 	}
 
 }

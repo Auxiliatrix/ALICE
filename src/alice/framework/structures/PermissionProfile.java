@@ -1,103 +1,120 @@
 package alice.framework.structures;
 
-import java.util.function.Predicate;
+import java.util.Optional;
+import java.util.function.BiPredicate;
 
 import alice.configuration.calibration.Constants;
-import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.User;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
 public class PermissionProfile {
 	
-	/* Internal Verification Predicate */
-	private Predicate<Mono<Member>> verification; 
+	/* Internal Verification BiPredicate */
+	private BiPredicate<Optional<User>, Mono<Guild>> verification; 
 	
 	/* Constructors */
 	public PermissionProfile() {
 		this(null);
 	}
 	
-	private PermissionProfile(Predicate<Mono<Member>> preset) {
+	private PermissionProfile(BiPredicate<Optional<User>, Mono<Guild>> preset) {
 		verification = preset;
 	}
 	
 	/* Primary Use Function */
-	public boolean verify(Mono<Member> member) {
-		return isDeveloper(member) || verification.test(member);
+	public boolean verify(Optional<User> user, Mono<Guild> guild) {
+		if( user.isEmpty() ) {
+			return false;
+		}
+		return isDeveloper(user) || verification.test(user, guild);
 	}
 	
 	/* Factory Methods */
 	public static PermissionProfile getAnyonePreset() {
-		return new PermissionProfile(member -> true);
+		return new PermissionProfile( (user, guild) -> true );
 	}
 	
 	public static PermissionProfile getAdminPreset() {
-		return new PermissionProfile(member -> hasPermission(member, Permission.ADMINISTRATOR));
+		return new PermissionProfile( (user, guild) -> hasPermission(user, guild, Permission.ADMINISTRATOR) );
 	}
 	
 	public static PermissionProfile getNotBotPreset() {
-		return new PermissionProfile(member -> !isBot(member));
+		return new PermissionProfile( (user, guild) -> !isBot(user, guild) );
 	}
 	
 	public static PermissionProfile getDeveloperPreset() {
-		return new PermissionProfile(member -> isDeveloper(member)) ;
+		return new PermissionProfile( (user, guild) -> isDeveloper(user) ) ;
 	}
 	
 	/* Builder Methods */
 	public PermissionProfile and(Permission permission) {
 		verification = verification == null 
-							? member -> hasPermission(member, permission)
-							: member -> verification.test(member) && hasPermission(member, permission);
+							? (user, guild) -> hasPermission(user, guild, permission)
+							: (user, guild) -> verification.test(user, guild) && hasPermission(user, guild, permission);
 		return this;
 	}
 	
 	public PermissionProfile or(Permission permission) {
 		verification = verification == null 
-							? member -> hasPermission(member, permission)
-							: member -> verification.test(member) || hasPermission(member, permission);
+							? (user, guild) -> hasPermission(user, guild, permission)
+							: (user, guild) -> verification.test(user, guild) || hasPermission(user, guild, permission);
 		return this;
 	}
 	
 	public PermissionProfile andNotBot() {
 		verification = verification == null
-							? member -> isBot(member)
-							: member -> verification.test(member) && isBot(member);
+							? (user, guild) -> isBot(user, guild)
+							: (user, guild) -> verification.test(user, guild) && isBot(user, guild);
 		return this;
 	}
 	
 	public PermissionProfile orNotBot() {
 		verification = verification == null
-							? member -> isBot(member)
-							: member -> verification.test(member) || isBot(member);
+							? (user, guild) -> isBot(user, guild)
+							: (user, guild) -> verification.test(user, guild) || isBot(user, guild);
 		return this;
 	}
 	
 	public PermissionProfile andDeveloper() {
 		verification = verification == null
-						? member -> isDeveloper(member)
-						: member -> verification.test(member) && isDeveloper(member);
+						? (user, guild) -> isDeveloper(user)
+						: (user, guild) -> verification.test(user, guild) && isDeveloper(user);
 		return this;
 	}
 	
 	public PermissionProfile orDeveloper() {
 		verification = verification == null
-						? member -> isDeveloper(member)
-						: member -> verification.test(member) || isDeveloper(member);
+						? (user, guild) -> isDeveloper(user)
+						: (user, guild) -> verification.test(user, guild) || isDeveloper(user);
 		return this;
 	}
 	
 	/* Helper Functions */
-	private static boolean hasPermission( Mono<Member> member, Permission permission ) {
-		return member.block().getBasePermissions().block().contains(permission);
+	private static boolean hasPermission( Optional<User> user, Mono<Guild> guild, Permission permission ) {
+		if( user.isEmpty() ) {
+			return false;
+		}
+		if( guild.block() == null ) {
+			return true;
+		}
+		return user.get().asMember(guild.block().getId()).block().getBasePermissions().block().contains(permission);
 	}
 	
-	private static boolean isBot( Mono<Member> member ) {
-		return member.block().isBot();
+	private static boolean isBot( Optional<User> user, Mono<Guild> guild ) {
+		if( user.isEmpty() ) {
+			return false;
+		}
+		return user.get().isBot();
 	}
 	
-	private static boolean isDeveloper( Mono<Member> member ) {
+	private static boolean isDeveloper( Optional<User> user ) {
+		if( user.isEmpty() ) {
+			return false;
+		}
 		for( long id : Constants.DEVELOPER_IDS ) {
-			if( id == member.block().getId().asLong() ) {
+			if( id == user.get().getId().asLong() ) {
 				return true;
 			}
 		}

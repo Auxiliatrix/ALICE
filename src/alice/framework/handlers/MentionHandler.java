@@ -4,6 +4,7 @@ import alice.configuration.calibration.Constants;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
+import alice.framework.utilities.MessageUtilities;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.Channel.Type;
 
@@ -25,7 +26,7 @@ public abstract class MentionHandler extends Handler<MessageCreateEvent> {
 	/* Overriden Template */
 	@Override
 	protected boolean filter(MessageCreateEvent event) {
-		return super.filter(event) && mentioned(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthorAsMember()));
+		return super.filter(event) && !MessageUtilities.fromSelf(event) && mentioned(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthor(), event.getGuild()));
 	}
 
 }
