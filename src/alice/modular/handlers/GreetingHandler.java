@@ -48,8 +48,7 @@ public class GreetingHandler extends MentionHandler {
 	};
 	
 	public GreetingHandler() {
-		super("Greet", "Default", false);
-		this.restrictions = PermissionProfile.getAnyonePreset();
+		super("Greet", "Default", false, PermissionProfile.getAnyonePreset());
 	}
 
 	@Override

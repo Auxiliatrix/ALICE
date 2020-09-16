@@ -13,8 +13,12 @@ public abstract class MentionHandler extends Handler<MessageCreateEvent> {
 	protected PermissionProfile restrictions;
 	
 	protected MentionHandler(String name, String category, boolean enableWhitelist) {
+		this(name, category, enableWhitelist, null);
+	}
+	
+	protected MentionHandler(String name, String category, boolean enableWhitelist, PermissionProfile restrictions) {
 		super(name, category, enableWhitelist, MessageCreateEvent.class);
-		this.restrictions = null;
+		this.restrictions = restrictions;
 	}
 	
 	/* Handler Specific Function */

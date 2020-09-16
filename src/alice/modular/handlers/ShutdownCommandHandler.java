@@ -27,8 +27,7 @@ public class ShutdownCommandHandler extends CommandHandler {
 	};
 	
 	public ShutdownCommandHandler() {
-		super("Shutdown", "Root", false);
-		this.restrictions = PermissionProfile.getDeveloperPreset();
+		super("Shutdown", "Root", false, PermissionProfile.getDeveloperPreset());
 	}
 
 	@Override

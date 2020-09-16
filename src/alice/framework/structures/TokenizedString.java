@@ -25,22 +25,29 @@ public class TokenizedString {
 	}
 	
 	public TokenizedString quotedOnly() {
-		activeTokens = new ArrayList<String>(quotedTokens);
-		return this;
+		TokenizedString copy = new TokenizedString(originalString);
+		copy.activeTokens = new ArrayList<String>(copy.quotedTokens);
+		return copy;
 	}
 	
 	public TokenizedString unquotedOnly() {
-		activeTokens = new ArrayList<String>(unquotedTokens);
-		return this;
+		TokenizedString copy = new TokenizedString(originalString);
+		copy.activeTokens = new ArrayList<String>(copy.unquotedTokens);
+		return copy;
 	}
 	
 	public TokenizedString inclusive() {
-		activeTokens = new ArrayList<String>(allTokens);
-		return this;
+		TokenizedString copy = new TokenizedString(originalString);
+		copy.activeTokens = new ArrayList<String>(copy.allTokens);
+		return copy;
 	}
 	
 	public List<String> getTokens() {
 		return new ArrayList<String>(activeTokens);
+	}
+	
+	public int size() {
+		return activeTokens.size();
 	}
 	
 	public boolean equals(String string) {

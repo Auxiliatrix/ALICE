@@ -13,4 +13,12 @@ public class MessageUtilities {
 		return event.getMessage().getAuthor().isEmpty() ? false : event.getMessage().getAuthor().get().equals(Brain.client.getSelf().block());
 	}
 	
+	public static synchronized String escapeMarkdown(String message) {
+		message = message.replace("\\", "\\\\");
+		message = message.replace("*", "\\*");
+		message = message.replace("__", "\\__");
+		message = message.replace("~~", "\\~~");
+		return message;
+	}
+	
 }

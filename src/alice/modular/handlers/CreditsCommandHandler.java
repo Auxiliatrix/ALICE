@@ -10,8 +10,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 public class CreditsCommandHandler extends CommandHandler {
 	
 	public CreditsCommandHandler() {
-		super("Credits", "Default", false);
-		this.restrictions = PermissionProfile.getAnyonePreset();
+		super("Credits", "Default", false, PermissionProfile.getAnyonePreset());
 	}
 
 	@Override
