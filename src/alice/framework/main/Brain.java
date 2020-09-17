@@ -1,5 +1,6 @@
 package alice.framework.main;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,12 @@ import org.reflections.Reflections;
 
 import alice.configuration.calibration.Constants;
 import alice.framework.handlers.Handler;
+import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.AtomicSaveFolder;
 import alice.framework.utilities.AliceLogger;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.rest.util.Image;
@@ -31,9 +34,12 @@ public class Brain {
 			AliceLogger.error("Please pass the TOKEN as the first argument.");
 			System.exit(0);
 		}
+		AliceLogger.info("Reloading save data...");
+		reload();
 		
 		AliceLogger.info("Logging in...");
 		login(args[0]);
+		
 		AliceLogger.info("Shutting down...");
 	}
 	
@@ -46,18 +52,36 @@ public class Brain {
 		return null;
 	}
 	
+	private static void reload() {
+		File folder = new File("tmp/guilds");
+		if( folder.isDirectory() ) {
+			for( File file : folder.listFiles() ) {
+				String guildId = file.getName();
+				int extension = guildId.indexOf(".");
+				if( extension > 0 ) {
+					guildId = guildId.substring(0, extension);
+					String guildFile = String.format("%s%s%s%s%s.json", "tmp", File.separator, "guilds", File.separator, guildId);
+					Brain.guildIndex.put(guildId, new AtomicSaveFile(guildFile));
+					AliceLogger.info(String.format("Loaded guild data for %s.", guildId), 1);
+				}
+			}
+		}
+	}
+	
 	private static void login(String token) {
 		AliceLogger.info("Establishing connection...", 1);
 		client = DiscordClientBuilder.create(token).build().login().block();
 		client.updatePresence(Presence.online(Activity.listening("%help"))).block();
-		
+		client.on(ReadyEvent.class)
+			.subscribe( event -> {
+				AliceLogger.info("Initializing modules...", 1);
+				loadModules(Constants.INCLUDED_MODULES, Constants.EXCLUDED_MODULES);
+				for( String modules : Constants.ADDITIONAL_MODULES ) {
+					loadModules(modules);
+				}
+			});
 		//updateAvatar("https://i.imgur.com/grVaLEQ.png");
 		
-		AliceLogger.info("Initializing modules...", 1);
-		loadModules(Constants.INCLUDED_MODULES, Constants.EXCLUDED_MODULES);
-		for( String modules : Constants.ADDITIONAL_MODULES ) {
-			loadModules(modules);
-		}
 		AliceLogger.info("Log in successful.");
 		client.onDisconnect().block();
 	}
@@ -78,7 +102,7 @@ public class Brain {
 				try {
 					h.add( (Handler) c.getConstructor().newInstance() );
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 					AliceLogger.error(String.format("An error occured while instantiating %s.", c.getName() ), 2);
 				}
 				return h;
