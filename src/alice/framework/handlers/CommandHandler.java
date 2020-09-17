@@ -6,7 +6,7 @@ import java.util.List;
 import alice.configuration.calibration.Constants;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
-import alice.framework.utilities.MessageUtilities;
+import alice.framework.utilities.EventUtilities;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
 public abstract class CommandHandler extends Handler<MessageCreateEvent> {
@@ -35,7 +35,7 @@ public abstract class CommandHandler extends Handler<MessageCreateEvent> {
 	/* Overriden Template */
 	@Override
 	protected boolean filter(MessageCreateEvent event) {
-		return super.filter(event) && !MessageUtilities.fromSelf(event) && invoked(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthor(), event.getGuild()));
+		return super.filter(event) && !EventUtilities.fromSelf(event) && invoked(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthor(), event.getGuild()));
 	}
 
 }

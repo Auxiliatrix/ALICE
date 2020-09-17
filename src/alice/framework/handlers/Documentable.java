@@ -2,7 +2,7 @@ package alice.framework.handlers;
 
 public interface Documentable {
 	
-	public static enum Category {
+	public static enum HelpCategory {
 		ROOT,
 		DEVELOPER,
 		ADMIN,
@@ -26,10 +26,10 @@ public interface Documentable {
 		}
 	}
 	
-	public static final Category ROOT = Category.ROOT;
-	public static final Category DEVELOPER = Category.DEVELOPER;
-	public static final Category ADMIN = Category.ADMIN;
-	public static final Category DEFAULT = Category.DEFAULT;
+	public static final HelpCategory ROOT = HelpCategory.ROOT;
+	public static final HelpCategory DEVELOPER = HelpCategory.DEVELOPER;
+	public static final HelpCategory ADMIN = HelpCategory.ADMIN;
+	public static final HelpCategory DEFAULT = HelpCategory.DEFAULT;
 	
 	public String getCategory();
 	public String getDescription();

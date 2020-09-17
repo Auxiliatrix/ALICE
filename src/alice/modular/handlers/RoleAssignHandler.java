@@ -15,7 +15,7 @@ import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.EmbedBuilders;
-import alice.framework.utilities.MessageUtilities;
+import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.RoleAssignAction;
 import alice.modular.actions.RoleUnassignAction;
@@ -73,7 +73,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		
-		AtomicSaveFile guildData = Brain.guildIndex.get(MessageUtilities.getGuildId(event));
+		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
 		
 		JSONArray allowRules = (JSONArray) guildData.optJSONArray("role_rules_allow", new JSONArray());
 		JSONArray disallowRules = (JSONArray) guildData.optJSONArray("role_rules_disallow", new JSONArray());

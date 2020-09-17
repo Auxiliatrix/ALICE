@@ -21,7 +21,6 @@ public abstract class Handler<E extends Event> {
 		this.enableWhitelist = enableWhitelist;
 		this.aliases = new ArrayList<String>();
 		this.aliases.add(name);
-		
 		Brain.client.on(type)
 		.filter(event -> filter(event))
 		.flatMap(event -> payload(event))

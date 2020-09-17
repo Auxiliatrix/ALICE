@@ -16,7 +16,7 @@ import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.EmbedBuilders;
-import alice.framework.utilities.MessageUtilities;
+import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
@@ -45,17 +45,17 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 		
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		List<String> tokens = ts.getTokens();
-		if( tokens.size() == 1 || tokens.size() == 2 && !tokens.get(1).equals("rules") ) {
+		if( tokens.size() == 1 || tokens.size() == 2 && !tokens.get(1).equalsIgnoreCase("rules") ) {
 			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getHelpConstructor(user, this)));
 			return response;
 		}
 		
-		AtomicSaveFile guildData = Brain.guildIndex.get(MessageUtilities.getGuildId(event));
+		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
 		
 		JSONArray allowRules = (JSONArray) guildData.optJSONArray("role_rules_allow", new JSONArray());
 		JSONArray disallowRules = (JSONArray) guildData.optJSONArray("role_rules_disallow", new JSONArray());
 		
-		switch( tokens.get(1) ) {
+		switch( tokens.get(1).toLowerCase() ) {
 			case "rules":
 				response.addAction(new MessageCreateAction(channel, getRulesConstructor(allowRules, disallowRules)));
 				return response;
@@ -75,8 +75,8 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 					return response;
 				}
 				
-				switch( tokens.get(2).charAt(0) ) {
-					case 'A':
+				switch( tokens.get(2).toLowerCase().charAt(0) ) {
+					case 'a':
 						int index = Integer.parseInt(tokens.get(2).substring(1));
 						if( index >= allowRules.length() ) {
 							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That rule does not exist!")));
@@ -87,7 +87,7 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 						guildData.put("role_rules_allow", allowRules);
 						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Rule removed successfully.")));
 						break;
-					case 'D':
+					case 'd':
 						index = Integer.parseInt(tokens.get(2).substring(1));
 						if( index >= allowRules.length() ) {
 							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That rule does not exist!")));
@@ -147,12 +147,12 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 	private static synchronized EmbedCreateSpec rulesConstructor( EmbedCreateSpec spec, JSONArray allowRules, JSONArray disallowRules ) {
 		StringBuilder allowList = new StringBuilder();
 		for( int f=0; f<allowRules.length(); f++ ) {
-			allowList.append(String.format(":small_blue_diamond: **A%d:** %s\n", f, MessageUtilities.escapeMarkdown(allowRules.getString(f))));
+			allowList.append(String.format(":small_blue_diamond: **A%d:** %s\n", f, EventUtilities.escapeMarkdown(allowRules.getString(f))));
 		}
 		
 		StringBuilder disallowList = new StringBuilder();
 		for( int f=0; f<disallowRules.length(); f++ ) {
-			disallowList.append(String.format(":small_orange_diamond: **D%d:** %s\n", f, MessageUtilities.escapeMarkdown(disallowRules.getString(f))));
+			disallowList.append(String.format(":small_orange_diamond: **D%d:** %s\n", f, EventUtilities.escapeMarkdown(disallowRules.getString(f))));
 		}
 		
 		spec.setAuthor(Constants.NAME, null, Brain.client.getSelf().block().getAvatarUrl());
