@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.json.JSONArray;
 
+import alice.configuration.references.Keywords;
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.handlers.Documentable;
@@ -24,40 +25,11 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 
 public class RoleAssignHandler extends MentionHandler implements Documentable {
-
-	public static final String[] ADD_REQUEST = new String[] {
-			"add",
-			"give",
-			"get",
-			"request",
-			"acquire",
-			"obtain",
-			"receive",
-			"send",
-			"grant",
-			"bestow",
-			"hand",
-			"borrow",
-			"lend",
-			"gimme"
-	};
-	
-	public static final String[] REMOVE_REQUEST = new String[] {
-			"take",
-			"remove",
-			"rid",
-			"unget",
-			"unacquire",
-			"unobtain",
-			"unreceive",
-			"return",
-			"unbestow",
-			"unhand",
-	};
 	
 	public RoleAssignHandler() {
 		super("RoleAssign", false, PermissionProfile.getAnyonePreset());
@@ -65,7 +37,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
-		return new TokenizedString(event.getMessage().getContent()).containsTokenIgnoreCase("role");
+		return new TokenizedString(event.getMessage().getContent()).containsTokenIgnoreCase("role") && event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
 	}
 
 	@Override
@@ -85,7 +57,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "You must specify a role in quotes!")));
 		} else {
 			String role = ts.quotedOnly().getTokens().get(0);
-			if( ts.containsAnyTokensIgnoreCase(REMOVE_REQUEST) ) {
+			if( ts.containsAnyTokensIgnoreCase(Keywords.REMOVE_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
 					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That role does not exist!")));
@@ -97,7 +69,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Role unassigned successfully!")));
 					}
 				}
-			} else if( ts.containsAnyTokensIgnoreCase(ADD_REQUEST) ) {
+			} else if( ts.containsAnyTokensIgnoreCase(Keywords.ADD_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
 					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That role doesn't exist!")));

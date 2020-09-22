@@ -6,7 +6,7 @@ public abstract class Action {
 	
 	protected Mono<?> mono;
 	
-	public Action() {
+	protected Action() {
 		this.mono = null;
 	}
 	

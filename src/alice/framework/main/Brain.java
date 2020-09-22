@@ -13,9 +13,11 @@ import alice.framework.handlers.Handler;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.AtomicSaveFolder;
 import alice.framework.utilities.AliceLogger;
+import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.rest.util.Image;
@@ -28,6 +30,20 @@ public class Brain {
 	public static AtomicReference<List<Handler>> handlers = new AtomicReference<List<Handler>>(new ArrayList<Handler>()); // This is disgusting
 	
 	public static AtomicSaveFolder guildIndex = new AtomicSaveFolder();
+		
+	private static Runnable upkeep = () -> {
+		int cycle = 0;
+		while( true ) {
+			AliceLogger.info(String.format("Starting cycle %d", cycle));
+			((MessageChannel) client.getChannelById(Snowflake.of(757836189687349308L)).block()).createMessage(String.format("Starting cycle %d", cycle)).block();
+			try {
+				Thread.sleep(300000);
+			} catch (InterruptedException e) {
+				break;
+			}
+			cycle++;
+		}
+	};
 	
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {
@@ -40,6 +56,9 @@ public class Brain {
 		AliceLogger.info("Logging in...");
 		login(args[0]);
 		
+		upkeep.run();
+		
+		client.onDisconnect().block();
 		AliceLogger.info("Shutting down...");
 	}
 	
@@ -83,7 +102,6 @@ public class Brain {
 		//updateAvatar("https://i.imgur.com/grVaLEQ.png");
 		
 		AliceLogger.info("Log in successful.");
-		client.onDisconnect().block();
 	}
 	
 	private static void loadModules(String includePrefix) {

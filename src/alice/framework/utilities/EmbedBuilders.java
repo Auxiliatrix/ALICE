@@ -20,6 +20,7 @@ import discord4j.rest.util.Color;
 public class EmbedBuilders {
 	
 	public static final String ERR_PERMISSION = "Permission Denied";
+	public static final String ERR_USAGE = "Invalid Usage";
 	
 	public static synchronized Consumer<EmbedCreateSpec> getCreditsConstructor() {
 		return c -> creditsConstructor(c);
@@ -47,6 +48,46 @@ public class EmbedBuilders {
 	
 	public static synchronized Consumer<EmbedCreateSpec> getSuccessConstructor(Optional<User> user, String message) {
 		return c -> successConstructor(c, user, message);
+	}
+	
+	public static synchronized Consumer<EmbedCreateSpec> getReputationSelfConstructor(User user, int reputation) {
+		return c -> reputationSelfConstructor(c, user, reputation);
+	}
+	
+	public static synchronized Consumer<EmbedCreateSpec> getReputationChangeConstructor(User user, int reputation) {
+		return c -> reputationChangeConstructor(c, user, reputation);
+	}
+	
+	public static synchronized Consumer<EmbedCreateSpec> getLeaderboardConstructor( String category, List<String> entries, List<String> values ) {
+		return c -> leaderboardConstructor(c, category, entries, values);
+	}
+	
+	private static synchronized EmbedCreateSpec leaderboardConstructor( EmbedCreateSpec spec, String category, List<String> entries, List<String> values ) {
+		spec.setColor(Color.of(212, 175, 55));
+		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
+		spec.setTitle(String.format("%s Leaderboard", category));
+		
+		for( int f=0; f<Math.min(entries.size(), values.size()); f++ ) {
+			spec.addField(entries.get(f), values.get(f), false);
+		}
+		
+		return spec;
+	}
+	
+	private static synchronized EmbedCreateSpec reputationChangeConstructor( EmbedCreateSpec spec, User user, int reputation ) {
+		spec.setColor(Color.of(212, 175, 55));
+		spec.setAuthor(String.format("%s#%s", user.getUsername(), user.getDiscriminator()), null, user.getAvatarUrl());
+		spec.setTitle("Reputation Up!");
+		spec.setDescription(String.format("This user now has :scroll: %d reputation!", reputation));
+		return spec;
+	}
+	
+	private static synchronized EmbedCreateSpec reputationSelfConstructor( EmbedCreateSpec spec, User user, int reputation ) {
+		spec.setColor(Color.of(212, 175, 55));
+		spec.setAuthor(String.format("%s#%s", user.getUsername(), user.getDiscriminator()), null, user.getAvatarUrl());
+		spec.setTitle("Reputation");
+		spec.setDescription(String.format("This user has :scroll: %d reputation.", reputation));
+		return spec;
 	}
 	
 	private static synchronized EmbedCreateSpec successConstructor( EmbedCreateSpec spec, Optional<User> user, String message ) {

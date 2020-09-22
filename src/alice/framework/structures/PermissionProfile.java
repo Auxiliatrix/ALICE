@@ -92,7 +92,7 @@ public class PermissionProfile {
 	}
 	
 	/* Helper Functions */
-	private static boolean hasPermission( Optional<User> user, Mono<Guild> guild, Permission permission ) {
+	public static synchronized boolean hasPermission( Optional<User> user, Mono<Guild> guild, Permission permission ) {
 		if( user.isEmpty() ) {
 			return false;
 		}
@@ -102,7 +102,7 @@ public class PermissionProfile {
 		return user.get().asMember(guild.block().getId()).block().getBasePermissions().block().contains(permission);
 	}
 	
-	private static boolean isBot( Optional<User> user, Mono<Guild> guild ) {
+	public static synchronized boolean isBot( Optional<User> user, Mono<Guild> guild ) {
 		if( user.isEmpty() ) {
 			return false;
 		}

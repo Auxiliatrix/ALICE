@@ -73,7 +73,9 @@ public class GreetingHandler extends MentionHandler implements Documentable {
 
 	@Override
 	public String getDescription() {
-		return "Allows this bot to greet you back!";
+		return "Allows this bot to greet you back!\n"
+				+ "This is a smart module, and will still work even if your message doesn't look exactly like it does in the help documentation.\n"
+				+ "Make sure to put this bot's name somewhere in the message, so she knows you're talking to her!";
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import reactor.core.publisher.Mono;
@@ -28,7 +29,7 @@ public class ClassroomSetupCommandHandler extends CommandHandler implements Docu
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
-		return true;
+		return event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
 	}
 
 	@Override

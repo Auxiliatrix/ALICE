@@ -19,4 +19,6 @@ public class Constants {
 	public static final String[] ADDITIONAL_MODULES = new String[] {
 			
 	};
+	
+	public static long REPUTATION_INTERVAL = 4 * 60 * 60 * 1000;
 }
