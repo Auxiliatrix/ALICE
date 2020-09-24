@@ -82,6 +82,14 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 					reputation++;
 					
 					reputationMap.put(target.getId().asString(), reputation);
+					
+					if( !reputationMap.has(user.get().getId().asString()) ) {
+						reputationMap.put(user.get().getId().asString(), 0);
+					}
+					reputation = reputationMap.getInt(user.get().getId().asString());
+					reputation++;
+					reputationMap.put(target.getId().asString(), reputation);
+					
 					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationChangeConstructor(target, reputation)));
 				}
 			}
@@ -138,8 +146,9 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 	public DocumentationPair[] getUsage() {
 		return new DocumentationPair[] {
 			new DocumentationPair(String.format("%s", invocation), "Displays your own reputation standing."),
-			new DocumentationPair(String.format("%s <@user>", invocation), "Gives a point of reputation to the given user. Has a cooldown of four hours."),
-			new DocumentationPair(String.format("%s lead|leader|leaderboard", invocation), "Displays this server's reputation leaderboard.")
+			new DocumentationPair(String.format("%s <@user>", invocation), "Gives a point of reputation to the given user, as well as yourself. Has a cooldown of four hours."),
+			new DocumentationPair(String.format("%s lead|leader|leaderboard", invocation), "Displays this server's reputation leaderboard."),
+			//new DocumentationPair(String.format("%s cooldown|cd <", args))
 		};
 	}
 	

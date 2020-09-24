@@ -47,6 +47,7 @@ public class Keywords {
 			"demolish",
 			"dismantle",
 			"raze",
+			"prune"
 	};
 	
 	public static final String[] END = new String[] {

@@ -46,6 +46,17 @@ public class TokenizedString {
 		return new ArrayList<String>(activeTokens);
 	}
 	
+	public List<Integer> getNumbers() {
+		List<Integer> numbers = new ArrayList<Integer>();
+		for( String token : activeTokens ) {
+			try {
+				int number = Integer.parseInt(token);
+				numbers.add(number);
+			} catch( NumberFormatException e ) {}
+		}
+		return numbers;
+	}
+	
 	public String get(int index) {
 		return activeTokens.get(index);
 	}
