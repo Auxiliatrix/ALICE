@@ -56,7 +56,8 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 		
 		if( ts.size() == 1 ) {
 			if( !reputationMap.has(ownId) ) {
-				reputationMap.put(ownId, 0);
+				reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(ownId, 0));
+				// reputationMap.put(ownId, 0);
 			}
 			int reputation = reputationMap.getInt(ownId);
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationSelfConstructor(user.get(), reputation)));
@@ -76,21 +77,24 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "You can't give reputation to yourself!", EmbedBuilders.ERR_USAGE)));
 				} else {
 					if( !reputationMap.has(target.getId().asString()) ) {
-						reputationMap.put(target.getId().asString(), 0);
+						reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(target.getId().asString(), 0));
+						// reputationMap.put(target.getId().asString(), 0);
 					}
-					int reputation = reputationMap.getInt(target.getId().asString()); // blah blah efficiency its O(1) get off my back
-					reputation++;
+					final int targetReputation = reputationMap.getInt(target.getId().asString()) + 1; // blah blah efficiency its O(1) get off my back
 					
-					reputationMap.put(target.getId().asString(), reputation);
+					reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(target.getId().asString(), targetReputation));
+					// reputationMap.put(target.getId().asString(), reputation);
 					
 					if( !reputationMap.has(user.get().getId().asString()) ) {
-						reputationMap.put(user.get().getId().asString(), 0);
+						reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(user.get().getId().asString(), 0));
+						// reputationMap.put(user.get().getId().asString(), 0);
 					}
-					reputation = reputationMap.getInt(user.get().getId().asString());
-					reputation++;
-					reputationMap.put(target.getId().asString(), reputation);
+					final int userReputation = reputationMap.getInt(user.get().getId().asString()) + 1;
+
+					reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(user.get().getId().asString(), userReputation));
+					// reputationMap.put(user.get().getId().asString(), reputation);
 					
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationChangeConstructor(target, reputation)));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationChangeConstructor(target, userReputation)));
 				}
 			}
 			
@@ -127,7 +131,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));
 		}
 		
-		guildData.put("reputation_map", reputationMap);
+		// guildData.put("reputation_map", reputationMap);
 		
 		return response;
 	}
