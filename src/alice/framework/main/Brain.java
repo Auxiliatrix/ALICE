@@ -33,9 +33,14 @@ public class Brain {
 		
 	private static Runnable upkeep = () -> {
 		int cycle = 0;
+		MessageChannel channel = (MessageChannel) client.getChannelById(Snowflake.of(757836189687349308L)).block();
 		while( true ) {
 			AliceLogger.info(String.format("Starting cycle %d", cycle));
-			((MessageChannel) client.getChannelById(Snowflake.of(757836189687349308L)).block()).createMessage(String.format("Starting cycle %d", cycle)).block();
+			try {
+				channel.createMessage(String.format("Starting cycle %d", cycle)).block();
+			} catch( Exception e ) {
+				AliceLogger.error("Socket reset this cycle. Trying again next cycle.");
+			}
 			try {
 				Thread.sleep(300000);
 			} catch (InterruptedException e) {

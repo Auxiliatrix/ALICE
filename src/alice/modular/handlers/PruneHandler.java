@@ -38,7 +38,7 @@ public class PruneHandler extends MentionHandler implements Documentable {
 		List<String> quoted = ts.quotedOnly().getTokens();
 		
 		if( numbers.isEmpty() ) {
-			response.addAction(new MessageDeleteFilteredAction(event.getMessage().getChannel().map(m -> (GuildMessageChannel) m), event.getMessage().getId(), m -> filterMessage(m, mentions, quoted)));
+			response.addAction(new MessageDeleteFilteredAction(event.getMessage().getChannel().map(m -> (GuildMessageChannel) m), event.getMessage().getId(), 1, m -> filterMessage(m, mentions, quoted)));
 		} else {
 			response.addAction(new MessageDeleteFilteredAction(event.getMessage().getChannel().map(m -> (GuildMessageChannel) m), event.getMessage().getId(), numbers.get(0), m -> filterMessage(m, mentions, quoted)));
 		}
@@ -47,18 +47,23 @@ public class PruneHandler extends MentionHandler implements Documentable {
 	}
 	
 	private boolean filterMessage(Message message, List<User> mentions, List<String> quoted) {
-		if( message.getAuthor().isEmpty() || !mentions.isEmpty() && !mentions.contains(message.getAuthor().get()) ) {
+		if( !mentions.contains(message.getAuthor().get()) && !mentions.isEmpty()) {
 			return false;
 		}
 		
+		boolean quoteMatch = false;
 		TokenizedString ts = new TokenizedString(message.getContent());
 		for( String quote : quoted ) {
 			if( ts.containsIgnoreCase(quote) ) {
-				return true;
+				quoteMatch = true;
+				break;
 			}
 		}
+		if( !quoteMatch && !quoted.isEmpty() ) {
+			return false;
+		}
 				
-		return false;
+		return true;
 	}
 
 	@Override
