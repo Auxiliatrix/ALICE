@@ -16,6 +16,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
+import discord4j.core.object.entity.channel.Channel.Type;
 
 public class PruneHandler extends MentionHandler implements Documentable {
 
@@ -26,7 +27,7 @@ public class PruneHandler extends MentionHandler implements Documentable {
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
-		return ts.containsAnyTokensIgnoreCase(Keywords.DESTROY);
+		return ts.containsAnyTokensIgnoreCase(Keywords.DESTROY) && event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
 	}
 
 	@Override

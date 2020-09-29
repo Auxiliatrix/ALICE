@@ -94,7 +94,8 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 					reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(user.get().getId().asString(), userReputation));
 					// reputationMap.put(user.get().getId().asString(), reputation);
 					
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationChangeConstructor(target, userReputation)));
+					guildData.put(lastRepKey, System.currentTimeMillis());
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationChangeConstructor(target, targetReputation)));
 				}
 			}
 			
@@ -120,7 +121,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 			entries.sort( (a, b) -> a.compareTo(b) );
 			List<String> fieldHeaders = new ArrayList<String>();
 			List<String> fieldBodies = new ArrayList<String>();
-			for( int f=0; f< Math.min(20, entries.size()); f++ ) {
+			for( int f=0; f< Math.min(10, entries.size()); f++ ) {
 				QuantifiedPair<String> entry = entries.get(f);
 				fieldHeaders.add(String.format("%d. %s%s", f+1, event.getGuild().block().getMemberById(Snowflake.of(entry.key)).block().getDisplayName(), f==0 ? " :star:" : ""));
 				fieldBodies.add(String.format("Reputation:\t:scroll: %d", entry.value));

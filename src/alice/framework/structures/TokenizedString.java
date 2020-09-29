@@ -211,7 +211,7 @@ public class TokenizedString {
 	
 	public boolean containsAnyTokensIgnoreCase(String...tokens) {
 		for( String token : tokens ) {
-			if( containsIgnoreCase(token) ) {
+			if( containsTokenIgnoreCase(token) ) {
 				return true;
 			}
 		}
@@ -229,7 +229,7 @@ public class TokenizedString {
 	
 	public boolean containsAllTokensIgnoreCase(String...tokens) {
 		for( String token : tokens ) {
-			if( !containsIgnoreCase(token) ) {
+			if( !containsTokenIgnoreCase(token) ) {
 				return false;
 			}
 		}

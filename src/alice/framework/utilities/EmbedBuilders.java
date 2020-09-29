@@ -13,6 +13,7 @@ import alice.framework.handlers.Documentable.DocumentationPair;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
+import alice.framework.structures.TellStonesBoard;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -60,6 +61,16 @@ public class EmbedBuilders {
 	
 	public static synchronized Consumer<EmbedCreateSpec> getLeaderboardConstructor( String category, List<String> entries, List<String> values ) {
 		return c -> leaderboardConstructor(c, category, entries, values);
+	}
+	
+	public static synchronized Consumer<EmbedCreateSpec> getTellstonesBoardConstructor( TellStonesBoard board ) {
+		return c -> tellstonesBoardConstructor(c, board);
+	}
+	
+	private static synchronized EmbedCreateSpec tellstonesBoardConstructor( EmbedCreateSpec spec, TellStonesBoard board ) {
+		spec.setColor(Color.of(0, 0, 128));
+		
+		return spec;
 	}
 	
 	private static synchronized EmbedCreateSpec leaderboardConstructor( EmbedCreateSpec spec, String category, List<String> entries, List<String> values ) {
