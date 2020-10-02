@@ -42,7 +42,7 @@ public class HelpCommandHandler extends CommandHandler implements Documentable {
 			String moduleName = ts.get(1);
 			Handler<?> module = Brain.getModuleByName(moduleName);
 			if( module == null || !(module instanceof Documentable) ) {
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That module does not exist!")));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That module does not exist!")));
 			} else {
 				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, module)));
 			}

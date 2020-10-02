@@ -2,7 +2,6 @@ package alice.modular.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.json.JSONArray;
 
@@ -24,7 +23,6 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
@@ -51,34 +49,33 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 		JSONArray disallowRules = (JSONArray) guildData.optJSONArray("role_rules_disallow", new JSONArray());
 
 		Mono<MessageChannel> channel = event.getMessage().getChannel();
-		Optional<User> user = event.getMessage().getAuthor();
 		
 		if( ts.quotedOnly().size() == 0 ) {
-			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "You must specify a role in quotes!")));
+			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You must specify a role in quotes!")));
 		} else {
 			String role = ts.quotedOnly().getTokens().get(0);
 			if( ts.containsAnyTokensIgnoreCase(Keywords.REMOVE_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That role does not exist!")));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role does not exist!")));
 				} else {
 					if( !roleAllowed(role, allowRules, disallowRules) ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "You don't have permission to modify that role!", EmbedBuilders.ERR_PERMISSION)));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You don't have permission to modify that role!", EmbedBuilders.ERR_PERMISSION)));
 					} else {
 						response.addAction(new RoleUnassignAction(event.getMessage().getAuthorAsMember(), foundRole));
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Role unassigned successfully!")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role unassigned successfully!")));
 					}
 				}
 			} else if( ts.containsAnyTokensIgnoreCase(Keywords.ADD_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That role doesn't exist!")));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role doesn't exist!")));
 				} else {
 					if( !roleAllowed(role, allowRules, disallowRules) ) {
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "You do not have permission to modify that role!", EmbedBuilders.ERR_PERMISSION)));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You do not have permission to modify that role!", EmbedBuilders.ERR_PERMISSION)));
 					} else {
 						response.addAction(new RoleAssignAction(event.getMessage().getAuthorAsMember(), foundRole));
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Role assigned successfully!")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role assigned successfully!")));
 					}
 				}
 			}

@@ -35,20 +35,20 @@ public class EmbedBuilders {
 		return c -> helpConstructor(c, user, module);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getErrorConstructor(Optional<User> user, String message) {
-		return getErrorConstructor(user, message, "");
+	public static synchronized Consumer<EmbedCreateSpec> getErrorConstructor(String message) {
+		return getErrorConstructor(message, "");
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getErrorConstructor(Optional<User> user, String message, String type) {
-		return c -> errorConstructor(c, user, message, type);
+	public static synchronized Consumer<EmbedCreateSpec> getErrorConstructor(String message, String type) {
+		return c -> errorConstructor(c, message, type);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getSuccessConstructor(Optional<User> user) {
-		return getSuccessConstructor(user, "");
+	public static synchronized Consumer<EmbedCreateSpec> getSuccessConstructor() {
+		return getSuccessConstructor("");
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getSuccessConstructor(Optional<User> user, String message) {
-		return c -> successConstructor(c, user, message);
+	public static synchronized Consumer<EmbedCreateSpec> getSuccessConstructor(String message) {
+		return c -> successConstructor(c, message);
 	}
 	
 	public static synchronized Consumer<EmbedCreateSpec> getReputationSelfConstructor(User user, int reputation) {
@@ -88,7 +88,6 @@ public class EmbedBuilders {
 	private static synchronized EmbedCreateSpec reputationChangeConstructor( EmbedCreateSpec spec, User user, int reputation ) {
 		spec.setColor(Color.of(212, 175, 55));
 		spec.setAuthor(String.format("%s#%s", user.getUsername(), user.getDiscriminator()), null, user.getAvatarUrl());
-		spec.setTitle("Reputation Up!");
 		spec.setDescription(String.format("This user now has :scroll: %d reputation!", reputation));
 		return spec;
 	}
@@ -96,30 +95,19 @@ public class EmbedBuilders {
 	private static synchronized EmbedCreateSpec reputationSelfConstructor( EmbedCreateSpec spec, User user, int reputation ) {
 		spec.setColor(Color.of(212, 175, 55));
 		spec.setAuthor(String.format("%s#%s", user.getUsername(), user.getDiscriminator()), null, user.getAvatarUrl());
-		spec.setTitle("Reputation");
 		spec.setDescription(String.format("This user has :scroll: %d reputation.", reputation));
 		return spec;
 	}
 	
-	private static synchronized EmbedCreateSpec successConstructor( EmbedCreateSpec spec, Optional<User> user, String message ) {
+	private static synchronized EmbedCreateSpec successConstructor( EmbedCreateSpec spec, String message ) {
 		spec.setColor(Color.of(95, 160, 82));
-		if( !user.isEmpty() ) {
-			spec.setAuthor(String.format("%s#%s", user.get().getUsername(), user.get().getDiscriminator()), null, user.get().getAvatarUrl());
-		} else {
-			spec.setAuthor(Constants.NAME, null, Brain.client.getSelf().block().getAvatarUrl());
-		}
 		spec.setTitle(":white_check_mark: Success!");
 		spec.setDescription(message.isEmpty() ? "Operation completed successfully." : message);
 		return spec;
 	}
 	
-	private static synchronized EmbedCreateSpec errorConstructor( EmbedCreateSpec spec, Optional<User> user, String message, String type ) {
+	private static synchronized EmbedCreateSpec errorConstructor( EmbedCreateSpec spec, String message, String type ) {
 		spec.setColor(Color.of(166, 39, 0));
-		if( !user.isEmpty() ) {
-			spec.setAuthor(String.format("%s#%s", user.get().getUsername(), user.get().getDiscriminator()), null, user.get().getAvatarUrl());
-		} else {
-			spec.setAuthor(Constants.NAME, null, Brain.client.getSelf().block().getAvatarUrl());
-		}
 		String errorMessage = String.format(":warning: %s!", type.isEmpty() ? "Error" : type);
 		spec.setTitle(errorMessage);
 		spec.setDescription(message.isEmpty() ? "Operation failed." : message);
@@ -170,7 +158,7 @@ public class EmbedBuilders {
 		Documentable d = (Documentable) module;
 		
 		if( d.getCategory().equals(Documentable.DEVELOPER.name()) && !PermissionProfile.isDeveloper(user) ) {
-			return errorConstructor(spec, user, "You must be a developer to view this module!", ERR_PERMISSION);
+			return errorConstructor(spec, "You must be a developer to view this module!", ERR_PERMISSION);
 		}
 		
 		spec.setColor(Color.of(63, 79, 95));

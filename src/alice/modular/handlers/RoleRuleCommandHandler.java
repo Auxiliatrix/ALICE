@@ -64,17 +64,17 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 				allowRules = guildData.modifyJSONArray("role_rules_allow", ja -> ja.put(tokens.get(2)));
 //				allowRules.put(tokens.get(2));
 //				guildData.put("role_rules_allow", allowRules);
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Rule added successfully.")));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule added successfully.")));
 				break;
 			case "disallow":
 				disallowRules = guildData.modifyJSONArray("role_rules_disallow", ja -> ja.put(tokens.get(2)));
 //				disallowRules.put(tokens.get(2));
 //				guildData.put("role_rules_disallow", disallowRules);
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Rule added successfully.")));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule added successfully.")));
 				break;
 			case "remove":
 				if( tokens.get(2).length() < 2 ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That rule does not exist!")));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That rule does not exist!")));
 					return response;
 				}
 				
@@ -82,27 +82,27 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 					case 'a':
 						int index = Integer.parseInt(tokens.get(2).substring(1));
 						if( index >= allowRules.length() ) {
-							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That rule does not exist!")));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That rule does not exist!")));
 							return response;
 						}
 						allowRules = guildData.modifyJSONArray("role_rules_allow", ja -> ja.remove(index));
 //						allowRules.remove(index);
 //						guildData.put("role_rules_allow", allowRules);
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Rule removed successfully.")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule removed successfully.")));
 						break;
 					case 'd':
 						index = Integer.parseInt(tokens.get(2).substring(1));
 						if( index >= allowRules.length() ) {
-							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That rule does not exist!")));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That rule does not exist!")));
 							return response;
 						}
 						disallowRules = guildData.modifyJSONArray("role_rules_disallow", ja -> ja.remove(index));
 //						disallowRules.remove(index);
 //						guildData.put("role_rules_disallow", disallowRules);
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Rule removed successfully.")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule removed successfully.")));
 						break;
 					default:
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "That rule does not exist!")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That rule does not exist!")));
 						return response;
 				}
 				break;

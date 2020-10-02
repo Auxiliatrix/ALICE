@@ -48,18 +48,18 @@ public class ClassroomSetupCommandHandler extends CommandHandler implements Docu
 				case "setup":
 					VoiceChannel location = EventUtilities.getConnectedVC(event);
 					if( location == null ) {
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "You must be connected to a voice channel!")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You must be connected to a voice channel!")));
 					} else {
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, String.format("Discord Classrooms Hub now bound to #%s", location.getName()))));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(String.format("Discord Classrooms Hub now bound to #%s", location.getName()))));
 						guildData.put("classroom_hub_channel", location.getId().asString());
 					}
 					break;
 				case "takedown":
 					if( guildData.has("classroom_hub_channel") ) {
 						guildData.remove("classroom_hub_channel");
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(user, "Discord Classrooms has been unbound.")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Discord Classrooms has been unbound.")));
 					} else {
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "Discord Classrooms has not been set up in this server.")));
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("Discord Classrooms has not been set up in this server.")));
 					}
 					break;
 				default:

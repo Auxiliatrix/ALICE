@@ -70,11 +70,11 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 			long remaining = Constants.REPUTATION_INTERVAL - (System.currentTimeMillis() - lastRep);
 			
 			if( remaining > 0 && !PermissionProfile.hasPermission(event.getMessage().getAuthor(), event.getGuild(), Permission.ADMINISTRATOR) ) {
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, String.format("You must wait %d seconds until you may do that again.", remaining/1000), EmbedBuilders.ERR_USAGE)));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(String.format("You must wait %d seconds until you may do that again.", remaining/1000), EmbedBuilders.ERR_USAGE)));
 			} else {
 				User target = event.getMessage().getUserMentions().blockFirst();
 				if( target.equals(user.get()) && !PermissionProfile.hasPermission(user, event.getGuild(), Permission.ADMINISTRATOR) ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "You can't give reputation to yourself!", EmbedBuilders.ERR_USAGE)));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You can't give reputation to yourself!", EmbedBuilders.ERR_USAGE)));
 				} else {
 					if( !reputationMap.has(target.getId().asString()) ) {
 						reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(target.getId().asString(), 0));

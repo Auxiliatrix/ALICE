@@ -43,7 +43,7 @@ public class PruneHandler extends MentionHandler implements Documentable {
 		} else {
 			response.addAction(new MessageDeleteFilteredAction(event.getMessage().getChannel().map(m -> (GuildMessageChannel) m), event.getMessage().getId(), numbers.get(0), m -> filterMessage(m, mentions, quoted)));
 		}
-		response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor(event.getMessage().getAuthor(), "Messages pruned successfully!")));
+		response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Messages pruned successfully!")));
 		return response;
 	}
 	

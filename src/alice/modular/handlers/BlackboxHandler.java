@@ -1,7 +1,5 @@
 package alice.modular.handlers;
 
-import java.util.Optional;
-
 import alice.configuration.references.Keywords;
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
@@ -16,7 +14,6 @@ import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.MessageDeleteBulkAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -45,25 +42,24 @@ public class BlackboxHandler extends MentionHandler implements Documentable {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
 		Mono<MessageChannel> channel = event.getMessage().getChannel();
-		Optional<User> user = event.getMessage().getAuthor();
 		if( ts.containsAnyIgnoreCase(Keywords.DESTROY) || ts.containsAnyIgnoreCase(Keywords.END) || ts.containsAnyIgnoreCase(Keywords.DISABLE) ) {
 			if( guildData.has(String.format("%s_blackbox_start", channel.block().getId().asString())) ) {
 				response.addAction(new MessageDeleteBulkAction(channel.map(c -> (GuildMessageChannel) c), guildData.getString(String.format("%s_blackbox_start", channel.block().getId().asString()))));
 				response.addAction(new MessageCreateAction(channel, spec -> blackboxCloseConstructor(spec)));
 				guildData.remove(String.format("%s_blackbox_start", channel.block().getId().asString()));
 			} else {
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "There is no active blackbox in this channel!")));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("There is no active blackbox in this channel!")));
 			}
 		} else if( ts.containsAnyIgnoreCase(Keywords.CANCEL) ) {
 			if( guildData.has(String.format("%s_blackbox_start", channel.block().getId().asString())) ) {
 				guildData.remove(String.format("%s_blackbox_start", channel.block().getId().asString()));
 				response.addAction(new MessageCreateAction(channel, spec -> blackboxCancelConstructor(spec)));
 			} else {
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "There is no active blackbox in this channel!")));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("There is no active blackbox in this channel!")));
 			}
 		} else if( ts.containsAnyIgnoreCase(Keywords.CREATE) || ts.containsAnyIgnoreCase(Keywords.START) || ts.containsAnyIgnoreCase(Keywords.ENABLE) ) {
 			if( guildData.has(String.format("%s_blackbox_start", channel.block().getId().asString())) ) {
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(user, "A blackbox is already open in this channel!")));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("A blackbox is already open in this channel!")));
 			} else {
 				guildData.put(String.format("%s_blackbox_start", channel.block().getId().asString()), event.getMessage().getId().asString());
 				response.addAction(new MessageCreateAction(channel, spec -> blackboxOpenConstructor(spec)));
