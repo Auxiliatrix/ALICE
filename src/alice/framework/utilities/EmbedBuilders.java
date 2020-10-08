@@ -59,8 +59,12 @@ public class EmbedBuilders {
 		return c -> reputationChangeConstructor(c, user, reputation);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getLeaderboardConstructor( String category, List<String> entries, List<String> values ) {
-		return c -> leaderboardConstructor(c, category, entries, values);
+	public static synchronized Consumer<EmbedCreateSpec> getLeaderboardConstructor( String category, List<String> entries, List<String> values, int total ) {
+		return c -> leaderboardConstructor(c, category, entries, values, total);
+	}
+	
+	public static synchronized Consumer<EmbedCreateSpec> getBlacklistConstructor( User user, List<Integer> rules ) {
+		return c -> blacklistConstructor(c, user, rules);
 	}
 	
 	public static synchronized Consumer<EmbedCreateSpec> getTellstonesBoardConstructor( TellStonesBoard board ) {
@@ -73,15 +77,31 @@ public class EmbedBuilders {
 		return spec;
 	}
 	
-	private static synchronized EmbedCreateSpec leaderboardConstructor( EmbedCreateSpec spec, String category, List<String> entries, List<String> values ) {
+	private static synchronized EmbedCreateSpec blacklistConstructor( EmbedCreateSpec spec, User user, List<Integer> rules ) {
+		spec.setColor(Color.of(139, 0, 0));
+		spec.setAuthor(String.format("%s#%s", user.getUsername(), user.getDiscriminator()), null, user.getAvatarUrl());
+		spec.setDescription("Message removed for violating blacklist rules.");
+		StringBuilder violated = new StringBuilder();
+		for( int rule : rules ) {
+			violated.append(String.format("Rule %d, ", rule));
+		}
+		if( rules.size() > 0 ) {
+			String violatedString = String.format("Violated Rules: %s (`%bl rules` for more info)", violated.toString().substring(0, violated.length()-2));
+			spec.setFooter(violatedString, null);
+		}
+		return spec;
+	}
+	
+	private static synchronized EmbedCreateSpec leaderboardConstructor( EmbedCreateSpec spec, String category, List<String> entries, List<String> values, int total ) {
 		spec.setColor(Color.of(212, 175, 55));
 		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
 		spec.setTitle(String.format("%s Leaderboard", category));
 		
 		for( int f=0; f<Math.min(entries.size(), values.size()); f++ ) {
-			spec.addField(entries.get(f), values.get(f), false);
+			spec.addField(entries.get(f), values.get(f), true);
 		}
 		
+		spec.setFooter(String.format("Total reputation awarded: %d", (int) (total / 2)), null);
 		return spec;
 	}
 	

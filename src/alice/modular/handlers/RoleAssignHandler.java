@@ -16,6 +16,7 @@ import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.EmbedBuilders;
 import alice.framework.utilities.EventUtilities;
+import alice.framework.utilities.StringUtilities;
 import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.RoleAssignAction;
 import alice.modular.actions.RoleUnassignAction;
@@ -23,8 +24,10 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
 public class RoleAssignHandler extends MentionHandler implements Documentable {
@@ -57,25 +60,48 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 			if( ts.containsAnyTokensIgnoreCase(Keywords.REMOVE_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role does not exist!")));
+					Role closestRole = getClosestRoleByName(event.getGuild().block(), role, Integer.MAX_VALUE);
+					if( closestRole == null ) {
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role does not exist!")));
+					} else {
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(String.format("Did you mean: `%s`?", closestRole.getName()), "Role not found")));
+					}
 				} else {
 					if( !roleAllowed(role, allowRules, disallowRules) ) {
 					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You don't have permission to modify that role!", EmbedBuilders.ERR_PERMISSION)));
 					} else {
-						response.addAction(new RoleUnassignAction(event.getMessage().getAuthorAsMember(), foundRole));
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role unassigned successfully!")));
+						if( event.getMessage().getUserMentions().blockFirst() != null && PermissionProfile.hasPermission(event.getMessage().getAuthor(), event.getGuild(), Permission.ADMINISTRATOR) ) {
+							for( User user : event.getMessage().getUserMentions().collectList().block() ) {
+								response.addAction(new RoleUnassignAction(user.asMember(event.getGuildId().get()), foundRole));
+							}
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role forcefully unassigned successfully!")));
+						} else {
+							response.addAction(new RoleUnassignAction(event.getMessage().getAuthorAsMember(), foundRole));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role unassigned successfully!")));
+						}
 					}
 				}
 			} else if( ts.containsAnyTokensIgnoreCase(Keywords.ADD_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role doesn't exist!")));
-				} else {
+					Role closestRole = getClosestRoleByName(event.getGuild().block(), role, Integer.MAX_VALUE);
+					if( closestRole == null ) {
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role does not exist!", "Role not found")));
+					} else {
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(String.format("Did you mean: `%s`?", closestRole.getName()), "Role not found")));
+					}				} else {
 					if( !roleAllowed(role, allowRules, disallowRules) ) {
 						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You do not have permission to modify that role!", EmbedBuilders.ERR_PERMISSION)));
 					} else {
-						response.addAction(new RoleAssignAction(event.getMessage().getAuthorAsMember(), foundRole));
-						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role assigned successfully!")));
+						if( event.getMessage().getUserMentions().blockFirst() != null && PermissionProfile.hasPermission(event.getMessage().getAuthor(), event.getGuild(), Permission.ADMINISTRATOR) ) {
+							for( User user : event.getMessage().getUserMentions().collectList().block() ) {
+								response.addAction(new RoleAssignAction(user.asMember(event.getGuildId().get()), foundRole));
+							}
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role forcefully assigned successfully!")));
+						} else {
+							response.addAction(new RoleAssignAction(event.getMessage().getAuthorAsMember(), foundRole));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role assigned successfully!")));
+						}
 					}
 				}
 			}
@@ -110,6 +136,22 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 			Role role = guild.getRoleById(id).block();
 			if( role.getName().equalsIgnoreCase(roleName) ) {
 				foundRole = role;
+			}
+		}
+		
+		return foundRole;
+	}
+	
+	private Role getClosestRoleByName(Guild guild, String roleName, int distance) {
+		Role foundRole = null;
+		List<Snowflake> ids = new ArrayList<Snowflake>(guild.getRoleIds());
+		int minDist = Integer.MAX_VALUE;
+		for( Snowflake id : ids ) {
+			Role role = guild.getRoleById(id).block();
+			int newMinDist = StringUtilities.levenshteinDistance(role.getName().toLowerCase(), roleName.toLowerCase());
+			if( newMinDist < minDist && newMinDist < distance ) {
+				foundRole = role;
+				minDist = newMinDist;
 			}
 		}
 		

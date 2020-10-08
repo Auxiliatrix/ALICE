@@ -2,8 +2,10 @@ package alice.framework.main;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.reflections.Reflections;
@@ -21,6 +23,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.rest.util.Image;
+import reactor.core.publisher.Mono;
 
 public class Brain {
 	
@@ -30,41 +33,33 @@ public class Brain {
 	public static AtomicReference<List<Handler>> handlers = new AtomicReference<List<Handler>>(new ArrayList<Handler>()); // This is disgusting
 	
 	public static AtomicSaveFolder guildIndex = new AtomicSaveFolder();
-		
-	private static Runnable upkeep = () -> {
-		int cycle = 0;
-		MessageChannel channel = (MessageChannel) client.getChannelById(Snowflake.of(757836189687349308L)).block();
-		while( true ) {
-			AliceLogger.info(String.format("Starting cycle %d", cycle));
-			try {
-				channel.createMessage(String.format("Starting cycle %d", cycle)).block();
-			} catch( Exception e ) {
-				AliceLogger.error("Socket reset this cycle. Trying again next cycle.");
-			}
-			try {
-				Thread.sleep(300000);
-			} catch (InterruptedException e) {
-				break;
-			}
-			cycle++;
-		}
-	};
+	
+	public static AtomicBoolean RESTART = new AtomicBoolean(true);
+	public static MessageChannel upkeepChannel;
+	public static int counter = 0;
 	
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {
 			AliceLogger.error("Please pass the TOKEN as the first argument.");
 			System.exit(0);
 		}
-		AliceLogger.info("Reloading save data...");
-		reload();
-		
-		AliceLogger.info("Logging in...");
-		login(args[0]);
-		
-		upkeep.run();
-		
-		client.onDisconnect().block();
-		AliceLogger.info("Shutting down...");
+		while( RESTART.get() ) {
+			AliceLogger.info("Reloading save data...");
+			reload();
+			
+			AliceLogger.info("Logging in...");
+			login(args[0]);
+			
+			upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
+			client.on(ReadyEvent.class)
+			.flatMap(event -> upkeepChannel.createMessage(String.format("Starting cycle %d", counter++)).and(Mono.delay(Duration.ofMinutes(5))))
+			.subscribe();
+			
+			client.onDisconnect().block();
+			client = null;
+			
+			AliceLogger.info("Shutting down...");
+		}
 	}
 	
 	public static Handler<?> getModuleByName(String name) {

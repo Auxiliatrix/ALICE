@@ -27,7 +27,7 @@ public class PruneHandler extends MentionHandler implements Documentable {
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
-		return ts.containsAnyTokensIgnoreCase(Keywords.DESTROY) && event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
+		return ts.containsAnyTokensIgnoreCase(Keywords.DESTROY) && ts.containsAnyTokensIgnoreCase("message", "messages") && event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
 	}
 
 	@Override

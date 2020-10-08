@@ -31,12 +31,12 @@ public class ThankHandler extends Handler<MessageCreateEvent> {
 		long lastRep = guildData.getLong(lastRepKey);
 		long remaining = Constants.REPUTATION_INTERVAL - (System.currentTimeMillis() - lastRep);
 		
-		return new TokenizedString(event.getMessage().getContent()).containsAnyTokensIgnoreCase("thank", "thanks", "ty", "tyty") && !PermissionProfile.isBot(event.getMessage().getAuthor(), event.getGuild()) && remaining <= 0;
+		return new TokenizedString(event.getMessage().getContent()).containsAnyTokensIgnoreCase("thanks", "ty", "tyty") && !PermissionProfile.isBot(event.getMessage().getAuthor(), event.getGuild()) && remaining <= 0;
 	}
 
 	@Override
 	protected Action execute(MessageCreateEvent event) {
-		return new MessageCreateAction(event.getMessage().getChannel(), "You can thank them by typing `%rep @user`!\nYou can award one every four hours, and should have one available now.");
+		return new MessageCreateAction(event.getMessage().getChannel(), "You can thank them by typing `%rep @user`! You can do so every four hours, and will give both of you a ticket for an end-of-quarter raffle.");
 	}
 
 }

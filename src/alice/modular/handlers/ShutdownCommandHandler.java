@@ -1,9 +1,10 @@
 package alice.modular.handlers;
 
 import alice.framework.actions.Action;
-import alice.framework.actions.NullAction;
+import alice.framework.actions.VoidAction;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.handlers.Documentable;
+import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
 import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.ShutdownAction;
@@ -15,16 +16,14 @@ public class ShutdownCommandHandler extends CommandHandler implements Documentab
 			"Shutting down.",
 			"Good night!",
 			"Farewell.",
-			"See you soon! *robot shutdown noise*",
 			"And i oop--",
 			"*windows xp powering off noise*",
-			"I'll be back.",
 			"I won't be down forever~",
 			"Lights out!",
 			"Going to sleep.",
 			"AAAAaaa a  a   a    a",
 			"Saving files... Alright! Shutting down!",
-			"Aww. See you in a bit, I guess!"
+			"Aww. See you later, I guess!"
 	};
 	
 	public ShutdownCommandHandler() {
@@ -39,7 +38,7 @@ public class ShutdownCommandHandler extends CommandHandler implements Documentab
 	@Override
 	protected Action execute(MessageCreateEvent event) {
 		String message = SHUTDOWN_MESSAGES[(int) (Math.random() * SHUTDOWN_MESSAGES.length)];
-		return new NullAction()
+		return new VoidAction(() -> {Brain.RESTART.set(false);})
 				.addAction(new MessageCreateAction(event.getMessage().getChannel(), message))
 				.addAction(new ShutdownAction());
 	}
@@ -51,13 +50,13 @@ public class ShutdownCommandHandler extends CommandHandler implements Documentab
 
 	@Override
 	public String getDescription() {
-		return "An override command to shut down this bot.";
+		return "An override command to restart this bot.";
 	}
 
 	@Override
 	public DocumentationPair[] getUsage() {
 		return new DocumentationPair[] {
-			new DocumentationPair(invocation, "Shuts down this bot across all servers.")	
+			new DocumentationPair(invocation, "Restarts this bot across all servers.")	
 		};
 	}
 	

@@ -1,5 +1,6 @@
 package alice.modular.handlers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,7 +71,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 			long remaining = Constants.REPUTATION_INTERVAL - (System.currentTimeMillis() - lastRep);
 			
 			if( remaining > 0 && !PermissionProfile.hasPermission(event.getMessage().getAuthor(), event.getGuild(), Permission.ADMINISTRATOR) ) {
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(String.format("You must wait %d seconds until you may do that again.", remaining/1000), EmbedBuilders.ERR_USAGE)));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(String.format("You must wait %s until you may do that again.", Duration.ofMillis(remaining).toString().replace("PT", "").replace("H", " Hours, ").replace("M", " Minutes, ").replace("S", " Seconds")), EmbedBuilders.ERR_USAGE)));
 			} else {
 				User target = event.getMessage().getUserMentions().blockFirst();
 				if( target.equals(user.get()) && !PermissionProfile.hasPermission(user, event.getGuild(), Permission.ADMINISTRATOR) ) {
@@ -114,20 +115,22 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 				}
 			}
 			
+			int total = 0;
 			List<QuantifiedPair<String>> entries = new ArrayList<QuantifiedPair<String>>();
 			for( String key : new HashSet<String>(reputationMap.keySet()) ) {
 				entries.add(new QuantifiedPair<String>(key, reputationMap.getInt(key)));
+				total += reputationMap.getInt(key);
 			}
 			entries.sort( (a, b) -> a.compareTo(b) );
 			List<String> fieldHeaders = new ArrayList<String>();
 			List<String> fieldBodies = new ArrayList<String>();
-			for( int f=0; f< Math.min(10, entries.size()); f++ ) {
+			for( int f=0; f< Math.min(12, entries.size()); f++ ) {
 				QuantifiedPair<String> entry = entries.get(f);
 				fieldHeaders.add(String.format("%d. %s%s", f+1, event.getGuild().block().getMemberById(Snowflake.of(entry.key)).block().getDisplayName(), f==0 ? " :star:" : ""));
 				fieldBodies.add(String.format("Reputation:\t:scroll: %d", entry.value));
 			}
 			
-			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getLeaderboardConstructor("Reputation", fieldHeaders, fieldBodies)));
+			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getLeaderboardConstructor("Reputation", fieldHeaders, fieldBodies, total)));
 		} else {
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));
 		}
