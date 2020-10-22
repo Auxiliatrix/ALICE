@@ -58,7 +58,6 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 		if( ts.size() == 1 ) {
 			if( !reputationMap.has(ownId) ) {
 				reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(ownId, 0));
-				// reputationMap.put(ownId, 0);
 			}
 			int reputation = reputationMap.getInt(ownId);
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationSelfConstructor(user.get(), reputation)));
@@ -71,7 +70,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 			long remaining = Constants.REPUTATION_INTERVAL - (System.currentTimeMillis() - lastRep);
 			
 			if( remaining > 0 && !PermissionProfile.hasPermission(event.getMessage().getAuthor(), event.getGuild(), Permission.ADMINISTRATOR) ) {
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(String.format("You must wait %s until you may do that again.", Duration.ofMillis(remaining).toString().replace("PT", "").replace("H", " Hours, ").replace("M", " Minutes, ").replace("S", " Seconds")), EmbedBuilders.ERR_USAGE)));
+				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor(String.format("You must wait %s until you may do that again.", Duration.ofMillis(remaining).toString().replace("PT", "").replace("H", " Hours, ").replace("M", " Minutes, ").replace("S", " Seconds")), "Cooldown Error")));
 			} else {
 				User target = event.getMessage().getUserMentions().blockFirst();
 				if( target.equals(user.get()) && !PermissionProfile.hasPermission(user, event.getGuild(), Permission.ADMINISTRATOR) ) {
@@ -130,7 +129,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 				fieldBodies.add(String.format("Reputation:\t:scroll: %d", entry.value));
 			}
 			
-			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getLeaderboardConstructor("Reputation", fieldHeaders, fieldBodies, total)));
+			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getLeaderboardConstructor("Reputation", fieldHeaders, fieldBodies, total, entries.size())));
 		} else {
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));
 		}

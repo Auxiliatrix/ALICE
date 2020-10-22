@@ -25,13 +25,19 @@ public class ThankHandler extends Handler<MessageCreateEvent> {
 		AtomicSaveFile guildData = Brain.guildIndex.get(event.getGuild().block().getId().asString());
 
 		String lastRepKey = String.format("%d_lastrep", event.getMessage().getAuthorAsMember().block().getId().asLong());
+		String lastRemindKey = String.format("%d_lastremind", event.getMessage().getAuthorAsMember().block().getId().asLong());
 		if( !guildData.has(lastRepKey) ) {
 			guildData.put(lastRepKey, System.currentTimeMillis() - (Constants.REPUTATION_INTERVAL+1000));
 		}
+		if( !guildData.has(lastRemindKey) ) {
+			guildData.put(lastRemindKey, System.currentTimeMillis() - (2*Constants.REPUTATION_INTERVAL+1000));
+		}
 		long lastRep = guildData.getLong(lastRepKey);
+		long lastRemind = guildData.getLong(lastRemindKey);
 		long remaining = Constants.REPUTATION_INTERVAL - (System.currentTimeMillis() - lastRep);
+		long remindCooldown = Constants.REPUTATION_INTERVAL*2 - (System.currentTimeMillis() - lastRemind);
 		
-		return new TokenizedString(event.getMessage().getContent()).containsAnyTokensIgnoreCase("thanks", "ty", "tyty") && !PermissionProfile.isBot(event.getMessage().getAuthor(), event.getGuild()) && remaining <= 0;
+		return new TokenizedString(event.getMessage().getContent()).containsAnyTokensIgnoreCase("thanks", "ty", "tyty") && !PermissionProfile.isBot(event.getMessage().getAuthor(), event.getGuild()) && remaining <= 0 && remindCooldown <= 0;
 	}
 
 	@Override

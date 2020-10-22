@@ -59,8 +59,8 @@ public class EmbedBuilders {
 		return c -> reputationChangeConstructor(c, user, reputation);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getLeaderboardConstructor( String category, List<String> entries, List<String> values, int total ) {
-		return c -> leaderboardConstructor(c, category, entries, values, total);
+	public static synchronized Consumer<EmbedCreateSpec> getLeaderboardConstructor( String category, List<String> entries, List<String> values, int total, int size ) {
+		return c -> leaderboardConstructor(c, category, entries, values, total, size);
 	}
 	
 	public static synchronized Consumer<EmbedCreateSpec> getBlacklistConstructor( User user, List<Integer> rules ) {
@@ -92,7 +92,7 @@ public class EmbedBuilders {
 		return spec;
 	}
 	
-	private static synchronized EmbedCreateSpec leaderboardConstructor( EmbedCreateSpec spec, String category, List<String> entries, List<String> values, int total ) {
+	private static synchronized EmbedCreateSpec leaderboardConstructor( EmbedCreateSpec spec, String category, List<String> entries, List<String> values, int total, int size ) {
 		spec.setColor(Color.of(212, 175, 55));
 		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
 		spec.setTitle(String.format("%s Leaderboard", category));
@@ -101,7 +101,7 @@ public class EmbedBuilders {
 			spec.addField(entries.get(f), values.get(f), true);
 		}
 		
-		spec.setFooter(String.format("Total reputation awarded: %d", (int) (total / 2)), null);
+		spec.setFooter(String.format("Total reputation awarded: %d | Total participants: %d", (int) (total / 2), size), null);
 		return spec;
 	}
 	

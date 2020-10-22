@@ -10,13 +10,11 @@ import reactor.core.publisher.Mono;
 public class MessageCreateAction extends Action {
 		
 	public MessageCreateAction(Mono<MessageChannel> channel, String content) {
-		super();
-		this.mono = channel.block().createMessage(content);
+		super(channel.block().createMessage(content));
 	}
 	
 	public MessageCreateAction(Mono<MessageChannel> channel, Consumer<? super EmbedCreateSpec> spec) {
-		super();
-		this.mono = channel.block().createEmbed(spec);
+		super(channel.block().createEmbed(spec));
 	}
 	
 }

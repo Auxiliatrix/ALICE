@@ -8,8 +8,7 @@ import reactor.core.publisher.Mono;
 public class RoleUnassignAction extends Action {
 	
 	public RoleUnassignAction(Mono<Member> target, Role role) {
-		super();
-		this.mono = target.block().removeRole(role.getId());
+		super(target.block().removeRole(role.getId()));
 	}
 	
 }

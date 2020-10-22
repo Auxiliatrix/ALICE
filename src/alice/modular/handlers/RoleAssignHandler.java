@@ -60,7 +60,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 			if( ts.containsAnyTokensIgnoreCase(Keywords.REMOVE_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
-					Role closestRole = getClosestRoleByName(event.getGuild().block(), role, Integer.MAX_VALUE);
+					Role closestRole = getClosestRoleByName(event.getGuild().block(), role, Integer.MAX_VALUE, allowRules, disallowRules);
 					if( closestRole == null ) {
 						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role does not exist!")));
 					} else {
@@ -84,7 +84,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 			} else if( ts.containsAnyTokensIgnoreCase(Keywords.ADD_REQUEST) ) {
 				Role foundRole = getRoleByName(event.getGuild().block(), role);
 				if( foundRole == null ) {
-					Role closestRole = getClosestRoleByName(event.getGuild().block(), role, Integer.MAX_VALUE);
+					Role closestRole = getClosestRoleByName(event.getGuild().block(), role, Integer.MAX_VALUE, allowRules, disallowRules);
 					if( closestRole == null ) {
 						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That role does not exist!", "Role not found")));
 					} else {
@@ -142,14 +142,14 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 		return foundRole;
 	}
 	
-	private Role getClosestRoleByName(Guild guild, String roleName, int distance) {
+	private Role getClosestRoleByName(Guild guild, String roleName, int distance, JSONArray allowRules, JSONArray disallowRules) {
 		Role foundRole = null;
 		List<Snowflake> ids = new ArrayList<Snowflake>(guild.getRoleIds());
 		int minDist = Integer.MAX_VALUE;
 		for( Snowflake id : ids ) {
 			Role role = guild.getRoleById(id).block();
 			int newMinDist = StringUtilities.levenshteinDistance(role.getName().toLowerCase(), roleName.toLowerCase());
-			if( newMinDist < minDist && newMinDist < distance ) {
+			if( newMinDist < minDist && newMinDist < distance && roleAllowed(roleName, allowRules, disallowRules)) {
 				foundRole = role;
 				minDist = newMinDist;
 			}

@@ -11,13 +11,11 @@ import reactor.core.publisher.Mono;
 public class MessageDeleteFilteredAction extends Action {
 	
 	public MessageDeleteFilteredAction(Mono<GuildMessageChannel> channel, Snowflake end, Predicate<? super Message> filter) {
-		super();
-		this.mono = channel.block().bulkDeleteMessages(channel.block().getMessagesBefore(end).filter(filter)).collectList();
+		super(channel.block().bulkDeleteMessages(channel.block().getMessagesBefore(end).filter(filter)).collectList());
 	}
 	
 	public MessageDeleteFilteredAction(Mono<GuildMessageChannel> channel, Snowflake end, int quantity, Predicate<? super Message> filter) {
-		super();
-		this.mono = channel.block().bulkDeleteMessages(channel.block().getMessagesBefore(end).filter(filter).take(quantity)).collectList();
+		super(channel.block().bulkDeleteMessages(channel.block().getMessagesBefore(end).filter(filter).take(quantity)).collectList());
 	}
 	
 }

@@ -26,7 +26,7 @@ public class BlacklistPassiveHandler extends Handler<MessageCreateEvent> {
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
-		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
+		AtomicSaveFile guildData = Brain.guildIndex.get(event.getGuild().block().getId().asString());
 		if( !guildData.has("blacklist_rules") ) {
 			guildData.put("blacklist_rules", new JSONArray());
 		}

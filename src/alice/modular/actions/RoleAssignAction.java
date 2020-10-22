@@ -8,8 +8,7 @@ import reactor.core.publisher.Mono;
 public class RoleAssignAction extends Action {
 	
 	public RoleAssignAction(Mono<Member> target, Role role) {
-		super();
-		this.mono = target.block().addRole(role.getId());
+		super(target.block().addRole(role.getId()));
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,6 +24,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.rest.util.Image;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class Brain {
@@ -36,7 +38,24 @@ public class Brain {
 	
 	public static AtomicBoolean RESTART = new AtomicBoolean(true);
 	public static MessageChannel upkeepChannel;
-	public static int counter = 0;
+	public static MessageChannel reportChannel;
+	
+	public static AtomicReference<PriorityQueue<Scheduled>> schedule = new AtomicReference<PriorityQueue<Scheduled>>(new PriorityQueue<Scheduled>());
+	
+	public static class Scheduled implements Comparable<Scheduled> {
+		public long date;
+		public Mono<?> response;
+		
+		public Scheduled(long date, Mono<?> response) {
+			this.date = date;
+			this.response = response;
+		}
+
+		@Override
+		public int compareTo(Scheduled o) {
+			return Long.valueOf(this.date).compareTo(o.date);
+		}
+	}
 	
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {
@@ -44,6 +63,7 @@ public class Brain {
 			System.exit(0);
 		}
 		while( RESTART.get() ) {
+			handlers.get().clear();
 			AliceLogger.info("Reloading save data...");
 			reload();
 			
@@ -51,8 +71,38 @@ public class Brain {
 			login(args[0]);
 			
 			upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
+			reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();
+
 			client.on(ReadyEvent.class)
-			.flatMap(event -> upkeepChannel.createMessage(String.format("Starting cycle %d", counter++)).and(Mono.delay(Duration.ofMinutes(5))))
+			.flatMap(
+					event -> Flux.defer( 
+							() -> Mono.fromRunnable(() -> {
+								schedule.get().add(new Scheduled(System.currentTimeMillis(), upkeepChannel.createMessage("Running upkeep.")));
+							})
+									.and(Mono.delay(Duration.ofMinutes(5)))
+									.repeat()
+						)
+				)
+			.subscribe();
+			
+			client.on(ReadyEvent.class)
+			.flatMap(
+					event -> Flux.defer(
+							() -> Mono.fromRunnable(
+										() -> {
+											while( !schedule.get().isEmpty() ) {
+												if( schedule.get().element().date < System.currentTimeMillis() ) {
+													schedule.get().remove().response.block();
+												} else {
+													break;
+												}
+											}
+										}
+									)
+										.and(Mono.delay(Duration.ofSeconds(1)))
+										.repeat()
+						)
+				)
 			.subscribe();
 			
 			client.onDisconnect().block();

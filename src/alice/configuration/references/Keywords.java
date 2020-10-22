@@ -80,6 +80,7 @@ public class Keywords {
 	
 	public static final String[] ADD_REQUEST = new String[] {
 			"add",
+			"bestow",
 			"give",
 			"get",
 			"request",

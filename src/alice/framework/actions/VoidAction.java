@@ -5,8 +5,7 @@ import reactor.core.publisher.Mono;
 public class VoidAction extends Action {
 	
 	public VoidAction(Runnable runnable) {
-		super();
-		this.mono = Mono.fromRunnable(runnable);
+		super( Mono.fromRunnable(runnable) );
 	}
 
 }

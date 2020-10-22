@@ -8,8 +8,7 @@ import reactor.core.publisher.Mono;
 public class MessageDeleteBulkAction extends Action {
 	
 	public MessageDeleteBulkAction(Mono<GuildMessageChannel> channel, String start) {
-		super();
-		this.mono = channel.block().bulkDeleteMessages(channel.block().getMessagesAfter(Snowflake.of(start))).collectList();
+		super(channel.block().bulkDeleteMessages(channel.block().getMessagesAfter(Snowflake.of(start))).collectList());
 	}
 	
 }

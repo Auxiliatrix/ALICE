@@ -9,13 +9,13 @@ import reactor.core.publisher.Mono;
 public class MemberMoveChannelAction extends Action {
 
 	public MemberMoveChannelAction( Mono<Member> member, VoiceChannel channel ) {
-		super();
-		this.mono = member.block().edit( gmes -> {
+		super( member.block().edit( gmes -> {
 				editUserVC(gmes, member, channel);
-		} );
+			})
+		);
 	}
 	
-	private GuildMemberEditSpec editUserVC(GuildMemberEditSpec gmes, Mono<Member> member, VoiceChannel channel) {
+	private static GuildMemberEditSpec editUserVC(GuildMemberEditSpec gmes, Mono<Member> member, VoiceChannel channel) {
 		gmes.setNewVoiceChannel(channel.getId());
 		return gmes;
 	}

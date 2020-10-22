@@ -18,6 +18,10 @@ public class AliceLogger {
 	private static boolean echo = true;
 	private static int threshold = -1;
 	
+	public static synchronized void report(String message) {
+		Brain.reportChannel.createMessage(message);
+	}
+	
 	public static synchronized void log(String message) {
 		// TODO: Add other channels
 		System.out.println(message);

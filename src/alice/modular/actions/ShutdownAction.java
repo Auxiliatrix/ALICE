@@ -6,8 +6,7 @@ import alice.framework.main.Brain;
 public class ShutdownAction extends Action {
 
 	public ShutdownAction() {
-		super();
-		this.mono = Brain.client.logout();
+		super(Brain.client.logout());
 	}
 
 }
