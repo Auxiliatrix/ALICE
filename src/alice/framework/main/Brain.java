@@ -77,7 +77,7 @@ public class Brain {
 			.flatMap(
 					event -> Flux.defer( 
 							() -> Mono.fromRunnable(() -> {
-								schedule.get().add(new Scheduled(System.currentTimeMillis(), upkeepChannel.createMessage("Running upkeep.")));
+								schedule.get().add(new Scheduled(System.currentTimeMillis(), upkeepChannel.createMessage("Running upkeep")));
 							})
 									.and(Mono.delay(Duration.ofMinutes(5)))
 									.repeat()
@@ -87,20 +87,20 @@ public class Brain {
 			
 			client.on(ReadyEvent.class)
 			.flatMap(
-					event -> Flux.defer(
-							() -> Mono.fromRunnable(
-										() -> {
-											while( !schedule.get().isEmpty() ) {
-												if( schedule.get().element().date < System.currentTimeMillis() ) {
-													schedule.get().remove().response.block();
-												} else {
-													break;
-												}
-											}
-										}
-									)
-										.and(Mono.delay(Duration.ofSeconds(1)))
-										.repeat()
+					event -> Flux.defer( () ->
+							Mono.defer(() -> {
+								Mono<?> baseMono = Mono.fromRunnable(() -> {});
+								while( !schedule.get().isEmpty() ) {
+									if( schedule.get().element().date < System.currentTimeMillis() ) {
+										baseMono = baseMono.and(schedule.get().remove().response);
+									} else {
+										break;
+									}
+								}
+								return baseMono;
+							})
+									.and(Mono.delay(Duration.ofSeconds(1)))
+									.repeat()
 						)
 				)
 			.subscribe();
