@@ -21,13 +21,8 @@ import reactor.core.publisher.Mono;
 public class TellstonesCommandHandler extends CommandHandler {
 
 	public TellstonesCommandHandler() {
-		super("Tellstones", false, PermissionProfile.getNotBotPreset());
+		super("Tellstones", false, PermissionProfile.getAnyonePreset().andFromUser());
 		this.aliases.add("ts");
-	}
-
-	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return true;
 	}
 
 	@Override
