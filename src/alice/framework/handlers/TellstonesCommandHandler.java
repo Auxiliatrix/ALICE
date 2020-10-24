@@ -31,7 +31,7 @@ public class TellstonesCommandHandler extends CommandHandler {
 	}
 
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		List<String> tokens = ts.getTokens();
@@ -105,7 +105,7 @@ public class TellstonesCommandHandler extends CommandHandler {
 			}
 		}
 
-		return response;
+		response.toMono().block();
 	}
 
 }

@@ -1,6 +1,5 @@
 package alice.modular.handlers;
 
-import alice.framework.actions.Action;
 import alice.framework.actions.VoidAction;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.handlers.Documentable;
@@ -31,16 +30,11 @@ public class ShutdownCommandHandler extends CommandHandler implements Documentab
 	}
 
 	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return true;
-	}
-
-	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		String message = SHUTDOWN_MESSAGES[(int) (Math.random() * SHUTDOWN_MESSAGES.length)];
-		return new VoidAction(() -> {Brain.RESTART.set(false);})
+		new VoidAction(() -> {Brain.RESTART.set(false);})
 				.addAction(new MessageCreateAction(event.getMessage().getChannel(), message))
-				.addAction(new ShutdownAction());
+				.addAction(new ShutdownAction()).toMono().block();
 	}
 
 	@Override

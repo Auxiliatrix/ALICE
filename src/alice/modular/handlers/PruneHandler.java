@@ -16,22 +16,21 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
-import discord4j.core.object.entity.channel.Channel.Type;
 
 public class PruneHandler extends MentionHandler implements Documentable {
 
 	public PruneHandler() {
-		super("Prune", false, PermissionProfile.getAdminPreset());
+		super("Prune", false, PermissionProfile.getAdminPreset().andNotDM());
 	}
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
-		return ts.containsAnyTokensIgnoreCase(Keywords.DESTROY) && ts.containsAnyTokensIgnoreCase("message", "messages") && event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
+		return ts.containsAnyTokensIgnoreCase(Keywords.DESTROY) && ts.containsAnyTokensIgnoreCase("message", "messages");
 	}
 
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		List<Integer> numbers = ts.getNumbers();
@@ -44,7 +43,7 @@ public class PruneHandler extends MentionHandler implements Documentable {
 			response.addAction(new MessageDeleteFilteredAction(event.getMessage().getChannel().map(m -> (GuildMessageChannel) m), event.getMessage().getId(), numbers.get(0), m -> filterMessage(m, mentions, quoted)));
 		}
 		response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Messages pruned successfully!")));
-		return response;
+		response.toMono().block();
 	}
 	
 	private boolean filterMessage(Message message, List<User> mentions, List<String> quoted) {

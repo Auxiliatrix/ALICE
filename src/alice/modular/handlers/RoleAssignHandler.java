@@ -25,7 +25,6 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
@@ -33,16 +32,16 @@ import reactor.core.publisher.Mono;
 public class RoleAssignHandler extends MentionHandler implements Documentable {
 	
 	public RoleAssignHandler() {
-		super("RoleAssign", false, PermissionProfile.getAnyonePreset());
+		super("RoleAssign", false, PermissionProfile.getAnyonePreset().andNotDM());
 	}
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
-		return new TokenizedString(event.getMessage().getContent()).containsTokenIgnoreCase("role") && event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
+		return new TokenizedString(event.getMessage().getContent()).containsTokenIgnoreCase("role");
 	}
 
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		
@@ -106,7 +105,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 				}
 			}
 		}
-		return response;
+		response.toMono().block();
 	}
 	
 	@Override

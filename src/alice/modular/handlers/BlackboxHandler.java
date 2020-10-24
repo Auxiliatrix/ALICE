@@ -14,7 +14,6 @@ import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.MessageDeleteBulkAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -24,24 +23,24 @@ import reactor.core.publisher.Mono;
 public class BlackboxHandler extends MentionHandler implements Documentable {
 
 	public BlackboxHandler() {
-		super("Blackbox", false, PermissionProfile.getAdminPreset());
+		super("Blackbox", false, PermissionProfile.getAdminPreset().andNotDM());
 		aliases.add("bb");
 	}
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
-		return (ts.containsIgnoreCase("blackbox") || ts.containsAllTokensIgnoreCase("black", "box"))
-				&& event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
+		return (ts.containsIgnoreCase("blackbox") || ts.containsAllTokensIgnoreCase("black", "box"));
 	}
 
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
 		Mono<MessageChannel> channel = event.getMessage().getChannel();
+		
 		if( ts.containsAnyIgnoreCase(Keywords.DESTROY) || ts.containsAnyIgnoreCase(Keywords.END) || ts.containsAnyIgnoreCase(Keywords.DISABLE) ) {
 			if( guildData.has(String.format("%s_blackbox_start", channel.block().getId().asString())) ) {
 				response.addAction(new MessageDeleteBulkAction(channel.map(c -> (GuildMessageChannel) c), guildData.getString(String.format("%s_blackbox_start", channel.block().getId().asString()))));
@@ -66,7 +65,7 @@ public class BlackboxHandler extends MentionHandler implements Documentable {
 			}
 		}
 		
-		return response;
+		response.toMono().block();
 	}
 	
 	private static synchronized EmbedCreateSpec blackboxOpenConstructor( EmbedCreateSpec spec ) {

@@ -39,7 +39,7 @@ public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements 
 	}
 
 	@Override
-	protected Action execute(VoiceStateUpdateEvent event) {
+	protected void execute(VoiceStateUpdateEvent event) {
 		System.out.println("Classroom triggered");
 		Action response = new NullAction();
 		
@@ -72,7 +72,7 @@ public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements 
 			}
 		}
 		
-		return response;
+		response.toMono().block();
 	}
 	
 	private VoiceChannelCreateSpec constructVC( VoiceChannelCreateSpec vccs, Mono<Category> category, String channelName ) {

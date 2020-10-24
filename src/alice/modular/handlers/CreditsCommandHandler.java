@@ -1,6 +1,5 @@
 package alice.modular.handlers;
 
-import alice.framework.actions.Action;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.handlers.Documentable;
 import alice.framework.structures.PermissionProfile;
@@ -15,13 +14,8 @@ public class CreditsCommandHandler extends CommandHandler implements Documentabl
 	}
 
 	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return true;
-	}
-
-	@Override
-	protected Action execute(MessageCreateEvent event) {
-		return new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getCreditsConstructor());
+	protected void execute(MessageCreateEvent event) {
+		new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getCreditsConstructor()).toMono().block();
 	}
 
 	@Override

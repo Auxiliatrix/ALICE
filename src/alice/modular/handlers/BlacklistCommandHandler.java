@@ -20,7 +20,6 @@ import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -29,17 +28,12 @@ import reactor.core.publisher.Mono;
 public class BlacklistCommandHandler extends CommandHandler implements Documentable {
 	
 	public BlacklistCommandHandler() {
-		super("Blacklist", false, PermissionProfile.getAdminPreset());
+		super("Blacklist", false, PermissionProfile.getAdminPreset().andNotDM());
 		this.aliases.add("bl");
-	}
-
-	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
 	}
 	
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		Mono<MessageChannel> channel = event.getMessage().getChannel();
 		Optional<User> user = event.getMessage().getAuthor();
@@ -50,40 +44,38 @@ public class BlacklistCommandHandler extends CommandHandler implements Documenta
 		
 		if( tokens.size() == 1 || tokens.size() == 2 && !tokens.get(1).equalsIgnoreCase("rules") ) {
 			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getHelpConstructor(user, this)));
-			return response;
+		} else {
+			AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
+			
+			if( !guildData.has("blacklist_rules") ) {
+				guildData.put("blacklist_rules", new JSONArray());
+			}
+			JSONArray blacklist = (JSONArray) guildData.getJSONArray("blacklist_rules");
+			
+			switch( tokens.get(1).toLowerCase() ) {
+				case "rules":
+					response.addAction(new MessageCreateAction(channel, getRulesConstructor(blacklist)));
+					break;
+				case "add":
+					blacklist = guildData.modifyJSONArray("blacklist_rules", ja -> ja.put(tokens.get(2)));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule added successfully.")));
+					break;
+				case "remove":
+					int index = Integer.parseInt(tokens.get(2));
+					if( index >= blacklist.length() ) {
+						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That rule does not exist!")));
+						break;
+					}
+					blacklist = guildData.modifyJSONArray("blacklist_rules", ja -> ja.remove(index));
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule removed successfully.")));
+					break;
+				default:
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));
+					break;
+			}
+			
+			response.toMono().block();
 		}
-		
-		
-		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
-		
-		if( !guildData.has("blacklist_rules") ) {
-			guildData.put("blacklist_rules", new JSONArray());
-		}
-		JSONArray blacklist = (JSONArray) guildData.getJSONArray("blacklist_rules");
-		
-		switch( tokens.get(1).toLowerCase() ) {
-			case "rules":
-				response.addAction(new MessageCreateAction(channel, getRulesConstructor(blacklist)));
-				return response;
-			case "add":
-				blacklist = guildData.modifyJSONArray("blacklist_rules", ja -> ja.put(tokens.get(2)));
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule added successfully.")));
-				break;
-			case "remove":
-				int index = Integer.parseInt(tokens.get(2));
-				if( index >= blacklist.length() ) {
-					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("That rule does not exist!")));
-					return response;
-				}
-				blacklist = guildData.modifyJSONArray("blacklist_rules", ja -> ja.remove(index));
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Rule removed successfully.")));
-				break;
-			default:
-				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));
-				return response;
-		}
-		
-		return response;
 	}
 	
 	@Override

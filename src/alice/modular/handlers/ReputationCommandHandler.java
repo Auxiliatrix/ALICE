@@ -31,17 +31,12 @@ import reactor.core.publisher.Mono;
 public class ReputationCommandHandler extends CommandHandler implements Documentable {
 
 	public ReputationCommandHandler() {
-		super("Reputation", false, PermissionProfile.getNotBotPreset());
+		super("Reputation", false, PermissionProfile.getAnyonePreset().andFromUser().andNotDM());
 		this.aliases.add("Rep");
 	}
 
 	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return true;
-	}
-
-	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
@@ -136,7 +131,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 		
 		// guildData.put("reputation_map", reputationMap);
 		
-		return response;
+		response.toMono().block();
 	}
 
 	@Override

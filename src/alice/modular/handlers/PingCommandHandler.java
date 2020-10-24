@@ -1,7 +1,5 @@
 package alice.modular.handlers;
 
-import alice.framework.actions.Action;
-import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.handlers.Documentable;
 import alice.framework.structures.PermissionProfile;
@@ -14,13 +12,8 @@ public class PingCommandHandler extends CommandHandler implements Documentable {
 		super("Ping", false, PermissionProfile.getAnyonePreset());
 	}
 	
-	public boolean trigger(MessageCreateEvent event) {
-		return true;
-	}
-	
-	public Action execute(MessageCreateEvent event) {
-		return new NullAction()
-				.addAction(new MessageCreateAction(event.getMessage().getChannel(), "Pong!"));
+	public void execute(MessageCreateEvent event) {
+		new MessageCreateAction(event.getMessage().getChannel(), "Pong!").toMono().block();
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class ChatMuteCommandHandler extends CommandHandler {
 	}
 
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		AtomicSaveFile guildData = Brain.guildIndex.get(event.getGuild().block().getId().asString());
 		for( User user : event.getMessage().getUserMentions().collectList().block() ) {
@@ -37,7 +37,7 @@ public class ChatMuteCommandHandler extends CommandHandler {
 			}
 		}
 		response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Chatmute enforced successfully.")));
-		return response;
+		response.toMono().block();
 	}
 	
 	

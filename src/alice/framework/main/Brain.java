@@ -105,6 +105,23 @@ public class Brain {
 				)
 			.subscribe();
 			
+//			client.on(MessageCreateEvent.class)
+//			.filter(event -> event.getMessage().getContent().startsWith("%break"))
+//			.flatMap(event -> event.getMessage().getChannel())
+//			.flatMap(channel -> {
+//				Thread thread = new Thread(() -> {
+//					System.out.println("Processing");
+//					try {
+//						Thread.sleep(11000);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//					channel.createMessage("Broken!").block();
+//				});
+//				return Mono.fromRunnable(() -> {thread.start();});
+//			})
+//			.subscribe();
+			
 			client.onDisconnect().block();
 			client = null;
 			

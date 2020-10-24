@@ -2,8 +2,6 @@ package alice.modular.handlers;
 
 import java.io.File;
 
-import alice.framework.actions.Action;
-import alice.framework.actions.VoidAction;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
@@ -21,8 +19,8 @@ public class GuildLoadPassiveHandler extends Handler<GuildCreateEvent> {
 		return true;
 	}
 	
-	protected Action execute(GuildCreateEvent event) {
-		return new VoidAction( () -> loadGuildData(event) );
+	protected void execute(GuildCreateEvent event) {
+		loadGuildData(event);
 	}
 	
 	private void loadGuildData(GuildCreateEvent event) {

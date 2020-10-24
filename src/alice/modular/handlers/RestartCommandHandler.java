@@ -1,6 +1,5 @@
 package alice.modular.handlers;
 
-import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.handlers.Documentable;
@@ -27,16 +26,11 @@ public class RestartCommandHandler extends CommandHandler implements Documentabl
 	}
 
 	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return true;
-	}
-
-	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		String message = RESTART_MESSAGES[(int) (Math.random() * RESTART_MESSAGES.length)];
-		return new NullAction()
+		new NullAction()
 				.addAction(new MessageCreateAction(event.getMessage().getChannel(), message))
-				.addAction(new ShutdownAction());
+				.addAction(new ShutdownAction()).toMono().block();
 	}
 
 	@Override

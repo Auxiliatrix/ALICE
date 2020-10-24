@@ -1,11 +1,9 @@
 package alice.framework.handlers;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import alice.framework.actions.Action;
 import alice.framework.main.Brain;
 import alice.framework.utilities.AliceLogger;
 import discord4j.core.event.domain.Event;
@@ -27,29 +25,21 @@ public abstract class Handler<E extends Event> {
 		redundantSubscribe(type);
 	}
 	
-	private void subscribe(Class<E> type) {
+	protected void subscribe(Class<E> type) {
 		AliceLogger.info(String.format("Initializing %s module.", name), 2);
 		Brain.client.on(type)
 		.filter(event -> filter(event))
 		.flatMap(event -> payload(event)
 					.doOnError(e -> subscribe(type))
 					.onErrorStop()
-					.timeout(
-							Duration.ofSeconds(10), 
-							Mono.fromRunnable(() -> {
-								AliceLogger.report(String.format("Timeout in %s", name));
-								AliceLogger.error(String.format("Timeout in %s", name));
-							})
-					)
 				)
 		.subscribe();
-		// if that doesnt work, catch the propagated timeout exception and resubscribe
 		AliceLogger.info(String.format("%s Module initialized.", name), 2);
 	}
 	
-	private AtomicReference<E> currentEvent = new AtomicReference<E>(null);
+	protected AtomicReference<E> currentEvent = new AtomicReference<E>(null);
 	
-	private void redundantSubscribe(Class<E> type) {
+	protected void redundantSubscribe(Class<E> type) {
 		Brain.client.on(type)
 		.filter(event -> filter(event))
 		.flatMap(event -> watchdog(event, type))
@@ -69,15 +59,16 @@ public abstract class Handler<E extends Event> {
 				}
 			}
 			if( currentEvent.get() != event ) {
-				AliceLogger.report(String.format("Synchronization failure detected by watchdog in ", this.getClass().getName()));
+				AliceLogger.report(String.format("Synchronization failure detected by watchdog in %s", this.getClass().getName()));
+				AliceLogger.error(String.format("Synchronization failure detected by watchdog in %s", this.getClass().getName()));
 				subscribe(type);
-				execute(event);
+				//return payload(event);
 			}
 		});
 	}
 	
 	protected abstract boolean trigger(E event);
-	protected abstract Action execute(E event);
+	protected abstract void execute(E event);
 	
 	protected boolean filter(E event) {
 		return trigger(event);
@@ -88,7 +79,10 @@ public abstract class Handler<E extends Event> {
 		synchronized(currentEvent) {
 			currentEvent.notifyAll();
 		}
-		return execute(event).toMono();
+		Thread thread = new Thread(() -> {
+			execute(event);
+		});
+		return Mono.fromRunnable(() -> thread.start());
 	}
 	
 	public String getName() {

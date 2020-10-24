@@ -15,7 +15,6 @@ import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
-import discord4j.core.object.entity.channel.Channel.Type;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import reactor.core.publisher.Mono;
@@ -23,17 +22,12 @@ import reactor.core.publisher.Mono;
 public class ClassroomSetupCommandHandler extends CommandHandler implements Documentable {
 
 	public ClassroomSetupCommandHandler() {
-		super("ClassroomSetup", false, PermissionProfile.getAdminPreset());
+		super("ClassroomSetup", false, PermissionProfile.getAdminPreset().andNotDM());
 		this.aliases.add("cs");
 	}
 
 	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT;
-	}
-
-	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		Mono<MessageChannel> channel = event.getMessage().getChannel();
@@ -67,7 +61,7 @@ public class ClassroomSetupCommandHandler extends CommandHandler implements Docu
 					break;
 			}
 		}
-		return response;
+		response.toMono().block();
 	}
 
 	@Override

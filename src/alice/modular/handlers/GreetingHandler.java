@@ -1,7 +1,5 @@
 package alice.modular.handlers;
 
-import alice.framework.actions.Action;
-import alice.framework.actions.NullAction;
 import alice.framework.handlers.Documentable;
 import alice.framework.handlers.MentionHandler;
 import alice.framework.structures.PermissionProfile;
@@ -59,11 +57,10 @@ public class GreetingHandler extends MentionHandler implements Documentable {
 	}
 
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		String chosenGreeting = GREETINGS_OUT[(int) (Math.random()*GREETINGS_OUT.length)];
 		String reference = event.getMessage().getAuthorAsMember().block() != null ? event.getMessage().getAuthorAsMember().block().getDisplayName() : event.getMessage().getAuthor().get().getUsername();
-		return new NullAction()
-				.addAction(new MessageCreateAction(event.getMessage().getChannel(), String.format("%s %s!", chosenGreeting, reference)));
+		new MessageCreateAction(event.getMessage().getChannel(), String.format("%s %s!", chosenGreeting, reference)).toMono().block();
 	}
 
 	@Override

@@ -13,23 +13,21 @@ import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.NicknameChangeAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.channel.Channel.Type;
 
 public class NicknameLockHandler extends MentionHandler implements Documentable {
 	
 	public NicknameLockHandler() {
-		super("Nickname", false, PermissionProfile.getAdminPreset());
+		super("Nickname", false, PermissionProfile.getAdminPreset().andFromUser().andNotDM());
 	}
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
-		return !event.getMessage().getAuthor().isEmpty() && event.getMessage().getChannel().block().getType() == Type.GUILD_TEXT
-				&& ts.containsAnyTokensIgnoreCase("nick", "name", "nickname") && ts.containsAnyIgnoreCase("set", "reset", "lock", "unlock");
+		return ts.containsAnyTokensIgnoreCase("nick", "name", "nickname") && ts.containsAnyIgnoreCase("set", "reset", "lock", "unlock");
 	}
 
 	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		AtomicSaveFile guildData = Brain.guildIndex.get(event.getGuild().block().getId().asString());
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
@@ -72,7 +70,7 @@ public class NicknameLockHandler extends MentionHandler implements Documentable 
 			}
 		}
 		
-		return response;
+		response.toMono().block();
 	}
 
 	@Override

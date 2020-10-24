@@ -19,7 +19,7 @@ public class AliceLogger {
 	private static int threshold = -1;
 	
 	public static synchronized void report(String message) {
-		Brain.reportChannel.createMessage(message);
+		Brain.reportChannel.createMessage(message).block();
 	}
 	
 	public static synchronized void log(String message) {

@@ -39,9 +39,9 @@ public class PermissionProfile {
 	public static PermissionProfile getAdminPreset() {
 		return new PermissionProfile( (user, guild) -> hasPermission(user, guild, Permission.ADMINISTRATOR) );
 	}
-	
-	public static PermissionProfile getNotBotPreset() {
-		return new PermissionProfile( (user, guild) -> !isBot(user, guild) );
+
+	public static PermissionProfile getOwnerPreset() {
+		return new PermissionProfile( (user, guild) -> isOwner(user, guild) );
 	}
 	
 	public static PermissionProfile getDeveloperPreset() {
@@ -63,17 +63,17 @@ public class PermissionProfile {
 		return this;
 	}
 	
-	public PermissionProfile andNotBot() {
+	public PermissionProfile andFromUser() {
 		verification = verification == null
-							? (user, guild) -> isBot(user, guild)
-							: (user, guild) -> verification.test(user, guild) && isBot(user, guild);
+							? (user, guild) -> fromUser(user)
+							: (user, guild) -> verification.test(user, guild) && fromUser(user);
 		return this;
 	}
 	
-	public PermissionProfile orNotBot() {
+	public PermissionProfile orFromUser() {
 		verification = verification == null
-							? (user, guild) -> isBot(user, guild)
-							: (user, guild) -> verification.test(user, guild) || isBot(user, guild);
+							? (user, guild) -> fromUser(user)
+							: (user, guild) -> verification.test(user, guild) || fromUser(user);
 		return this;
 	}
 	
@@ -91,6 +91,48 @@ public class PermissionProfile {
 		return this;
 	}
 	
+	public PermissionProfile andNotDM() {
+		verification = verification == null
+					? (user, guild) -> isNotDM(user, guild)
+					: (user, guild) -> verification.test(user, guild) && isNotDM(user, guild);
+		return this;
+	}
+	
+	public PermissionProfile orNotDM() {
+		verification = verification == null
+					? (user, guild) -> isNotDM(user, guild)
+					: (user, guild) -> verification.test(user, guild) || isNotDM(user, guild);
+		return this;
+	}
+	
+	public PermissionProfile andNotGuild() {
+		verification = verification == null
+					? (user, guild) -> isNotGuild(user, guild)
+					: (user, guild) -> verification.test(user, guild) && isNotGuild(user, guild);
+		return this;
+	}
+	
+	public PermissionProfile orNotGuild() {
+		verification = verification == null
+					? (user, guild) -> isNotGuild(user, guild)
+					: (user, guild) -> verification.test(user, guild) || isNotGuild(user, guild);
+		return this;
+	}
+	
+	public PermissionProfile andOwner() {
+		verification = verification == null
+					? (user, guild) -> isOwner(user, guild)
+					: (user, guild) -> verification.test(user, guild) && isOwner(user, guild);
+		return this;
+	}
+	
+	public PermissionProfile orOwner() {
+		verification = verification == null
+					? (user, guild) -> isOwner(user, guild)
+					: (user, guild) -> verification.test(user, guild) || isOwner(user, guild);
+		return this;
+	}
+	
 	/* Helper Functions */
 	public static synchronized boolean hasPermission( Optional<User> user, Mono<Guild> guild, Permission permission ) {
 		if( user.isEmpty() ) {
@@ -102,11 +144,11 @@ public class PermissionProfile {
 		return user.get().asMember(guild.block().getId()).block().getBasePermissions().block().contains(permission);
 	}
 	
-	public static synchronized boolean isBot( Optional<User> user, Mono<Guild> guild ) {
+	public static synchronized boolean fromUser( Optional<User> user ) {
 		if( user.isEmpty() ) {
 			return false;
 		}
-		return user.get().isBot();
+		return !user.get().isBot();
 	}
 	
 	public static synchronized boolean isDeveloper( Optional<User> user ) {
@@ -119,6 +161,24 @@ public class PermissionProfile {
 			}
 		}
 		return false;
+	}
+	
+	public static synchronized boolean isOwner( Optional<User> user, Mono<Guild> guild ) {
+		if( user.isEmpty() ) {
+			return false;
+		}
+		if( guild.block() == null ) {
+			return true;
+		}
+		return guild.block().getOwner().block().getId().equals(user.get().getId());
+	}
+	
+	public static synchronized boolean isNotDM( Optional<User> user, Mono<Guild> guild ) {
+		return guild.block() != null;
+	}
+	
+	public static synchronized boolean isNotGuild( Optional<User> user, Mono<Guild> guild ) {
+		return guild.block() == null;
 	}
 	
 }

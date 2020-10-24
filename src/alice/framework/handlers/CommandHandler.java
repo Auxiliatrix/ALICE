@@ -6,21 +6,14 @@ import java.util.List;
 import alice.configuration.calibration.Constants;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
-import alice.framework.utilities.EventUtilities;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
-public abstract class CommandHandler extends Handler<MessageCreateEvent> {
+public abstract class CommandHandler extends MessageHandler {
 
-	protected PermissionProfile restrictions;
 	protected String invocation;
 	
-	protected CommandHandler(String name, boolean enableWhitelist) {
-		this(name, enableWhitelist, null);
-	}
-	
 	protected CommandHandler(String name, boolean enableWhitelist, PermissionProfile restrictions) {
-		super(name, enableWhitelist, MessageCreateEvent.class);
-		this.restrictions = restrictions;
+		super(name, enableWhitelist, restrictions);
 		this.invocation = String.format("%s%s", Constants.COMMAND_PREFIX, name);
 	}
 	
@@ -34,8 +27,8 @@ public abstract class CommandHandler extends Handler<MessageCreateEvent> {
 	
 	/* Overriden Template */
 	@Override
-	protected boolean filter(MessageCreateEvent event) {
-		return super.filter(event) && !EventUtilities.fromSelf(event) && invoked(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthor(), event.getGuild()));
+	protected boolean trigger(MessageCreateEvent event) {
+		return invoked(event);
 	}
 
 }

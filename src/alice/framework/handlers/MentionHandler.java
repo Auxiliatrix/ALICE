@@ -4,21 +4,13 @@ import alice.configuration.calibration.Constants;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
-import alice.framework.utilities.EventUtilities;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.Channel.Type;
 
-public abstract class MentionHandler extends Handler<MessageCreateEvent> {
-
-	protected PermissionProfile restrictions;
-	
-	protected MentionHandler(String name, boolean enableWhitelist) {
-		this(name, enableWhitelist, null);
-	}
+public abstract class MentionHandler extends MessageHandler {
 	
 	protected MentionHandler(String name, boolean enableWhitelist, PermissionProfile restrictions) {
-		super(name, enableWhitelist, MessageCreateEvent.class);
-		this.restrictions = restrictions;
+		super(name, enableWhitelist, restrictions);
 	}
 	
 	/* Handler Specific Function */
@@ -29,8 +21,8 @@ public abstract class MentionHandler extends Handler<MessageCreateEvent> {
 	
 	/* Overriden Template */
 	@Override
-	protected boolean filter(MessageCreateEvent event) {
-		return super.filter(event) && !EventUtilities.fromSelf(event) && mentioned(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthor(), event.getGuild()));
+	protected boolean trigger(MessageCreateEvent event) {
+		return mentioned(event);
 	}
 
 }

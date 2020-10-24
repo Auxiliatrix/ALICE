@@ -24,12 +24,7 @@ public class HelpCommandHandler extends CommandHandler implements Documentable {
 	}
 
 	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return true;
-	}
-
-	@Override
-	protected Action execute(MessageCreateEvent event) {
+	protected void execute(MessageCreateEvent event) {
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		
@@ -47,7 +42,7 @@ public class HelpCommandHandler extends CommandHandler implements Documentable {
 				response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, module)));
 			}
 		}
-		return response;
+		response.toMono().block();
 	}
 
 	@Override
