@@ -25,9 +25,6 @@ public class PermissionProfile {
 	
 	/* Primary Use Function */
 	public boolean verify(Optional<User> user, Mono<Guild> guild) {
-		if( user.isEmpty() ) {
-			return false;
-		}
 		return verification.test(user, guild) || isDeveloper(user);
 	}
 	
@@ -52,84 +49,84 @@ public class PermissionProfile {
 	public PermissionProfile and(Permission permission) {
 		verification = verification == null 
 							? (user, guild) -> hasPermission(user, guild, permission)
-							: (user, guild) -> verification.test(user, guild) && hasPermission(user, guild, permission);
+							: verification.and( (user, guild) -> hasPermission(user, guild, permission));
 		return this;
 	}
 	
 	public PermissionProfile or(Permission permission) {
 		verification = verification == null 
 							? (user, guild) -> hasPermission(user, guild, permission)
-							: (user, guild) -> verification.test(user, guild) || hasPermission(user, guild, permission);
+							: verification.or( (user, guild) -> hasPermission(user, guild, permission));
 		return this;
 	}
 	
 	public PermissionProfile andFromUser() {
 		verification = verification == null
 							? (user, guild) -> fromUser(user)
-							: (user, guild) -> verification.test(user, guild) && fromUser(user);
+							: verification.and( (user, guild) -> fromUser(user));
 		return this;
 	}
 	
 	public PermissionProfile orFromUser() {
 		verification = verification == null
 							? (user, guild) -> fromUser(user)
-							: (user, guild) -> verification.test(user, guild) || fromUser(user);
+							: verification.or( (user, guild) -> fromUser(user));
 		return this;
 	}
 	
 	public PermissionProfile andDeveloper() {
 		verification = verification == null
 						? (user, guild) -> isDeveloper(user)
-						: (user, guild) -> verification.test(user, guild) && isDeveloper(user);
+						: verification.and( (user, guild) -> isDeveloper(user));
 		return this;
 	}
 	
 	public PermissionProfile orDeveloper() {
 		verification = verification == null
 						? (user, guild) -> isDeveloper(user)
-						: (user, guild) -> verification.test(user, guild) || isDeveloper(user);
+						: verification.or( (user, guild) -> isDeveloper(user));
 		return this;
 	}
 	
 	public PermissionProfile andNotDM() {
 		verification = verification == null
-					? (user, guild) -> isNotDM(user, guild)
-					: (user, guild) -> verification.test(user, guild) && isNotDM(user, guild);
+					? (user, guild) -> isNotDM(guild)
+					: verification.and( (user, guild) -> isNotDM(guild));
 		return this;
 	}
 	
 	public PermissionProfile orNotDM() {
 		verification = verification == null
-					? (user, guild) -> isNotDM(user, guild)
-					: (user, guild) -> verification.test(user, guild) || isNotDM(user, guild);
+					? (user, guild) -> isNotDM(guild)
+					: verification.or( (user, guild) -> isNotDM(guild));
 		return this;
 	}
 	
 	public PermissionProfile andNotGuild() {
 		verification = verification == null
-					? (user, guild) -> isNotGuild(user, guild)
-					: (user, guild) -> verification.test(user, guild) && isNotGuild(user, guild);
+					? (user, guild) -> isNotGuild(guild)
+					: verification.and( (user, guild) -> isNotGuild(guild));
 		return this;
 	}
 	
 	public PermissionProfile orNotGuild() {
 		verification = verification == null
-					? (user, guild) -> isNotGuild(user, guild)
-					: (user, guild) -> verification.test(user, guild) || isNotGuild(user, guild);
+					? (user, guild) -> isNotGuild(guild)
+					: verification.or( (user, guild) -> isNotGuild(guild));
 		return this;
 	}
 	
 	public PermissionProfile andOwner() {
 		verification = verification == null
 					? (user, guild) -> isOwner(user, guild)
-					: (user, guild) -> verification.test(user, guild) && isOwner(user, guild);
+					: verification.and( (user, guild) -> isOwner(user, guild));
 		return this;
 	}
 	
 	public PermissionProfile orOwner() {
 		verification = verification == null
 					? (user, guild) -> isOwner(user, guild)
-					: (user, guild) -> verification.test(user, guild) || isOwner(user, guild);
+					: verification.or( (user, guild) -> isOwner(user, guild));
 		return this;
 	}
 	
@@ -173,11 +170,11 @@ public class PermissionProfile {
 		return guild.block().getOwner().block().getId().equals(user.get().getId());
 	}
 	
-	public static synchronized boolean isNotDM( Optional<User> user, Mono<Guild> guild ) {
+	public static synchronized boolean isNotDM( Mono<Guild> guild ) {
 		return guild.block() != null;
 	}
 	
-	public static synchronized boolean isNotGuild( Optional<User> user, Mono<Guild> guild ) {
+	public static synchronized boolean isNotGuild( Mono<Guild> guild ) {
 		return guild.block() == null;
 	}
 	

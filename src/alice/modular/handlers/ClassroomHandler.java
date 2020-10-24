@@ -26,7 +26,6 @@ public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements 
 
 	@Override
 	protected boolean trigger(VoiceStateUpdateEvent event) {
-		System.out.println("Logging classroom");
 		AtomicSaveFile guildData = Brain.guildIndex.get(event.getCurrent().getGuild().block().getId().asString());
 		boolean result = false;
 		if( EventUtilities.getConnected(event) ) {
@@ -40,7 +39,6 @@ public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements 
 
 	@Override
 	protected void execute(VoiceStateUpdateEvent event) {
-		System.out.println("Classroom triggered");
 		Action response = new NullAction();
 		
 		AtomicSaveFile guildData = Brain.guildIndex.get(event.getCurrent().getGuild().block().getId().asString());
@@ -50,12 +48,10 @@ public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements 
 			String id = validState.getChannel().block().getId().asString();
 			Mono<Member> member = validState.getMember();
 			if( guildData.getString("classroom_hub_channel").equals(id) ) {
-				System.out.println("Classroom verified");
 				String channelName = String.format("%s#%s's Classroom", member.block().getUsername(), member.block().getDiscriminator());
 				VoiceChannel channel = validState.getGuild().block().createVoiceChannel( c -> constructVC( c, validState.getChannel().block().getCategory(), channelName) ).block();
 				//response.addAction(new ChannelCreateAction(validState.getGuild(), validState.getChannel().block().getCategory(), channelName, Type.GUILD_VOICE));
 				response.addAction(new MemberMoveChannelAction(member, channel));
-				System.out.println("Response made");
 				guildData.put(String.format("%s_classroom", channel.getId().asString()), true);
 			}
 		}
@@ -63,11 +59,9 @@ public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements 
 			VoiceState validState = event.getOld().get();
 			String id = validState.getChannel().block().getId().asString();
 			if( !guildData.getString("classroom_hub_channel").equals(id) ) {
-				System.out.println("Classroom verified");
 				if( validState.getChannel().block().getVoiceStates().collectList().block().size() == 0 ) {
 					response.addAction(new ChannelDeleteAction(validState.getGuild(), validState.getChannel().block().getId()));
 					guildData.remove(String.format("%s_classroom", validState.getChannel().block().getId().asString()));
-					System.out.println("Response made");
 				}
 			}
 		}

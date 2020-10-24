@@ -20,7 +20,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 public class BlacklistPassiveHandler extends MessageHandler {
 
 	public BlacklistPassiveHandler() {
-		super("BlacklistFilter", false, PermissionProfile.getAdminPreset().andFromUser());
+		super("BlacklistFilter", false, PermissionProfile.getAnyonePreset());
 	}
 
 	@Override
