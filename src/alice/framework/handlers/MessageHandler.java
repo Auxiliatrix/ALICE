@@ -13,8 +13,9 @@ public abstract class MessageHandler extends Handler<MessageCreateEvent> {
 		this.restrictions = restrictions;
 	}
 	
+	@Override
 	protected boolean filter(MessageCreateEvent event) {
-		return super.filter(event) && !EventUtilities.fromSelf(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthor(), event.getGuild()));
+		return !EventUtilities.fromSelf(event) && (restrictions == null || restrictions.verify(event.getMessage().getAuthor(), event.getGuild())) && super.filter(event);
 	}
 	
 }
