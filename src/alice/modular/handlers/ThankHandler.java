@@ -1,6 +1,7 @@
 package alice.modular.handlers;
 
 import alice.configuration.calibration.Constants;
+import alice.framework.handlers.Documentable;
 import alice.framework.handlers.MessageHandler;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
@@ -9,10 +10,10 @@ import alice.framework.structures.TokenizedString;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
-public class ThankHandler extends MessageHandler {
+public class ThankHandler extends MessageHandler implements Documentable {
 
 	public ThankHandler() {
-		super("Thank", false, PermissionProfile.getAnyonePreset().andNotDM().andFromUser());
+		super("Thank", true, PermissionProfile.getAnyonePreset().andNotDM().andFromUser());
 	}
 
 	@Override
@@ -38,6 +39,23 @@ public class ThankHandler extends MessageHandler {
 	@Override
 	protected void execute(MessageCreateEvent event) {
 		new MessageCreateAction(event.getMessage().getChannel(), "You can thank them by typing `%rep @user`! You can do so every four hours, and will give both of you a ticket for an end-of-quarter raffle.").toMono().block();
+	}
+
+	@Override
+	public String getCategory() {
+		return "Reputation Plug-In";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Reminds users that they can thank other users by giving them reputation points.";
+	}
+
+	@Override
+	public DocumentationPair[] getUsage() {
+		return new DocumentationPair[] {
+			new DocumentationPair("Thanks!", "Reminds user that they can thank others with %rep.")	
+		};
 	}
 
 }

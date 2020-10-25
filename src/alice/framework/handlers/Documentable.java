@@ -14,7 +14,7 @@ public interface Documentable {
 		private String outcome;
 		public DocumentationPair(String usage, String outcome) {
 			this.usage = usage;
-			this.outcome = outcome;
+			this.outcome = String.format("> %s", outcome);
 		}
 		
 		public String getUsage() {

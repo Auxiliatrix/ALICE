@@ -8,15 +8,16 @@ import alice.framework.structures.AtomicSaveFile;
 import alice.modular.actions.NicknameChangeAction;
 import discord4j.core.event.domain.guild.MemberUpdateEvent;
 
-public class NicknameLockPassiveHandler extends Handler<MemberUpdateEvent> {
+public class NicknamePassiveHandler extends Handler<MemberUpdateEvent> {
 	
-	public NicknameLockPassiveHandler() {
-		super("NicknameLockPassive", false, MemberUpdateEvent.class);
+	public NicknamePassiveHandler() {
+		super("Nickname", MemberUpdateEvent.class);
+		aliases.add("nick");
 	}
 
 	@Override
 	protected boolean trigger(MemberUpdateEvent event) {
-		return !event.getMember().block().getDisplayName().equals(event.getOld().get().getDisplayName());
+		return isEnabled(false, event.getGuild()) && !event.getMember().block().getDisplayName().equals(event.getOld().get().getDisplayName());
 	}
 
 	@Override

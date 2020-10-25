@@ -19,11 +19,11 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import reactor.core.publisher.Mono;
 
-public class ClassroomSetupCommandHandler extends CommandHandler implements Documentable {
+public class ClassroomCommandHandler extends CommandHandler implements Documentable {
 
-	public ClassroomSetupCommandHandler() {
-		super("ClassroomSetup", false, PermissionProfile.getAdminPreset().andNotDM());
-		this.aliases.add("cs");
+	public ClassroomCommandHandler() {
+		super("Classroom", true, PermissionProfile.getAdminPreset().andNotDM());
+		aliases.add("class");
 	}
 
 	@Override

@@ -21,8 +21,13 @@ public abstract class MentionHandler extends MessageHandler {
 	
 	/* Overriden Template */
 	@Override
-	protected boolean trigger(MessageCreateEvent event) {
-		return mentioned(event);
+	protected boolean filter(MessageCreateEvent event) {
+		return super.filter(event) && mentioned(event);
 	}
 
+	@Override
+	protected boolean trigger(MessageCreateEvent event) {
+		return true;
+	}
+	
 }

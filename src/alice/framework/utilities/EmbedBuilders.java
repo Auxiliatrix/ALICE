@@ -13,7 +13,6 @@ import alice.framework.handlers.Documentable.DocumentationPair;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
-import alice.framework.structures.TellStonesBoard;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -67,13 +66,34 @@ public class EmbedBuilders {
 		return c -> blacklistConstructor(c, user, rules);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getTellstonesBoardConstructor( TellStonesBoard board ) {
-		return c -> tellstonesBoardConstructor(c, board);
+	public static synchronized Consumer<EmbedCreateSpec> getModulesConstructor( List<String> enabledList, List<String> disabledList ) {
+		return c -> modulesConstructor(c, enabledList, disabledList);
 	}
 	
-	private static synchronized EmbedCreateSpec tellstonesBoardConstructor( EmbedCreateSpec spec, TellStonesBoard board ) {
-		spec.setColor(Color.of(0, 0, 128));
+	private static synchronized EmbedCreateSpec modulesConstructor( EmbedCreateSpec spec, List<String> enabledList, List<String> disabledList ) {
+		spec.setColor(Color.of(63, 79, 95));
+		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
+		spec.setTitle(String.format(":gear: Modules -- %s", enabledList != null && disabledList != null ? "All" : (enabledList != null ? "Enabled" : "Disabled")));
 		
+		int count = 0;
+		int enabledCount = 0;
+		
+		if( enabledList != null ) {
+			for( String enabled : enabledList ) {
+				spec.addField(enabled, ":green_circle: Enabled", true);
+				count++;
+				enabledCount++;
+			}
+		}
+		
+		if( disabledList != null ) {
+			for( String disabled : disabledList ) {
+				spec.addField(disabled, ":red_circle: Disabled", true);
+				count++;
+			}
+		}
+
+		spec.setFooter(String.format("Total active modules: %d | Total enabled modules: %d", count, enabledCount), null);
 		return spec;
 	}
 	

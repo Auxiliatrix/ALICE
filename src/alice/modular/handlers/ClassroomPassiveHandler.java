@@ -2,7 +2,6 @@ package alice.modular.handlers;
 
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
-import alice.framework.handlers.Documentable;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
@@ -17,16 +16,19 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.spec.VoiceChannelCreateSpec;
 import reactor.core.publisher.Mono;
 
-public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements Documentable {
+public class ClassroomPassiveHandler extends Handler<VoiceStateUpdateEvent> {
 
-	public ClassroomHandler() {
-		super("Classroom", false, VoiceStateUpdateEvent.class);
-		aliases.add("Class");
+	public ClassroomPassiveHandler() {
+		super("Classroom", VoiceStateUpdateEvent.class);
+		aliases.add("class");
 	}
 
 	@Override
 	protected boolean trigger(VoiceStateUpdateEvent event) {
 		AtomicSaveFile guildData = Brain.guildIndex.get(event.getCurrent().getGuild().block().getId().asString());
+		if( !isEnabled(true, event.getCurrent().getGuild()) ) {
+			return false;
+		}
 		boolean result = false;
 		if( EventUtilities.getConnected(event) ) {
 			result |= guildData.has("classroom_hub_channel") && guildData.getString("classroom_hub_channel").equals(event.getCurrent().getChannel().block().getId().asString());
@@ -75,24 +77,6 @@ public class ClassroomHandler extends Handler<VoiceStateUpdateEvent> implements 
 		}
 		vccs.setName(channelName);
 		return vccs;
-	}
-
-	@Override
-	public String getCategory() {
-		return "Discord Classrooms";
-	}
-
-	@Override
-	public String getDescription() {
-		return "A module that handles Discord Classrooms."
-				+ "When a user joins the voice channel designated using ClassroomSetup, "
-				+ "they will be sent to a new, temporary voice channel that will be destroyed "
-				+ "once it has become empty.";
-	}
-
-	@Override
-	public DocumentationPair[] getUsage() {
-		return new DocumentationPair[] {};
 	}
 	
 }

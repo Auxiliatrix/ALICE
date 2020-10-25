@@ -14,10 +14,11 @@ import alice.modular.actions.NicknameChangeAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 
-public class NicknameLockHandler extends MentionHandler implements Documentable {
+public class NicknameHandler extends MentionHandler implements Documentable {
 	
-	public NicknameLockHandler() {
+	public NicknameHandler() {
 		super("Nickname", false, PermissionProfile.getAdminPreset().andFromUser().andNotDM());
+		aliases.add("nick");
 	}
 
 	@Override

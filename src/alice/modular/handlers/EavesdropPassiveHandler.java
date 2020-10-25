@@ -1,5 +1,6 @@
 package alice.modular.handlers;
 
+import alice.framework.handlers.Documentable;
 import alice.framework.handlers.MessageHandler;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
@@ -10,7 +11,7 @@ import alice.modular.actions.SayAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.Channel.Type;
 
-public class EavesdropPassiveHandler extends MessageHandler {
+public class EavesdropPassiveHandler extends MessageHandler implements Documentable {
 
 	public EavesdropPassiveHandler() {
 		super("Eavesdrop", false, PermissionProfile.getAnyonePreset());
@@ -38,6 +39,21 @@ public class EavesdropPassiveHandler extends MessageHandler {
 				}
 			}
 		}
+	}
+
+	@Override
+	public String getCategory() {
+		return DEVELOPER.name();
+	}
+
+	@Override
+	public String getDescription() {
+		return "";
+	}
+
+	@Override
+	public DocumentationPair[] getUsage() {
+		return new DocumentationPair[] {};
 	}
 
 }

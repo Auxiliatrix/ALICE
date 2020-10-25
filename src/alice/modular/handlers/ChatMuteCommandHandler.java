@@ -3,6 +3,7 @@ package alice.modular.handlers;
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.handlers.CommandHandler;
+import alice.framework.handlers.Documentable;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
@@ -12,7 +13,7 @@ import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 
-public class ChatMuteCommandHandler extends CommandHandler {
+public class ChatMuteCommandHandler extends CommandHandler implements Documentable {
 	
 	public ChatMuteCommandHandler() {
 		super("ChatMute", false, PermissionProfile.getAdminPreset());
@@ -38,6 +39,23 @@ public class ChatMuteCommandHandler extends CommandHandler {
 		}
 		response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Chatmute enforced successfully.")));
 		response.toMono().block();
+	}
+
+	@Override
+	public String getCategory() {
+		return ADMIN.name();
+	}
+
+	@Override
+	public String getDescription() {
+		return "Allows admins to 'chatmute' users, automatically deleting all messages that they send.";
+	}
+
+	@Override
+	public DocumentationPair[] getUsage() {
+		return new DocumentationPair[] {
+			new DocumentationPair(String.format("%s @user", invocation), "Chatmutes the given user, or un-chatmutes them, if they already are..")
+		};
 	}
 	
 	

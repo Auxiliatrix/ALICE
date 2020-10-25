@@ -27,8 +27,13 @@ public abstract class CommandHandler extends MessageHandler {
 	
 	/* Overriden Template */
 	@Override
+	protected boolean filter(MessageCreateEvent event) {
+		return super.filter(event) && invoked(event);
+	}
+	
+	@Override
 	protected boolean trigger(MessageCreateEvent event) {
-		return invoked(event);
+		return true;
 	}
 
 }

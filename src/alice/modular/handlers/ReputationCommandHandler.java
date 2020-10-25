@@ -31,8 +31,8 @@ import reactor.core.publisher.Mono;
 public class ReputationCommandHandler extends CommandHandler implements Documentable {
 
 	public ReputationCommandHandler() {
-		super("Reputation", false, PermissionProfile.getAnyonePreset().andFromUser().andNotDM());
-		this.aliases.add("Rep");
+		super("Reputation", true, PermissionProfile.getAnyonePreset().andFromUser().andNotDM());
+		this.aliases.add("rep");
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 
 	@Override
 	public String getCategory() {
-		return DEFAULT.name();
+		return "Reputation Plug-In";
 	}
 
 	@Override

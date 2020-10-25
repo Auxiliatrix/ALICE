@@ -160,6 +160,7 @@ public class PermissionProfile {
 		return false;
 	}
 	
+	
 	public static synchronized boolean isOwner( Optional<User> user, Mono<Guild> guild ) {
 		if( user.isEmpty() ) {
 			return false;

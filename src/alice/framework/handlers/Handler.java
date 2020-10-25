@@ -5,24 +5,24 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import alice.framework.main.Brain;
+import alice.framework.structures.AtomicSaveFile;
 import alice.framework.utilities.AliceLogger;
 import discord4j.core.event.domain.Event;
+import discord4j.core.object.entity.Guild;
 import reactor.core.publisher.Mono;
 
 public abstract class Handler<E extends Event> {
 	
 	protected String name;
-	protected boolean enableWhitelist;
 	
 	protected List<String> aliases;
 	
-	protected Handler(String name, boolean enableWhitelist, Class<E> type) {
+	protected Handler(String name, Class<E> type) {
 		this.name = name;
-		this.enableWhitelist = enableWhitelist;
 		this.aliases = new ArrayList<String>();
 		this.aliases.add(name);
 		subscribe(type);
-		redundantSubscribe(type);
+		//redundantSubscribe(type);
 	}
 	
 	protected void subscribe(Class<E> type) {
@@ -89,11 +89,12 @@ public abstract class Handler<E extends Event> {
 		return name;
 	}
 	
-	public boolean getEnableWhitelist() {
-		return enableWhitelist;
-	}
-	
 	public List<String> getAliases() {
 		return new ArrayList<String>(aliases);
+	}
+	
+	public boolean isEnabled( boolean whitelist, Mono<Guild> guild ) {
+		AtomicSaveFile guildData = Brain.guildIndex.get(guild.block().getId().asString());
+		return (!whitelist || guildData.has(String.format("module_enable_%s", name))) && !guildData.has(String.format("module_disable_%s", name));
 	}
 }

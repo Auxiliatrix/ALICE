@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.reflections.Reflections;
 
 import alice.configuration.calibration.Constants;
+import alice.framework.handlers.Documentable;
 import alice.framework.handlers.Handler;
+import alice.framework.handlers.MessageHandler;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.AtomicSaveFolder;
 import alice.framework.utilities.AliceLogger;
@@ -133,6 +135,18 @@ public class Brain {
 		for( Handler<?> h : handlers.get() ) {
 			if( h.getName().equalsIgnoreCase(name) || h.getAliases().contains(name.toLowerCase()) ) {
 				return h;
+			}
+		}
+		return null;
+	}
+	
+	public static MessageHandler getDocumentableByName(String name) {
+		for( Handler<?> h : handlers.get() ) {
+			if( !(h instanceof MessageHandler) || !(h instanceof Documentable) ) {
+				continue;
+			}
+			if( h.getName().equalsIgnoreCase(name) || h.getAliases().contains(name.toLowerCase()) ) {
+				return (MessageHandler) h;
 			}
 		}
 		return null;

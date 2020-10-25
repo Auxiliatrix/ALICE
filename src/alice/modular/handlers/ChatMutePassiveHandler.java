@@ -10,7 +10,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 public class ChatMutePassiveHandler extends MessageHandler {
 
 	public ChatMutePassiveHandler() {
-		super("ChatMuteEnforcer", false, PermissionProfile.getAnyonePreset().andFromUser());
+		super("ChatMute", false, PermissionProfile.getAnyonePreset().andFromUser());
+		aliases.add("cm");
 	}
 
 	@Override
