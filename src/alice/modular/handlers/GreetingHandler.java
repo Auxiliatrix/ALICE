@@ -53,7 +53,7 @@ public class GreetingHandler extends MentionHandler implements Documentable {
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
-		return ts.containsAnyIgnoreCase(GREETINGS_IN);
+		return ts.startsWithAnyIgnoreCase(GREETINGS_IN);
 	}
 
 	@Override

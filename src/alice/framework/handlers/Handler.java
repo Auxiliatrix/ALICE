@@ -94,6 +94,12 @@ public abstract class Handler<E extends Event> {
 	}
 	
 	public boolean isEnabled( boolean whitelist, Mono<Guild> guild ) {
+		if( guild.block() == null ) {
+			return false;
+		}
+		if( !Brain.guildIndex.containsKey(guild.block().getId().asString()) ) {
+			return false;
+		}
 		AtomicSaveFile guildData = Brain.guildIndex.get(guild.block().getId().asString());
 		return (!whitelist || guildData.has(String.format("module_enable_%s", name))) && !guildData.has(String.format("module_disable_%s", name));
 	}

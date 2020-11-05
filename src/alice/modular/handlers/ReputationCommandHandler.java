@@ -23,6 +23,7 @@ import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.rest.util.Permission;
@@ -40,6 +41,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 		Action response = new NullAction();
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
+		Guild guild = event.getGuild().block();
 		Optional<User> user = event.getMessage().getAuthor();
 		String ownId = event.getMessage().getAuthorAsMember().block().getId().asString();
 		
@@ -108,7 +110,6 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 					return arg0.value - this.value;
 				}
 			}
-			
 			int total = 0;
 			List<QuantifiedPair<String>> entries = new ArrayList<QuantifiedPair<String>>();
 			for( String key : new HashSet<String>(reputationMap.keySet()) ) {
@@ -119,11 +120,19 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 			List<String> fieldHeaders = new ArrayList<String>();
 			List<String> fieldBodies = new ArrayList<String>();
 			for( int f=0; f< Math.min(12, entries.size()); f++ ) {
+				if( entries.isEmpty() ) {
+					break;
+				}
 				QuantifiedPair<String> entry = entries.get(f);
-				fieldHeaders.add(String.format("%d. %s%s", f+1, event.getGuild().block().getMemberById(Snowflake.of(entry.key)).block().getDisplayName(), f==0 ? " :star:" : ""));
-				fieldBodies.add(String.format("Reputation:\t:scroll: %d", entry.value));
+				try {
+					fieldHeaders.add(String.format("%d. %s%s", f+1, guild.getMemberById(Snowflake.of(entry.key)).block().getDisplayName(), f==0 ? " :star:" : ""));
+					fieldBodies.add(String.format("Reputation:\t:scroll: %d", entry.value));
+				} catch( Exception e ) {
+					entries.remove(f);
+					f--;
+					continue;
+				}
 			}
-			
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getLeaderboardConstructor("Reputation", fieldHeaders, fieldBodies, total, entries.size())));
 		} else {
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));

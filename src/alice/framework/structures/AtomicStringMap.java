@@ -8,11 +8,11 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 @SuppressWarnings("serial")
-public class AtomicSaveFolder extends HashMap<String, AtomicSaveFile> {
+public class AtomicStringMap<E> extends HashMap<String, E> {
 	
 	private Lock saveFilesLock;
 	
-	public AtomicSaveFolder() {
+	public AtomicStringMap() {
 		this.saveFilesLock = new ReentrantLock();
 	}
 
@@ -22,42 +22,42 @@ public class AtomicSaveFolder extends HashMap<String, AtomicSaveFile> {
 		saveFilesLock.unlock();
 	}
 
-	public void forEach(BiConsumer<? super String, ? super AtomicSaveFile> arg0) {
+	public void forEach(BiConsumer<? super String, ? super E> arg0) {
 		saveFilesLock.lock();
 		super.forEach(arg0);
 		saveFilesLock.unlock();
 	}
 	
-	public AtomicSaveFile merge(String key, AtomicSaveFile value, BiFunction<? super AtomicSaveFile, ? super AtomicSaveFile, ? extends AtomicSaveFile> remappingFunction) {
+	public E merge(String key, E value, BiFunction<? super E, ? super E, ? extends E> remappingFunction) {
 		saveFilesLock.lock();
-		AtomicSaveFile ret = super.merge(key, value, remappingFunction);
+		E ret = super.merge(key, value, remappingFunction);
 		saveFilesLock.unlock();
 		return ret;
 	}
 	
-	public AtomicSaveFile put(String arg0, AtomicSaveFile arg1) {
+	public E put(String arg0, E arg1) {
 		saveFilesLock.lock();
-		AtomicSaveFile ret = super.put(arg0, arg1);
+		E ret = super.put(arg0, arg1);
 		saveFilesLock.unlock();
 		return ret;
 	}
 	
-	public void putAll(Map<? extends String, ? extends AtomicSaveFile> arg0) {
+	public void putAll(Map<? extends String, ? extends E> arg0) {
 		saveFilesLock.lock();
 		super.putAll(arg0);
 		saveFilesLock.unlock();
 	}
 	
-	public AtomicSaveFile putIfAbsent(String key, AtomicSaveFile value) {
+	public E putIfAbsent(String key, E value) {
 		saveFilesLock.lock();
-		AtomicSaveFile ret = super.putIfAbsent(key, value);
+		E ret = super.putIfAbsent(key, value);
 		saveFilesLock.unlock();
 		return ret;
 	}
 	
-	public AtomicSaveFile remove(Object arg0) {
+	public E remove(Object arg0) {
 		saveFilesLock.lock();
-		AtomicSaveFile ret = super.remove(arg0);
+		E ret = super.remove(arg0);
 		saveFilesLock.unlock();
 		return ret;
 	}
@@ -69,21 +69,21 @@ public class AtomicSaveFolder extends HashMap<String, AtomicSaveFile> {
 		return ret;
 	}
 
-	public AtomicSaveFile replace(String key, AtomicSaveFile value) {
+	public E replace(String key, E value) {
 		saveFilesLock.lock();
-		AtomicSaveFile ret = super.replace(key, value);
+		E ret = super.replace(key, value);
 		saveFilesLock.unlock();
 		return ret;
 	}
 	
-	public boolean replace(String key, AtomicSaveFile oldValue, AtomicSaveFile newValue) {
+	public boolean replace(String key, E oldValue, E newValue) {
 		saveFilesLock.lock();
 		boolean ret = super.replace(key, oldValue, newValue);
 		saveFilesLock.unlock();
 		return ret;
 	}
 	
-	public void replaceAll(BiFunction<? super String, ? super AtomicSaveFile, ? extends AtomicSaveFile> arg0) {
+	public void replaceAll(BiFunction<? super String, ? super E, ? extends E> arg0) {
 		saveFilesLock.lock();
 		super.replaceAll(arg0);
 		saveFilesLock.unlock();

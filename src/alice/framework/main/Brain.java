@@ -15,8 +15,10 @@ import alice.configuration.calibration.Constants;
 import alice.framework.handlers.Documentable;
 import alice.framework.handlers.Handler;
 import alice.framework.handlers.MessageHandler;
+import alice.framework.interactives.Interactive;
+import alice.framework.interactives.builders.InteractiveBuilder;
 import alice.framework.structures.AtomicSaveFile;
-import alice.framework.structures.AtomicSaveFolder;
+import alice.framework.structures.AtomicStringMap;
 import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
@@ -33,16 +35,18 @@ public class Brain {
 	
 	public static GatewayDiscordClient client = null;
 	
-	@SuppressWarnings("rawtypes")
-	public static AtomicReference<List<Handler>> handlers = new AtomicReference<List<Handler>>(new ArrayList<Handler>()); // This is disgusting
-	
-	public static AtomicSaveFolder guildIndex = new AtomicSaveFolder();
+	public static AtomicReference<List<Handler<?>>> handlers = new AtomicReference<List<Handler<?>>>(new ArrayList<Handler<?>>()); // This is disgusting
+	public static AtomicReference<List<InteractiveBuilder<?>>> interactiveTypes = new AtomicReference<List<InteractiveBuilder<?>>>(new ArrayList<InteractiveBuilder<?>>()); // This is disgusting
+
+	public static AtomicStringMap<AtomicSaveFile> guildIndex = new AtomicStringMap<AtomicSaveFile>();
+	public static AtomicStringMap<AtomicSaveFile> channelIndex = new AtomicStringMap<AtomicSaveFile>();
 	
 	public static AtomicBoolean RESTART = new AtomicBoolean(true);
 	public static MessageChannel upkeepChannel;
 	public static MessageChannel reportChannel;
 	
 	public static AtomicReference<PriorityQueue<Scheduled>> schedule = new AtomicReference<PriorityQueue<Scheduled>>(new PriorityQueue<Scheduled>());
+	public static AtomicStringMap<Interactive> interactives = new AtomicStringMap<Interactive>();
 	
 	public static class Scheduled implements Comparable<Scheduled> {
 		public long date;
@@ -131,7 +135,7 @@ public class Brain {
 		}
 	}
 	
-	public static Handler<?> getModuleByName(String name) {
+	public static synchronized Handler<?> getModuleByName(String name) {
 		for( Handler<?> h : handlers.get() ) {
 			if( h.getName().equalsIgnoreCase(name) || h.getAliases().contains(name.toLowerCase()) ) {
 				return h;
@@ -140,7 +144,7 @@ public class Brain {
 		return null;
 	}
 	
-	public static MessageHandler getDocumentableByName(String name) {
+	public static synchronized MessageHandler getDocumentableByName(String name) {
 		for( Handler<?> h : handlers.get() ) {
 			if( !(h instanceof MessageHandler) || !(h instanceof Documentable) ) {
 				continue;
@@ -152,10 +156,10 @@ public class Brain {
 		return null;
 	}
 	
-	private static void reload() {
-		File folder = new File("tmp/guilds");
-		if( folder.isDirectory() ) {
-			for( File file : folder.listFiles() ) {
+	private static synchronized void reload() {
+		File guildFolder = new File("tmp/guilds");
+		if( guildFolder.isDirectory() ) {
+			for( File file : guildFolder.listFiles() ) {
 				String guildId = file.getName();
 				int extension = guildId.indexOf(".");
 				if( extension > 0 ) {
@@ -166,9 +170,21 @@ public class Brain {
 				}
 			}
 		}
+		File channelFolder = new File("tmp/channels");
+		if( channelFolder.isDirectory() ) {
+			for( File file : channelFolder.listFiles() ) {
+				String channelId = file.getName();
+				int extension = channelId.indexOf(".");
+				if( extension > 0 ) {
+					channelId = channelId.substring(0, extension);
+					String channelFile = String.format("%s%s%s%s%s.json", "tmp", File.separator, "channels", File.separator, channelId);
+					Brain.channelIndex.put(channelId, new AtomicSaveFile(channelFile));
+				}
+			}
+		}
 	}
 	
-	private static void login(String token) {
+	private static synchronized void login(String token) {
 		AliceLogger.info("Establishing connection...", 1);
 		client = DiscordClientBuilder.create(token).build().login().block();
 		client.updatePresence(Presence.online(Activity.listening("%help"))).block();
@@ -179,18 +195,18 @@ public class Brain {
 				for( String modules : Constants.ADDITIONAL_MODULES ) {
 					loadModules(modules);
 				}
+				loadInteractiveTypes("alice.framework.interactives.builders");
 			});
 		//updateAvatar("https://i.imgur.com/grVaLEQ.png");
 		
 		AliceLogger.info("Log in successful.");
 	}
 	
-	private static void loadModules(String includePrefix) {
+	private static synchronized void loadModules(String includePrefix) {
 		loadModules(includePrefix, "");
 	}
 	
-	@SuppressWarnings("rawtypes")
-	private static void loadModules(String includePrefix, String excludePrefix) {
+	private static synchronized void loadModules(String includePrefix, String excludePrefix) {
 		Reflections include = new Reflections(includePrefix);
 		Reflections exclude = excludePrefix.isEmpty() ? null : new Reflections(excludePrefix);
 		for( Class<?> c : include.getSubTypesOf(alice.framework.handlers.Handler.class) ) {
@@ -199,7 +215,7 @@ public class Brain {
 			}
 			handlers.updateAndGet( h -> { 
 				try {
-					h.add( (Handler) c.getConstructor().newInstance() );
+					h.add( (Handler<?>) c.getConstructor().newInstance() );
 				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 					e.printStackTrace();
 					AliceLogger.error(String.format("An error occured while instantiating %s.", c.getName() ), 2);
@@ -209,8 +225,31 @@ public class Brain {
 		}
 	}
 	
+	private static synchronized void loadInteractiveTypes(String includePrefix) {
+		loadInteractiveTypes(includePrefix, "");
+	}
+	
+	private static synchronized void loadInteractiveTypes(String includePrefix, String excludePrefix) {
+		Reflections include = new Reflections(includePrefix);
+		Reflections exclude = excludePrefix.isEmpty() ? null : new Reflections(excludePrefix);
+		for( Class<?> c : include.getSubTypesOf(alice.framework.interactives.builders.InteractiveBuilder.class) ) {
+			if( exclude != null && exclude.getSubTypesOf(alice.framework.interactives.builders.InteractiveBuilder.class).contains(c) ) {
+				continue;
+			}
+			interactiveTypes.updateAndGet( i -> { 
+				try {
+					i.add( (InteractiveBuilder<?>) c.getConstructor().newInstance() );
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+					e.printStackTrace();
+					AliceLogger.error(String.format("An error occured while adding Interactive Type %s.", c.getName() ), 2);
+				}
+				return i;
+			} );
+		}
+	}
+	
 	@SuppressWarnings("unused")
-	private static void updateAvatar(String url) {
+	private static synchronized void updateAvatar(String url) {
 		client.edit(spec -> {
 			spec.setAvatar(Image.ofUrl(url).block());
 			AliceLogger.info("Avatar updated.");

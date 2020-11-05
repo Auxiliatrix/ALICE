@@ -40,7 +40,7 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 		
 		TokenizedString ts = new TokenizedString(event.getMessage().getContent());
 		List<String> tokens = ts.getTokens();
-		if( tokens.size() == 1 || tokens.size() == 2 && !tokens.get(1).equalsIgnoreCase("rules") ) {
+		if( tokens.size() == 1 || tokens.size() == 2 && !tokens.get(1).equalsIgnoreCase("list") ) {
 			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getHelpConstructor(user, this)));
 		} else {
 			AtomicSaveFile guildData = Brain.guildIndex.get(EventUtilities.getGuildId(event));
@@ -122,7 +122,7 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 		return new DocumentationPair[] {
 			new DocumentationPair(String.format("%s allow \"<pattern>\"", invocation), "Adds the given pattern to the list of allowable roles."),
 			new DocumentationPair(String.format("%s disallow \"<pattern>\"", invocation), "Adds the given pattern to the list of disallowed roles."),
-			new DocumentationPair(String.format("%s rules", invocation), "Displays the current rules established for role assignments."),
+			new DocumentationPair(String.format("%s list", invocation), "Displays the current rules established for role assignments."),
 			new DocumentationPair(String.format("%s remove <index>", invocation), "Removes the given rule from the list of rules, if possible.")
 		};
 	}
