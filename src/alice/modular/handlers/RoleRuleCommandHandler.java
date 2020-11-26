@@ -49,7 +49,7 @@ public class RoleRuleCommandHandler extends CommandHandler implements Documentab
 			JSONArray disallowRules = (JSONArray) guildData.optJSONArray("role_rules_disallow", new JSONArray());
 			
 			switch( tokens.get(1).toLowerCase() ) {
-				case "rules":
+				case "list":
 					response.addAction(new MessageCreateAction(channel, getRulesConstructor(allowRules, disallowRules)));
 					break;
 				case "allow":

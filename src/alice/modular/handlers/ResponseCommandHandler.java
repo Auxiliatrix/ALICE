@@ -60,7 +60,7 @@ public class ResponseCommandHandler extends CommandHandler implements Documentab
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You must specify a response to remove!", EmbedBuilders.ERR_USAGE)));
 						break;
 					}
-					if( guildData.getJSONArray("responses").length()-1 > ts.getNumbers().get(0) ) {
+					if( guildData.getJSONArray("responses").length() < ts.getNumbers().get(0) ) {
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("That response doesn't exist!", EmbedBuilders.ERR_USAGE)));
 						break;
 					}
