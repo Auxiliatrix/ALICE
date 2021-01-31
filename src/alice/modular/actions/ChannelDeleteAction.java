@@ -10,7 +10,7 @@ public class ChannelDeleteAction extends Action {
 	public ChannelDeleteAction(Mono<Guild> guild, Snowflake id) {
 		super(
 				guild.block().getChannelById(id).block() != null ?
-						guild.block().getChannelById(id).block().delete() :
+						guild.block().getChannelById(id).block().delete().retry() :
 							Mono.fromRunnable( () -> {} )
 			);
 	}

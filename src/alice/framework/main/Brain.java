@@ -14,6 +14,7 @@ import org.reflections.Reflections;
 import alice.configuration.calibration.Constants;
 import alice.framework.handlers.Documentable;
 import alice.framework.handlers.Handler;
+import alice.framework.handlers.MessageCreateEventWrapper;
 import alice.framework.handlers.MessageHandler;
 import alice.framework.interactives.Interactive;
 import alice.framework.interactives.builders.InteractiveBuilder;
@@ -24,6 +25,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -223,6 +225,12 @@ public class Brain {
 				return h;
 			} );
 		}
+		
+//		AliceLogger.info(String.format("Initializing %s module.", "TESTING"), 2);
+//		client.on(MessageCreateEvent.class)
+//			.map(event -> new MessageCreateEventWrapper(event))
+//			.subscribe( event -> event.execute() );
+//		AliceLogger.info(String.format("%s Module initialized.", "TESTING"), 2);
 	}
 	
 	private static synchronized void loadInteractiveTypes(String includePrefix) {

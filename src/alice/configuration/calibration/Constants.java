@@ -20,5 +20,5 @@ public class Constants {
 			
 	};
 	
-	public static long REPUTATION_INTERVAL = 4 * 60 * 60 * 1000;
+	public static long REPUTATION_INTERVAL = 2 * 60 * 60 * 1000;
 }

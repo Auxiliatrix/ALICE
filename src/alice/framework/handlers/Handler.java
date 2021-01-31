@@ -29,11 +29,11 @@ public abstract class Handler<E extends Event> {
 		AliceLogger.info(String.format("Initializing %s module.", name), 2);
 		Brain.client.on(type)
 		.filter(event -> filter(event))
-		.flatMap(event -> payload(event)
-					.doOnError(e -> subscribe(type))
-					.onErrorStop()
-				)
-		.subscribe();
+//		.flatMap(event -> payload(event)
+//					.doOnError(e -> subscribe(type))
+//					.onErrorStop()
+//				)
+		.subscribe(event -> payload(event).block());
 		AliceLogger.info(String.format("%s Module initialized.", name), 2);
 	}
 	

@@ -13,7 +13,7 @@ public class ChannelCreateAction extends Action {
 	public ChannelCreateAction(Mono<Guild> guild, Mono<Category> category, String channelName, Type channelType) {
 		super(
 			channelType == Type.GUILD_TEXT ? guild.block().createTextChannel(tccs -> constructTC(tccs, category, channelName) ) : 
-				channelType == Type.GUILD_VOICE ? guild.block().createVoiceChannel( vccs -> constructVC(vccs, category, channelName) ) :
+				channelType == Type.GUILD_VOICE ? guild.block().createVoiceChannel( vccs -> constructVC(vccs, category, channelName) ).retry() :
 					Mono.fromRunnable( () -> {} )
 		);
 	}

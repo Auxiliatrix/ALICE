@@ -51,7 +51,7 @@ public class ClassroomPassiveHandler extends Handler<VoiceStateUpdateEvent> {
 			Mono<Member> member = validState.getMember();
 			if( guildData.getString("classroom_hub_channel").equals(id) ) {
 				String channelName = String.format("%s#%s's Classroom", member.block().getUsername(), member.block().getDiscriminator());
-				VoiceChannel channel = validState.getGuild().block().createVoiceChannel( c -> constructVC( c, validState.getChannel().block().getCategory(), channelName) ).block();
+				VoiceChannel channel = validState.getGuild().block().createVoiceChannel( c -> constructVC( c, validState.getChannel().block().getCategory(), channelName) ).block(); // this line causes errors
 				//response.addAction(new ChannelCreateAction(validState.getGuild(), validState.getChannel().block().getCategory(), channelName, Type.GUILD_VOICE));
 				response.addAction(new MemberMoveChannelAction(member, channel));
 				guildData.put(String.format("%s_classroom", channel.getId().asString()), true);
