@@ -12,6 +12,7 @@ import alice.framework.handlers.Documentable;
 import alice.framework.handlers.Documentable.DocumentationPair;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
+import alice.framework.structures.Faction;
 import alice.framework.structures.PermissionProfile;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
@@ -70,6 +71,36 @@ public class EmbedBuilders {
 		return c -> modulesConstructor(c, enabledList, disabledList);
 	}
 	
+	public static synchronized Consumer<EmbedCreateSpec> getModularConstructor(Color color, String title, String message) {
+		return c -> modularConstructor(c, color, title, message);
+	}
+		
+	public static synchronized Consumer<EmbedCreateSpec> getFactionProfileConstructor(Faction faction, User leader, User[] officers, int rank) {
+		return c -> factionProfileConstructor(c, faction, leader, officers, rank);
+	}
+	
+	private static synchronized EmbedCreateSpec factionProfileConstructor( EmbedCreateSpec spec, Faction faction, User leader, User[] officers, int rank ) {
+		spec.setTitle(String.format(":crossed_swords: %s", faction.name));
+		spec.setDescription(String.format("*%s*", faction.description));
+		spec.addField(":clipboard: __Faction Info__", String.format("**Leader**: %s#%s\nMembers: %d", leader.getUsername(), leader.getDiscriminator(), faction.members.size()), true);
+		spec.setColor(Color.of(faction.color));
+		spec.setThumbnail(faction.flag);
+		StringBuilder officerString = new StringBuilder();
+		for( User user : officers ) {
+			officerString.append(String.format("%s#%s\n", user.getUsername(), user.getDiscriminator()));
+		}
+		spec.addField(":military_medal: __Officers__", officerString.toString(), true);
+		spec.setFooter(String.format("Server Rank: %d | Established %s UTC", rank, faction.getEstablishedString()), null);
+		return spec;
+	}
+	
+	private static synchronized EmbedCreateSpec modularConstructor( EmbedCreateSpec spec, Color color, String title, String message ) {
+		spec.setColor(color);
+		spec.setTitle(title);
+		spec.setDescription(message.isEmpty() ? "<Message not found>" : message);
+		return spec;
+	}
+	
 	private static synchronized EmbedCreateSpec modulesConstructor( EmbedCreateSpec spec, List<String> enabledList, List<String> disabledList ) {
 		spec.setColor(Color.of(63, 79, 95));
 		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
@@ -121,7 +152,7 @@ public class EmbedBuilders {
 			spec.addField(entries.get(f), values.get(f), true);
 		}
 		
-		spec.setFooter(String.format("Total reputation awarded: %d | Total participants: %d", (int) (total / 2), size), null);
+		spec.setFooter(String.format("Cumulative Score: %d | Total Entries: %d", total, size), null);
 		return spec;
 	}
 	
@@ -207,7 +238,7 @@ public class EmbedBuilders {
 		spec.setDescription(d.getDescription());
 		
 		for( DocumentationPair dp : d.getUsage() ) {
-			spec.addField(dp.getUsage(), dp.getOutcome(), false);
+			spec.addField(dp.getUsage(), dp.getOutcome(), true);
 		}
 		
 		if( d.getExamples().length > 0 ) {
