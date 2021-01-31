@@ -1,0 +1,1784 @@
+Programs must be written for people to read, and only incidentally for machines to execute.
+- H. Abelson and G. Sussman (in "The Structure and Interpretation of Computer Programs)
+
+The computer revolution is a revolution in the way we think and in the way we express what we think. The essence of this change is the emergence of what might best be called procedural epistemology--the study of the structure of knowledge from an imperative point of view, as opposed to the more declarative point of view taken by classical mathematical subjects.
+- H. Abelson and G. Sussman (in "The Structure and Interpretation of Computer Programs)
+
+We have also obtained a glimpse of another crucial idea about languages and program design. This is the approach of stratified design, the notion that a complex system should be structured as a sequence of levels that are described using a sequence of languages. Each level is constructed by combining parts that are regarded as primitive at that level, and the parts constructed at each level are used as primitives at the next level. The language used at each level of a stratified design has primitives, means of combination, and means of abstraction appropriate to that level of detail.
+- H. Abelson and G. Sussman (in "The Structure and Interpretation of Computer Programs")
+
+A common mistake people make when trying to design something completely foolproof is to underestimate the ingenuity of complete fools.
+- D. Adams
+
+Good teaching is more a giving of the right questions than a giving of the right answers.
+- J. Albers
+
+They know enough who know how to learn
+- J. Adams
+
+Computer Science is a science of abstraction -creating the right model for a problem and devising the appropriate mechanizable techniques to solve it.
+- A. Aho and J. Ullman
+
+Each pattern describes a problem which occurs over and over again in our environment, and then describes the core of the solution to that problem, in such a way that you can use this solution a million times over, without ever doing it in the same way twice.
+- C. Alexander
+
+Don't worry about people stealing your ideas. If your ideas are any good, you'll have to ram them down people's throats.
+- H. Aiken
+
+Eighty percent of success is showing up.
+- W. Allen
+
+If you're not failing every now and again, it's a sign you're not doing anything very innovative.
+- W. Allen
+
+More is different.
+- P. Anderson (attacking the reductionist hypothesis in science, by concluding that quantitatively larger systems can be qualitatively different)
+
+If everything is under control, you're not going fast enough.
+- M. Andretti (racecar driver)
+
+Today, most software exists, not to solve a problem, but to interface with other software.
+- I. O. Angell
+
+All programmers are playwrights and all computers are lousy actors.
+- Anonymous
+
+Bad code isn't bad, its just misunderstood.
+- Anonymous
+
+Debugging is anticipated with distaste, performed with reluctance, and bragged about forever.
+- Anonymous
+
+Distance education begins at the 8th row in a classroom.
+- Anonymous
+
+Experience is a poor teacher: it gives its tests before it teaches its lessons.
+- Anonymous
+
+If you understand what you're doing, you're not learning anything.
+- Anonymous
+
+I am not trying to teach you information; I'm trying to teach you how to think about, interpret, and use the information.
+- Anonymous (actually, I lost this reference)
+
+In theory, there is no difference between theory and practice, but not in practice.
+- Anonymous
+
+It is easier to measure something than to understand what you have measured.
+- Anonymous
+
+Measure twice, cut once.
+- Anonymous
+
+Microsoft, where quality is job 1.1
+- Anonymous
+
+On a visit to the NASA space center, President Kennedy spoke to a man sweeping up in one of the buildings. "What's your job here?" asked Kennedy. "Well Mr. President," the janitor replied, "I'm helping to put a man on the moon".
+- Anonymous
+
+One day a mother comes home from work and asks her son, "What did you do today?" The son replied, "I taught our dog how to play the piano." The mother, incredulous, asked, "Our dog can play the piano?", to which the son laughed and replied, "Of course not mom. I said that I taught him; I didn't say that he learned how."
+- Anonymous
+
+Here is how a true educator deals with a problem.
+The principal of a small middle school had a problem with a few of the older girls, who were starting to use lipstick. They were applying it in the bathroom, and then they would press their lips to the mirror to smooth it out, leaving lip prints.
+
+He invited the girls to the ladies room, where they met with the custodian. He said he wanted them to witness just how hard it was to clean these mirrors.
+
+The custodian took a long brush on a handle out of a box, dipped it into the nearest toilet, moved to the mirror, and proceeded to scrub it with the brush.
+
+That was the last day the girls pressed their lips on the mirror.
+
+- Anonymous
+
+Programming languages should be designed not by piling feature on top of feature, but by removing the weaknesses and restrictions that make additional features appear necessary.
+- Anonymous, Revised Report on the Algorithmic Language Scheme
+
+Programs for sale: Fast, Reliable, Cheap: choose two.
+- Anonymous
+
+Ready, fire, aim (the fast approach to software development).
+Ready, aim, aim, aim, aim ... (the slow approach to software development).
+- Anonymous
+
+Real programmers don't comment their code. If it was hard to write, it should be hard to understand.
+- Anonymous
+
+Recurses! Called again.
+- Anonymous
+
+The huge printing presses of a major Chicago newspaper began malfunctioning on the Saturday before Christmas, putting all the revenue for advertising that was to appear in the Sunday paper in jeopardy. None of the technicians could track down the problem. Finally, a frantic call was made to the retired printer who had worked with these presses for over 40 years. "We'll pay anything; just come in and fix them," he was told.
+When he arrived, he walked around for a few minutes, surveying the presses; then he approached one of the control panels and opened it. He removed a dime from his pocket, turned a screw 1/4 of a turn, and said, "The presses will now work correctly." After being profusely thanked, he was told to submit a bill for his work.
+
+The bill arrived a few days later, for $10,000.00! Not wanting to pay such a huge amount for so little work, the printer was told to please itemize his charges, with the hope that he would reduce the amount once he had to identify his services. The revised bill arrived: $1.00 for turning the screw; $9,999.00 for knowing which screw to turn.
+
+Commentary: most debugging problems are fixed easily; identifying the location of the problem is hard.
+
+- Anonymous
+
+The person who knows HOW will always have a job. The person who knows WHY will always be his/her boss.
+- Anonymous
+
+The sooner you get behind in your work, the more time you have to catch up.
+- Anonymous
+
+There are only 10 different kinds of people in the world: those who know binary and those who don't.
+- Anonymous
+
+Think (design) globally; act (code) locally.
+- Anonymous
+
+Think twice, code once.
+- Anonymous
+
+Time is an excellent teacher; but eventually it kills all its students.
+- Anonymous
+
+Weeks of programming can save you hours of planning.
+- Anonymous
+
+When a programming language is created that allows programmers to program in simple English, it will be discovered that programmers cannot speak English.
+- Anonymous
+
+Why do we never have time to do it right, but always have time to do it over?
+- Anonymous
+
+By viewing the old we learn the new.
+- Anonymous Chinese Proverb
+
+Give me a fish and I eat for a day. Teach me to fish and I eat for a lifetime.
+- Anonymous Chinese Proverb
+
+He who asks is a fool for five minutes; he who does not ask remains a fool forever.
+- Anonymous Chinese Proverb
+
+Teachers open the door, but you must enter by yourself.
+- Anonymous Chinese Proverb
+
+Tell me and I forget. Show me and I remember. Involve me and I understand.
+- Anonymous Chinese Proverb
+
+The first step towards wisdom is calling things by their right names.
+- Anonymous Chinese Proverb
+
+The person who says it cannot be done should not interrupt the person doing it.
+- Anonymous Chinese Proverb
+
+He who is ashamed of asking is ashamed of learning.
+- Anonymous Danish Proverb
+
+For want of a nail the shoe was lost.
+For want of a shoe the horse was lost.
+For want of a horse the rider was lost.
+For want of a rider the message was lost.
+For want of a message the battle was lost.
+For want of a battle the kingdom was lost.
+And all for the want of a horseshoe nail.
+- Anonymous Proverb
+
+No matter how far down the wrong road you have gone, turn back now.
+- Anonymous Turkish Proverb
+
+Those who know, do. Those who understand, teach.
+- Aristotle
+
+We are what we repeatedly do. Excellence, then, is not an act, but a habit.
+- Aristotle
+
+The most exciting phrase to hear in science -the one that heralds new discoveries- is not "Eureka!" but "That's funny...".
+- I. Asimov
+
+The Analytical Engine weaves Algebraical patterns just as the Jacquard loom weaves flowers and leaves.
+- A. Augusta, Countess of Lovelace, on Babbage's Analytical Engine
+
+On two occasions, I have been asked [by members of Parliament], "Pray, Mr. Babbage, if you put into the machine wrong figures, will the right answers come out?" I am not able to rightly apprehend the kind of confusion of ideas that could provoke such a question.
+- C. Babbage
+
+I, myself, have had many failures and I've learned that if you are not failing a lot, you are probably not being as creative as you could be -you aren't stretching your imagination.
+- J. Backus
+
+You need the willingness to fail all the time. You have to generate many ideas and then you have to work very hard only to discover that they don't work. And you keep doing that over and over until you find one that does work.
+- J. Backus (NYT Obituary )
+
+A prudent question is one-half of wisdom.
+- F. Bacon
+
+Playing with pointers is like playing with fire. Fire is perhaps the most important tool known to man. Carefully used, fire brings enormous benefits; but when fire gets out of control, disaster strikes.
+- J. Barnes
+
+I can only think that the book is read because it deals with the difficulties of schooling, which do not change. Please note: the difficulties, not the problems. Problems are solved or disappear with the revolving times. Difficulties remain. It will always be difficult to teach well, to learn accurately; to read, write, and count readily and competently; to acquire a sense of history and start one's education or anothers.
+- J. Barzun ("Begin Here", pp 14),
+
+The American university is built on two false premises: that all teachers must add to the existing stock of knowledge by research, and that all self-respecting institutions fulfill this role only by employing productive scholars...Of course, the teacher must keep reading and thinking abreast of his time, but this does not mean that he must write and publish. The confusion hides a further absurd assumption, which is that when a man writes a scholarly book that reaches a dozen specialists he adds immeasurably to the world's knowledge; whereas if he imparts his thoughts and his reading to one hundred and fifty students every year, he is wasting his time and leaving the world in darkness. One is tempted to ask what blinkered pedant ever launched the notion that students in coming to college seceded from the human race and may therefore be safely left out when knowledge is being broadcast.
+- J. Barzun ("Teacher in America"),
+
+The sole justification of teaching, of the school itself, is that the student comes out of it able to do something he could not do before. I say do and not know, because knowledge that doesn't lead to doing something new or doing something better is not knowledge at all.
+- J. Barzun ("Begin Here", pp 112),
+
+The truth is, when all is said and done, one does not teach a subject, one teaches a student how to learn it. Teaching may look like administering a dose, but even a dose must be worked on by the body if it is to cure. Each individual must cure his or her own ignorance.
+- J. Barzun ("Begin Here", pp 35),
+
+Optimism is an occupational hazard of programming: testing is the treatment.
+- K. Beck
+
+Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better.
+- S. Beckett
+
+The cheapest, fastest, and most reliable components of a computer system are those that aren't there.
+- G. Bell
+
+Dakin (to Irwin, his teacher): Do you really believe that, sir, or are you just trying to make us think?
+- A. Bennett (in "The History Boys")
+
+The key to performance is elegance, not battalions of special cases.
+- J. Bentley & D. McIlroy
+
+Walking on water and developing software from a specification are easy if both are frozen.
+- E. Berard
+
+More than the act of testing, the act of designing tests is one of the best bug preventers known. The thinking that must be done to create a useful test can discover and eliminate bugs before they are coded - indeed, test-design thinking can discover and eliminate bugs at every stage in the creation of software, from conception to specification, to design, coding and the rest.
+- B. Bezier
+
+Percy:  You know, they do say that the Infanta's eyes are more beautiful
+        than the famous Stone of Galveston. 
+Edmund: Mm! ... What?
+Percy:  The famous Stone of Galveston, My Lord.
+Edmund: And what's that, exactly?
+Percy:  Well, it's a famous blue stone, and it comes ... from Galveston.
+Edmund: I see. And what about it?
+Percy:  Well, My Lord, the Infanta's eyes are bluer than it, for a start.
+Edmund: I see. And have you ever seen this stone?
+Percy:  (nods) No, not as such, My Lord, but I know a couple of people who
+         have, and they say it's very very blue indeed. 
+Edmund: And have these people seen the Infanta's eyes?
+Percy:  No, I shouldn't think so, My Lord.
+Edmund: And neither have you, presumably.
+Percy:  No, My Lord.
+Edmund: So, what you're telling me, Percy, is that something you have never
+        seen is slightly less blue than something else you have never seen.
+Percy:  (finally begins to grasp) Yes, My Lord.
+I sometimes feel this way when trying to explain a new programming concept.
+- From the Queen of Spain's Beard episode of Blackadder.
+When I grew up, my Dad used to encourage my brother and me to fail. So I would come home from school, and sit at the dinner table and my dad would say kids what did you fail at this week. And if I didn't have something to tell him, he would be disappointed. So if we weren't failing enough in our home, it meant we weren't trying new things.
+- S. Blakely (founder of Spanx, youngest self-made woman billionaire 2013) from CNN interview
+
+There is a division in the student population between those who go to college to learn and those who go to college to earn a diploma.
+- J. Blau (letter to the editor, Chronicle of Higher Education, May 24, 2002)
+
+The cleaner and nicer the program, the faster it's going to run. And if it doesn't, it'll be easy to make it fast.
+- J. Bloch (in Seibel, "Coders at Work")
+
+It is wrong to think that the task of physics is to find out how nature is. Physics concerns what we say about nature.
+- N. Bohr
+
+Opposites are not contradictory but complementary.
+- N. Bohr
+
+Sir Thomas More: Why not be a teacher? You'd be a fine teacher; perhaps a great one.
+Richard Rich: If I was, who would know it?
+Sir Thomas More: You; your pupils; your friends; G-d. Not a bad public, that.
+
+- R. Bolt (in his play, A Man for All Seasons)
+
+Software development has been, is, and will likely remain fundamentally hard. Building quality systems involves an essential and irreducible complexity, which is why the entire history of software engineering can be characterized as one of rising levels of abstraction. As such, the task of the software development team is to engineer the illusion of simplicity. Nonetheless, software-intensive systems can amplify human intelligence, but they cannot replace human judgment; software-intensive systems can fuse, co-ordinate, classify, and analyze information, but they cannot create knowledge. In other words, not everything we want to build can be built: there exist pragmatic theoretical and technical limits that make software development hard if not impossible. Furthermore, not everything we want to build should be built: there exist moral economic, social, and political limits that govern human industry. From fundamental to human, these are the factors that define the limits of software, factors that separate our vision from execution.
+- G. Booch (in a blurb from a talk, "The Limits of Software")
+
+That language is an instrument of human reason, and not merely a medium for the expression of thought, is a truth generally admitted.
+- G. Boole
+
+The greatest obstacle to discovery is not ignorance, but the illusion of knowledge.
+- D. Boorstin
+
+The most likely way for the world to be destroyed, most experts agree, is by accident. That's where we come in; we're computer professionals. We cause accidents.
+- N. Borenstein
+
+All models are wrong; some models are useful.
+- G. Box
+
+Simplicity and flexibility will trump optimization and power in a world where connectivity is the key.
+- A. Bosworth (paraphrased by David Bank in Breaking Windows, page 203)
+
+The important thing in science is not so much to obtain new facts as to discover new ways of think about them.
+- W. Bragg
+
+Information wants too be free. Information also wants to be expensive. Information wants to be free because it has become so cheap to distribute, copy, and recombine---too cheap to meter. It wants to be expensive because it can be immeasurably valuable to the recipient. That tension will not go away. It leads to endless wrenching debate about price, copyright, "intellectual property", the moral rightness of casual distribution, because each round of new devices makes the tension worse, not better.
+- S. Brand (see the Information Wants to Be Free web page)
+
+Programming is the art of writing essays in crystal clear prose and making them executable.
+- P. Brinch Hansen
+
+It is important that students bring a certain ragamuffin, barefoot irreverence to their studies; they are not here to worship what is known, but to question it.
+- J. Bronowski
+
+That is the essence of science: ask an impertinent question, and you are on the way to a pertinent answer.
+- J. Bronowski
+
+Welcome to Yale. Yale will be for you and to you what you make of it. Despite the gloom of the times this is not a gloomy place. It is a place where life can have purpose without being a society of driven men and women. It is also a place where there is no escape from argument, for the next person you meet will not be likely to agree with the last person talked to. This is a community which rewards participation but does not expect conformity. This is primarily a place for learning, but not all learning is in books or laboratories or classrooms. You probably have not been as free before. You may not be as free again. Enjoy the privilege of doubt. Make the most of it.
+- K. Brewster
+
+Good judgment comes from experience; experience comes from bad judgment.
+- F. Brooks
+
+Much of the essence of building a program is in fact the debugging of the specification.
+- F. Brooks
+
+Plan to throw one away; you will anyhow.
+- F. Brooks ("The Mythical Man-Month", Chapter 11)
+
+If you plan to throw one away, you will throw away two.
+- C. Zerouni
+
+Scientists build to learn; Engineers learn to build.
+- F. Brooks
+
+The hardest part of the software task is arriving at a complete and consistent specification, and much of the essence of building a program is in fact the debugging of the specification.
+- F. Brooks
+
+The programmer, like the poet, works only slightly removed from pure thought-stuff. He builds castles in the air, from air, creating by exertion of the imagination. Few media of creation are so flexible, so easy to polish and rework, so readily capable of realizing grand conceptual structures. Yet the program construct, unlike the poet's words, is real in the sense that it moves and works, producing visible outputs separate from the construct itself. It prints results, draws pictures, produces sounds, moves arms. The magic of myth and legend has come true in our time. One types the correct incantation on a keyboard, and a display screen comes to life, showing things that never were nor could be. ... The computer resembles the magic of legend in this respect, too. If one character, one pause, of the incantation is not strictly in proper form, the magic doesn't work. Human beings are not accustomed to being perfect, and few areas of human activity demand it. Adjusting to the requirement for perfection is, I think, the most difficult part of learning to program.
+- F. Brooks ("The Mythical Man Month", pages 7-8)
+
+Successful software always gets changed.
+- F. Brooks
+
+A man's reach should exceed his grasp, or what's heaven for?
+- R. Browning
+
+They may forget what you said, but they will never forget how you made them feel.
+- C. Buchner
+
+...and then it occurred to me that a computer is a stupid machine with the ability to do incredibly smart things, while computer programmers are smart people with the ability to do incredibly stupid things. They are, in short, a perfect match.
+- B. Bryson
+
+Learning how to learn is life's most important skill.
+- T. Buzan
+
+The first 90% of the code accounts for the first 90% of the development time. The remaining 10% of the code accounts for the other 90% of the development time.
+- T. Cargill
+
+The sooner you start to code, the longer the program will take.
+- R. Carlson
+
+The important point is that the cost of adding a feature isn't just the time it takes to code it. The cost also includes the addition of an obstacle to future expansion. Sure, any given feature list can be implemented, given enough coding time. But in addition to coming out late, you will usually wind up with a code base that is so fragile that new ideas that should be dead-simple wind up taking longer and longer to work into the tangled existing web. The trick is to pick the features that don't fight each other.
+- J. Carmack
+
+In essence, engineering is doing what you want with what you have.
+- J. Carmack
+
+Programming is not a zero-sum game. Teaching something to a fellow programmer doesn't take it away from you. I'm happy to share what I can, because I'm in it for the love of programming.
+- J. Carmack
+
+We think too much about effective methods of teaching and not enough about effective methods of learning. No matter how good teaching may be, each student must take the responsibility for his own education.
+- J. Carolus S.J.
+
+In 1958 I walked into this room full of glowing red tubes. What mesmerized me was that you could write a piece of software and you created this littel universe that you were in charge of, and it did what you told it to do. Of course the problem was it didn't always do what you wanted it to do. It did what you told it to do, and the difference between what you wanted and what you told it is called a bug.
+- V. Cerf
+
+In a way, math isn't the art of answering mathematical questions, it is the art of asking the right questions, the questions that give you insight, the ones that lead you in interesting directions, the ones that connect with lots of other interesting questions -the ones with beautiful answers.
+- G. Chaitin (pg. 23, in "Meta Math: The Quest for Omega")
+
+Mathematical truth is not totally objective. If a mathematical statement is false, there will be no proofs, but if it is true, there will be an endless variety of proofs, not just one! Proofs are not impersonal, they express the personality of their creator/discoverer just as much as literary efforts do. If something important is true, there will be many reasons that it is true, many proofs of that fact. Math is the music of reason, and some proofs sound like jazz, others sound like a fugue. Which is better, the jazz or the fugue? Neither: it's all a matter of taste...each proof will emphasize different aspects of the problem, each proof will lead in a different direction. Each one will have different corollaries, different generalizations...Mathematical facts are not isolated, they are woven into a vast spider's web of interconnections.
+- G. Chaitin (pg. 23, in "Meta Math: The Quest for Omega")
+
+Any sufficiently advanced technology is indistinguishable from magic.
+- A. Clarke
+
+We don't have time to stop for gas, we're already late.
+- M. Cleron (Commenting on how Software Projects are often Run)
+
+To be truly educated from this point of view means to be in a position to inquire and create on the basis of the resources available to you, which you've come to appreciate and comprehend. To know where to look, to know how to formulate serious questions, to question a standard doctrine, if that's appropriate, to find your own way, to shape the questions that are worth pursuing, and to develop the path to pursue them. That means knowing, understanding many things, but also, much more important than what you have stored in your mind, to know where to look, how to look, how to question, how to challenge, how to proceed independently to deal with the challenges that the world presents to you....
+- N. Chomsky (Video )
+
+Whenever there is a hard job to be done I assign it to a lazy man; he is sure to find an easy way of doing it.
+- W. Chrysler
+
+Personally, I'm always read to learn, although I do not always like being taught.
+- W. Churchill
+
+The real technology -behind all our other technologies- is language. It actually creates the world our consciousness lives in.
+- A. Codrescu
+
+I hear and I forget; I see and I remember; I do and I understand.
+- Confucius
+
+Never hesitate to ask a lesser person.
+- Confucius
+
+Any organization that designs a system (defined broadly) will produce a design whose structure is a copy of the organization's communication structure.
+(commonly expressed as Conway's law, "Systems resemble the organizations that produce them.")
+- M. Conway
+
+Press on. Nothing in the world can take the place of persistence. Talent will not; nothing is more common than unsuccessful men with talent. Genius will not; unrewarded genius is almost a proverb. Education alone will not; the world is full of educated derelicts. Persistence and determination alone are omnipotent.
+- C. Coolidge
+
+Six jokes: "What do you get when you cross a computer with an airplane? What do you get when you cross a computer with a camera? What do you get when you cross a computer with an alarm clock? What do you get when you cross a computer with a car? What do you get when you cross a computer with a bank? What do you get when you cross a computer with a warship?"
+In all six cases the answer is "A computer." [Cooper illustrates how the nature of these systems becomes dominated by the nature of their computer components]
+
+- A. Cooper (I'm paraphrasing some pictures and text appearing in "The Inmates are Running the Asylum")
+
+The value of a prototype is in the education it gives you, not in the code itself.
+- A. Cooper (in "The Inmates are Running the Asylum")
+
+When the words are fuzzy, the programmers reflexively retreat to the most precise method of articulation available: source code. Although there is nothing more precise than code, there is also nothing more permanent or resistant to change. So the situation frequently crops up where nomenclature confusion drives programmers to begin coding prematurely, and that code becomes the de facto design, regardless of its appropriateness or correctness.
+- A. Cooper (in "The Inmates are Running the Asylum")
+
+Doing more things faster is no substitute for doing the right things.
+- S. R. Covey
+
+The generation of random numbers is too important to be left to chance.
+- R. Coveyou
+
+If you don't think carefully, you might believe that programming is just typing statements in a programming language.
+- W. Cunningham
+
+Who dares to teach must never cease to learn.
+- J.C. Dana
+
+Every now and then go away, have a little relaxation, for when you come back to your work your judgment will be surer. Go some distance away because then the work appears smaller and more of it can be taken in at a glance and a lack of harmony and proportion is more readily seen.
+- L. Da Vinci
+
+Simplicity is the ultimate sophistication.
+- L. Da Vinci
+
+If you cannot describe what you are doing as a process, you don't know what you're doing.
+- W. E. Deming
+
+Question authority; but, raise your hand first.
+- A. Dershowitz
+
+One can think effectively only when one is willing to endure suspense and to undergo the trouble of searching.
+- J. Dewey
+
+As long as there were no machines, programming was no problem at all; when we had a few weak computers, programming became a mild problem, and now [1972] that we have gigantic computers, programming has become a gigantic problem. As the power of available machines grew by a factor of more than a thousand, society's ambition to apply these new machines grew in proportion, and it was the poor programmer who found his job in this exploded field of tension between the ends and the means. The increased power of the hardware, together with the perhaps more dramatic increase in its reliability, made solutions feasible that the programmer had not dared to dream about a few years before. And now, a few years later, he had to dream about them and even worse, he had to transform such dreams into reality! It is no wonder that we found ourselves in a software crisis
+- E. Dijkstra (The Humble Programmer, "ACM Turing Award Lectures: The First 25 Years", Addison-Wesley, 1987, pages 17-32)
+
+A most important, but also most elusive, aspect of any tool is its influence on the habits of those who train themselves in its use. If the tool is a programming language this influence is, whether we like it or not, an influence on our thinking habits.... A programming language is a tool that has profound influence on our thinking habits.
+- E. Dijkstra
+
+Being abstract is something profoundly different from being vague... The purpose of abstraction is not to be vague, but to create a new semantic level in which one can be absolutely precise.
+- E. Dijkstra
+
+Besides a mathematical inclination, an exceptionally good mastery of one's native tongue is the most vital asset of a competent programmer.
+- E. Dijkstra
+
+Computer Science is no more about computers than astronomy is about telescopes.
+- E. Dijkstra
+
+If we wish to count lines of code, we should not regard them as lines produced but as lines spent.
+- E. Dijkstra
+
+John von Neumann draws attention to what seemed to him a contrast. He remarked that for simple mechanisms, it is often easier to describe how they work than what they do, while for more complicated mechanisms, it is usually the other way around.
+- E. Dijkstra (Trip Reports, 213)
+
+Object-oriented programming is an exceptionally bad idea which could only have originated in California
+- E. Dijkstra (note: OOP originated in Norway, quite near Holland -Dijkstra's home)
+
+...our intellectual powers are rather geared to master static relations and that our powers to visualize processes evolving in time are relatively poorly developed. For that reason we should do (as wise programmers aware of our limitations) our utmost to shorten the conceptual gap between the static program and the dynamic process, to make the correspondence between the program (spread out in text space) and the process (spread out in time) as trivial as possible.
+- E. Dijkstra (in "Goto Considered Harmful")
+
+Program testing can be used to show the presence of bugs, but never to show their absence!
+- E. Dijkstra
+
+Progress is possible only if we train ourselves to think about programs without thinking of them as pieces of executable code.
+- E. Dijkstra
+
+Simplicity is a prerequisite for reliability.
+- E. Dijkstra
+
+...Simplifications have had a much greater long-range scientific impact than individual feats of ingenuity. The opportunity for simplification is very encouraging, because in all examples that come to mind the simple and elegant systems tend to be easier and faster to design and get right, more efficient in execution, and much more reliable than the more contrived contraptions that have to be debugged into some degree of acceptability....Simplicity and elegance are unpopular because they require hard work and discipline to achieve and education to be appreciated.
+- E. Dijkstra (The Tide, not the waves; in Denning/Metcalfe: Beyond Calculation, Springer-Verlag 1997)
+
+The tools we use have a profound (and devious!) influence on our thinking habits, and, therefore, on our thinking abilities.
+- E. Dijkstra
+
+The competent programmer is fully aware of the strictly limited size of his own skull; therefore he approaches the programming task in full humility, and among other things he avoids clever tricks like the plague.
+- E. Dijkstra (in "The Humble Programmer", his 1972 Turing Award Lecture)
+
+The art of programming is the art of organizing complexity, of mastering multitude and avoiding its bastard chaos.
+- E. Dijkstra (in "Notes on Structured Programming")
+
+The effective exploitation of his powers of abstraction must be regarded as one of the most vital activities of a competent programmer.
+- E. Dijkstra (in "The Humble Programmer", his 1972 Turing Award Lecture)
+
+We are all shaped by the tools we use, in particular: the formalisms we use shape our thinking habits, for better or for worse, and that means that we have to be very careful in the choice of what we learn and teach, for unlearning is not really possible.
+- E. Dijkstra (in Answers to Questions from Students of Software Engineering)
+
+We shall do a much better programming job, provided that we approach the task with a full appreciation of its tremendous difficulty, provided that we stick to modest and elegant programming languages, provided that we respect the intrinsic limitations of the human mind and approach the task as Very Humble Programmers.
+- E. Dijkstra (in "The Humble Programmer", his 1972 Turing Award Lecture)
+
+Yes, I share your concern: how to program well -though a teachable topic- is hardly taught. The situation is similar to that in mathematics, where the explicit curriculum is confined to mathematical results; how to do mathematics is something the student must absorb by osmosis, so to speak. One reason for preferring symbol-manipulating, calculating arguments is that their design is much better teachable than the design of verbal/pictorial arguments. Large-scale introduction of courses on such calculational methodology, however, would encounter insurmountable political problems.
+- E. Dijkstra (in Answers to Questions from Students of Software Engineering)
+
+Text is linear; it is black and white; it doesn't zoom around the page in 3-D; it isn't intelligent by itself; in fact, in terms of immediate reaction it is quite boring. I can't imagine a single preliterate was ever wowed at the first sight of text, and yet text has been the basis of arguably the most fundamental intellectual transformation of the human species. It and its subforms, such as algebra, have made science education for all a plausible goal.
+- A.diSessa ("Changing Minds: Computers, Learning, and Literacy", MIT Press, 2000; page 112)
+
+There is nothing so useless as doing efficiently that which should not be done at all.
+- P. Drucker
+
+The first step in fixing a broken program is getting it to fail repeatably [on the simplest example possible].
+- T. Duff
+
+It's supposed to be hard! If it wasn't hard, everyone would do it. The hard... is what makes it great!
+- J. Dugan (said by Tom Hanks' character in "A League of Their Own" in response to a complaint from one of his ball players)
+
+In a fixed mindset students believe their basic abilities, their intelligence, their talents, are just fixed traits. They have a certain amount and that's that, and then their goal becomes to look smart all the time and never look dumb. In a growth mindset students understand that their talents and abilities can be developed through effort, good teaching and persistence. They don't necessarily think everyone's the same or anyone can be Einstein, but they believe everyone can get smarter if they work at it.
+- C. Dweck (see also the quote by J. Hamilton)
+
+It's when something fails that you learn. If it doesn't fail, you don't learn anything; you haven't made any progress. Everything I do is a mistake; it fails.
+- J. Dyson (interview in Wired Magazine, p. 112, Dec. 2012)
+
+Genius is 1 percent inspiration and 99 percent perspiration. As a result, genius is often a talented person who has simply done all of his homework.
+- T. Edison
+
+Any fool can know. The point is to understand.
+- A. Einstein
+
+Any intelligent fool can make things bigger, more complex, and more violent. It takes a touch of genius - and a lot of courage - to move in the opposite direction.
+- A. Einstein
+
+Everything should be made as simple as possible, but not simpler.
+- A. Einstein
+
+Example isn't another way to teach. It is the only way to teach.
+- A. Einstein
+
+The formulation of a problem is often more essential than its solution, which may be merely a matter of mathematical or experimental skill.
+- A. Einstein
+
+I never teach my pupils. I only attempt to provide the conditions in which they can learn.
+- A. Einstein
+
+If you can't explain it simply, you don't understand it well enough.
+- A. Einstein
+
+Imagination is more important than knowledge.
+- A. Einstein
+
+Out of clutter, find simplicity. From discord, find harmony. In the middle of difficulty, lies opportunity.
+- A. Einstein
+
+Reinventing the wheel is a process.
+- R. Elisha
+
+To arrive at the simple is difficult.
+- R. Elisha
+
+Shall I tell you the secret of the true scholar? It is this: every man I meet is my master in some point, and in that I learn of him.
+- R.W. Emerson
+
+The proof of a high education is the ability to speak about complex matters as simply as possible.
+- R.W. Emerson
+
+In those days [batch processing] programmers never even documented their programs, because it was assumed that nobody else would ever use them. Now, however, time-sharing had made exchanging software trivial: you just stored one copy in the public repository and thereby effectively gave it to the world. Immediately people began to document their programs and to think of them as being usable by others. They started to build on each others work.
+- R. Fano (in Waldrop, "The Dream Machine", pp. 232)
+
+..a function approach [to teaching programming] has numerous, beneficial side-effects.
+- M. Felleisen (in What's TeachScheme!)
+
+Thus, writing a clever piece of code that works is one thing; designing something that can support a long-lasting business is quite another. Commercial software design and production is, or should be, a rigorous, capital-intensive activity. Software products should be based on a broad, deep structure that can support much more than whatever the product contains at any given time. In addition to code that works, you need documentation, help functions, error handling, multi-platform support, and multiple languages. You also need an underlying architecture that allows you to add and change features, purchase and integrated external software components, and allows other software vendors to make their products talk to yours, add customized widgets to it, embed your product inside something larger of their own. A good architecture, one that will carry you for a decade's worth of unpredictable technology and marked changes, take months to develop. But if you skip this step, as Netscape did, you have made a truly Faustian bargain.
+The problem with this [building just what you need, instead of planning ahead] is that these systems start getting ferociously complicated. It comes time to fix a mistake, add a feature, replace something and you discover that everything is connected to everything else in ways you can't even begin to understand. Because you're doing something more ambitious than the initial academic prototype, it's big enough that you need to partition it across a team. The members of the team need to have a clear idea of how their work relates to everyone else's, and they need to be able to communicate to the testers whose job it is to find errors. Otherwise [in other words], you give the patient a kidney transplant and his heart suddenly fails; then you give him a heart drug, but that makes his lungs collapse. You don't know why, and you're screwed.
+
+And then the future comes, and you're really screwed. Later releases of the product inevitably are more complex, because they must continue to support previous version while adding new capabilities. You discover that the original developers have quit or been promoted or have forgotten what they did, and it's time to keep up with the competition by adding new features, supporting more platforms, translating into Japanese, and so forth. The engineering team has to quadruple in size. You start discovering things like three different groups need to change the same piece of code, and each set of changes causes problems for the others, and nobody else can test their work until that piece of code is stable, so a hundred people twiddle their thumbs for a week. Or you want to use an existing function for some new purpose, but you can't isolate it from everything else, so you have to write it all over again. This not only means that you have the extra time and cost of writing and maintaining twice as much code, but you probably have to ensure that the two versions work exactly alike, which they almost certainly won't.
+
+With each successive release, these problems get worse. By the time you're on your fifth release, the decision to do your first product the quick and dirty way has probably cost you ten times what it originally saved. A program like Microsoft's Windows 98 is tens of millions of lines of code. Nobody can keep that much complexity in their head or hope to manage it effectively. So you need an architecture that says to everyone, "Here's how this thing works, and to do your part, you need to understand only these five things, and don't you dare touch anything else."
+
+- C. Ferguson (High Stakes, No Prisoners; Times Business Press, page 107-109)
+
+I can live with doubt and uncertainty. I think it's much more interesting to live not knowing than to have answers which might be wrong... In physics the truth is rarely perfectly clear, and that is certainly universally the case in human affairs. Hence, what is not surrounded by uncertainty cannot be the truth.
+- R. Feynman (in "Perfectly Reasonable Deviations from the Beaten Track: The Letters of Richard P. Feynman")
+
+If you're teaching a class, you can think about the elementary things that you know very well. These things are kind of fun and delightful. It doesn't do any harm to think them over again. Is there a better way to present them? The elementary things are easy to think about; if you can't think of a new thought, no harm done; what you thought about it before is good enough for the class. If you do think of something new, you're rather pleased that you have a new way of looking at it.
+The questions of the students are often the source of new research. They often ask profound questions that I've thought about at times and then given up on, so to speak, for a while. It wouldn't do me any harm to think about them again and see if I can go any further now. The students may not be able to see the thing I want to answer, or the subtleties I want to think about, but they remind me of a problem by asking questions in the neighborhood of that problem. It's not so easy to remind yourself of these things.
+
+- R. Feynman (from "The Dignified Professor" in "Surely You're Joking Mr. Feynman": pg. 166)
+
+Precise language is not the problem. Clear language is the problem.
+- R. Feynman
+
+The inside of a computer is as dumb as hell but it goes like mad!
+- R. Feynman
+
+Feynman's Learning Strategy
+Step 1: Continually ask "Why"?
+Step 2: When you learn something, learn it to where you can explain it to a child.
+Step 3: Instead of arbitrarily memorizing things, look for the explanation that makes it obvious.
+
+- R. Feynman
+
+What I cannot create I do not understand.
+- R. Feynman
+
+When the problem [quantum chromodynamics] is finally solved, it will all be by imagination. Then there will be some big thing about the great way it was done. But it's simple -it will all be by imagination, and persistence.
+- R. Feynman (in Mlodinow's "Feynman's Rainbow")
+
+When a Caltech student asked the eminent cosmologist Michael Turner what his "bias" was in favoring one or another particle as a likely candidate to compromise dark matter in the universe, Feynman snapped, "Why do you want to know his bias? Form your own bias!"
+- R. Feynman (related by Timothy Ferris in "Perfectly Reasonable Deviations from the Beaten Track: The Letters of Richard P. Feynman")
+
+There does not now, nor will there ever exist, a programming language in which it is the least bit hard to write bad programs.
+- L. Flon
+
+If I ask another professor what he teaches in the introductory programming course, whether he answers proudly "Pascal" or diffidently "FORTRAN," I know that he is teaching a grammar, a set of semantic rules, and some finished algorithms, leaving the students to discover, on their own, some process of design.
+- R. Floyd
+
+In order to get the world in one's grasp, to comprehend the world, one must not look at the world nor describe it, one must calculate it.
+- V. Flusser
+
+An engineer can do for a nickel what any damn fool can do for a dollar.
+- H. Ford
+
+Failure is the opportunity to begin again more intelligently.
+- H. Ford
+
+The only real mistake is the one from which we learn nothing.
+- H. Ford
+
+Education's purpose is to replace an empty mind with an open one.
+- M. Forbes
+
+Any fool can write code that a computer can understand. Good programmers write code that humans can understand.
+- M. Fowler, "Refactoring: Improving the Design of Existing Code"
+
+[Describing JUnit] Never in the field of program testing, was so much owed by so many to so few lines of code.
+- M. Fowler (apologizing to Winston Churchill)
+
+Awaken people's curiosity. It is enough to open minds, do not overload them. Put there just a spark.
+- A. France
+
+Simplicity is the soul of efficiency.
+- A. Freeman (in The Eye of Osiris)
+
+When I am working on a problem, I never think about beauty. I think only of how to solve the problem. But when I have finished, if the solution is not beautiful, I know it is wrong.
+- B. Fuller
+
+The biggest difference between time and space is that you can't reuse time.
+- M. Furst
+
+Habitability is the characteristic of source code that enables programmers coming to the code later in its life to understand its construction and intentions and to change it comfortably and confidently... Software needs to be habitable because it always has to change...Programs are written and maintained, bugs are fixed, features are added, performance is tuned, and a whole variety of changes are made both by the original and new programming team members... What is important is that it be easy for programmers to come up to speed with the code, to be able to navigate through it effectively, to be able to understand what changes to make, and to be able to make them safely and correctly.
+- R. Gabriel (Patterns of Software, Oxford Press 1996)
+
+All truths are easy to understand once they are discovered; the point is to discover them.
+- G. Galilei
+
+Mathematics is the language with which G-d has written the universe.
+- G. Galilei
+
+A complex system that works in invariably found to have evolved from a simple system that worked.
+- J. Gall
+
+An excellent plumber is infinitely more admirable than an incompetent philosopher. The society that scorns excellence in plumbing because plumbing is a humble activity and tolerates shoddiness in philosophy because it is exalted activity will have neither good plumbing or good philosophy. Neither its pipes or its theories will hold water.
+- J. Gardner
+
+640K [of main memory] ought to be enough for anybody.
+- W. Gates (Founder and CEO Microsoft), 1981 - disclaimed
+
+The best way to prepare [to be a programmer] is to write programs, and to study great programs that other people have written. In my case, I went to the garbage cans at the Computer Science Center and fished out listings of their operating systems.
+- W. Gates
+
+We flew down weekly to meet with IBM, but they thought the way to measure software was the amount of code we wrote, when really the better the software, the fewer lines of code.
+- W. Gates
+
+A great lathe operator commands several times the wage of an average lathe operator, but a great writer of software code is worth 10,000 times the price of an average software writer.
+- W. Gates
+
+Learning to write programs stretches your mind, and helps you think better, creates a way to thinking about things that I think is helpful in all domains.
+- W. Gates
+
+It is not knowledge, but the act of learning, not possession, but the act of getting there which generates the greatest satisfaction.
+- F. Gauss
+
+Beauty is more important in computing than anywhere else in technology because software is so complicated. Beauty is the ultimate defense against complexity. ... The geniuses of the computer field, on the other hand, are the people with the keenest aesthetic senses, the ones who are capable of creating beauty. Beauty is decisive at every level: the most important interfaces, the most important programming languages, the winning algorithms are the beautiful ones.
+- D. Gelernter ("Machine Beauty", Basic Books, 1998)
+
+Good programmers know what's beautiful and bad ones don't.
+- D. Gelernter ("Machine Beauty", Basic Books, 1998)
+
+Object-oriented programming as it emerged in Simula 67 allows software structure to be based on real-world structures, and gives programmers a powerful way to simplify the design and construction of complex programs.
+- D. Gelernter ("Machine Beauty", Basic Books, 1998)
+
+One of the principal objects of theoretical research in any department of knowledge is to find the point of view from which the subject appears in its greatest simplicity.
+- J. W. Gibbs
+
+Vague and nebulous is the beginning of all things, but not their end.
+- K. Gibran
+
+At the source of every error which is blamed on the computer, you will find at least two human errors, one of which is the error of blaming it on the computer.
+- T. Gilb (in "Laws of Unreliability", Datamation March 1975)
+
+Indirection is the right direction.
+- A. Glew
+
+Computer programs are the most intricate, delicately balanced and finely interwoven of all the products of human industry to date. They are machines with far more moving parts than any engine: the parts don't wear out, but they interact and rub up against one another in ways the programmers themselves cannot predict.
+- J. Gleick
+
+Never put off until run time what can be done at compile time.
+- A. Glew
+
+Always code as if the guy who ends up maintaining your code will be a violent psychopath who knows where you live.
+- M. Golding
+
+This attitude [the abstract method in mathematics] can be encapsulated in the following slogan: a mathematical object is what it does.
+- T. Gowers (in "Mathematics: A Very Short Introduction" pg. 18)
+
+A really good language should be both clean and dirty: cleanly designed, with a small core of well understood and highly orthogonal operators, but dirty in the sense that it lets hackers have their way with it....A real hacker's language will always have a slightly raffish character.
+- P. Graham (in "Hackers and Painters" pg. 204)
+
+Fixing fresh bugs is easier than fixing old ones. It's usually fairly quick to find a bug in code you just wrote. When it turns up you often know what's wrong before you even look at the source, because you were already worrying about it subconsciously. Fixing a bug in something you wrote six months ago (the average case if you release once a year) is a lot more work. And since you don't understand the code as well, you're more likely to fix it in an ugly way, or even introduce more bugs.
+When you catch bugs early, you also get fewer compound bugs. Compound bugs are two separate bugs that interact: you trip going downstairs, and when you reach for the handrail it come off in your hand. In software this kind of bug is the hardest to find, and also tends to have the worst consequences. The traditional "break everything and then filter out the bugs" approach inherently yields a lot of compound bugs. And software released in a series of small chances inherently tends not to. The floors are constantly being swept clean of any loose objects that might later get stuck to something.
+
+- P. Graham (in "Hackers and Painters" pg. 65-66)
+
+Great software, likewise, requires a fanatical devotion to beauty. If you look inside good software, you find that parts that no one is ever supposed to see are beautiful too. When it comes to code I behave in a way that would make me eligible for prescription drugs if I approached everyday life the same way. It drives me crazy to see code that's badly indented, or that uses ugly variable names.
+- P. Graham (in "Hackers and Painters" pg. 29)
+
+Imagine the kind of conversation you would have with someone so far away that there was a transmission delay of one minute. Now imagine speaking to someone in the next room. You wouldn't just have the same conversation faster, you would have a different kind of conversation. In Lisp, developing software is like speaking face-to-face. You can test code as you're writing it. And instant turnaround has just as dramatic an effect on development as it does on conversation. You don't just write the same program faster; you write a different kind of program.
+- P. Graham (in "On Lisp")
+
+Simplicity is the most important thing in technology. And it's only getting more important.
+- P. Graham
+
+The difference between design and research seems to be a question of the good versus the new. Design doesn't have to be new, but it has to be good. Research doesn't have to be good, but it has to be new. I think these two paths converge at the top: the best design surpasses its predecessors by using new ideas, and the best research solves problems that are not only new, but worth solving. So ultimately design and research are aiming for the same destination, just approaching it from different directions.
+- P. Graham (in "Hackers and Painters" footnote 9, pg. 224)
+
+The way to make programs easy to read is not to stuff them with comments... A good programming language ought to be better for explaining software than English. You should only need comments when there is some kind of kludge you need to warn readers about, just as on a road there are only arrows on parts with unexpectedly sharp curves.
+- P. Graham (in "Hackers and Painters" footnote 9, pg. 224)
+
+You should figure our programs as you're writing them, just as writers and painters and architects do. Realizing this [programming as sketching] has real implications for software design. It means that a programming language should, above all, be malleable. A programming language is for thinking of programs, not for expressing programs you've already thought of. It should be a pencil, not pen.
+...
+Remember too that languages are not primarily a form for finished programs, but something that programs have to be developed in.
+...
+A good programming language should, like oil paint, make it easy to change your mind.
+...
+Paintings usually begin with a sketch. Gradually the details get filled in. But it is not merely a process of filling in. Sometimes the original plans turn out to be mistaken. Countless paintings, when you look at them in x-rays, turn out to have limbs that have been moved or facial features that have been readjusted.
+...
+So the test of a language is not simply how clean the finished program looks in it, but how clean the path to the finished program was.
+...
+What made oil paint so exciting, when it first became popular in the fifteenth century, was that you could make the finished work from the prototype. You could make a preliminary drawing if you wanted to, but you weren't held to it; you could work out all the details, and even make major changes as you finished the painting. You can do this with software too. A prototype doesn't have to be just a model; you can refine it into the finished product....it's good for morale.
+...
+Building something by gradually refining a prototype is good for morale because it keeps you engaged. In software, my rule is: always have working code. If you're writing something you'll be able to test in an hour, you have the prospect of an immediate reward to motivate you.
+- P. Graham (in "Hackers and Painters" pg. 22, 27, 218, 219, 220, 221)
+
+Incidentally, when we're faced with a "prove or disprove," we're usually better off trying first to disprove with a counterexample, for two reasons: A disproof is potentially easier (we need just one counterexample); and nitpicking arouses our creative juices. Even if the given assertion is true, our search for a counterexample often leads to a proof, as soon as we see why a counterexample is impossible. Besides, it's healthy to be skeptical.
+- R. Graham, D. Knuth and O. Patashnik (in "Concrete Mathematics: A Foundation for Computer Science")
+
+Any sufficiently complicated C or FORTRAN program contains an ad hoc informally specified bug-ridden slow implementation of half of Lisp.
+- P. Greenspun
+
+Writing is nature's way of letting you know how sloppy your thinking is.
+- R. Guindon (cartoon, San Francisco Chronincle, January 1989)
+
+Mathematics is nature's way of letting you know how sloppy your writing is.
+- L. Lamport, ("Specifying Systems", 2002, p. 2
+
+Formal mathematics is nature's way of letting you know how sloppy your mathematics is.
+- L. Lamport, ("Specifying Systems", 2002, p. 2
+
+UNIX was not designed to stop people from doing stupid things, because that would also stop them from doing clever things.
+- D. Gwyn
+
+Any performance problem can be solved by removing a level of indirection. (also see "Any programming problem..." by Anonymous).
+- M. Haertel
+
+The tendency to err that programmers have been noticed to share with other human beings has often been treated as though it were an awkwardness attendant upon programming's adolescence, which like acne would disappear with the craft's coming of age. It has proved otherwise.
+- M. Halpern
+
+Research by Stanford pyschology professor Carol Dweck suggests that a student who has been raised to believe that his or her success stems from special abilities rather than hard work and learning from mistakes may become fixated on maintaining the "gifted" status at any cost, which could include cheating.
+- J. Hamilton (from "Why We Cheat" in "Stanford Magazine", Sep/Oct 2015)
+
+Education is what, when, and why to do things. Training is how to do it.
+- R. Hamming
+
+In science if you know what you are doing you should not be doing it. In engineering if you don't know what you are doing you should not be doing it.
+- R. Hamming
+
+The purpose of computing is insight, not numbers.
+- R. Hamming
+
+The mathematician's patterns, like those of the painter's or the poet's, the ideas, like the colours or words, must fit together in a harmonious way. There is no permanent place in this world for ugly mathematics.
+- G.H. Hardy (in "A Mathematician's Apology")
+
+Programming is an explanatory activity.
+- R. Harper
+
+It is very interesting to me how quickly the class has divided up into three factions. One faction being the students who sit in the back of the class, given up sitting in their assigned seats, preparing the cases. What is it, only October? They've already given up trying -the cowards. The second group are the ones who won't raise their hands or volunteer an answer, but will try when they're called upon. That's where I am right now, living in a state of constant fear. And then there's the third echelon: the upper echelon; the volunteers. They raise their hands in class. They thrust themselves into the fray. I don't think they're smarter than anyone else, but they have courage. And, they'll achieve the final recognition, that teachers will get to know their names, and they'll get better grades. The past couple weeks I've been preparing to enter the upper echelon, and this weekend -if I can get all my work done- I'm going to enter it Monday morning, in Kingsfield's contract law class.
+- James Hart (a law student in "The Paper Chase")
+
+[Breaking into the "red" room in the Harvard law library, which contains the notes of Harvard professors from their school days, and drafts of their articles and books] Do you realize what this is? This is it. This is the unbroken chain. The ageless passing of wisdom. Hey [what is it?] listen to this. "Kingsfield, Charles W. notes on contract law in the course on contracts by Professor Williston at the Harvard Law School, 1927". What the hell is it. They're just notes: and they look just like mine. Look [reading from Kingsfield's notes]. "Questions: Does everybody have a contract to obey everybody else's rights. What is a contract? What do you owe to others?" Look, there are even doodles. [C'mon, let's get outta here.] Wait, wait. "Can we make a contract with G-d that is biding to man? ... After all, I am almost the living extension of the old judges. Where would they be without me. I carry in my mind the cases they wrote. Where the hell would they be if it wasn't for me? Who would hang their pictures if there were no law students? It's hard being the living extension of tradition."
+- James Hart (a law student in "The Paper Chase")
+
+There are features that should not be used. There are concepts that should not be exploited. There are problems that should not be solved. There are programs that should not be written.
+- R. Harter
+
+Eventually hardware fails; eventually software works.
+- M. Hartung
+
+PROBLEMS
+Problems worthy
+of attack
+prove their worth
+by hitting back.
+- P.Hein (in "Grooks")
+
+There are two schools of thought about teaching computer science. We might caricature the two views this way:
+The conservative view: Computer programs have become too large and complex to encompass in a human mind. Therefore, the job of computer science education is to teach people how to discipline their work in such a way that 500 mediocre programmers can join together and produce a program that correctly meets its specification.
+The radical view: Computer programs have become too large and complex to encompass in a human mind. Therefore, the job of computer science education is to teach people how to expand their minds so that the programs can fit, by learning to think in a vocabulary of larger, more powerful, more flexible ideas than the obvious ones. Each unit of programming thought must have a big payoff in the capabilities of the program.
+- B. Harvey and M. Wright (in "Simply Scheme")
+
+THE ROAD TO WISDOM
+The road to wisdom? - Well, it's plain
+and simple to express:
+Err
+and err
+and err again
+but less
+and less
+and less.
+- P.Hein (in "Grooks")
+
+The one who insists on never uttering an error must remain silent.
+- W. Heisenberg
+
+The speed of a non-working program is irrelevant.
+- S. Heller (in "Efficient C/C++ Programming")
+
+Refactoring provides enough energy to a system for it to relax into a new and more comfortable state, a new local minimum. The effect of refactoring commonality is to tame the complexity of your system.
+- K. Henney (in Minimalism: The Imperial Clothing Crisis)
+
+A process cannot be understood by stopping it. Understanding must move with the flow of the process, must join and flow with it.
+- F. Herbert (The First Law of Mentat in "Dune")
+
+It's [programming] the only job I can think of where I get to be both an engineer and an artist. There's an incredible, rigorous, technical element to it, which I like because you have to do very precise thinking. On the other hand, it has a wildly creative side where the boundaries of imagination are the only real limitation.
+- A. Hertzfeld (original Mac programmer)
+
+...At first I hoped that such a technically unsound project would collapse but I soon realized it was doomed to success. Almost anything in software can be implemented, sold, and even used given enough determination. There is nothing a mere scientist can say that will stand against the flood of a hundred million dollars. But there is one quality that cannot be purchased in this way -and that is reliability. The price of reliability is the pursuit of the utmost simplicity. It is a price which the very rich find most hard to pay.
+- C.A.R. Hoare
+
+I had the idea to define programming languages in a way that gave enough information to the user of the programming language to be able to predict whether the computer would do what hte programming wanted it to.
+I was eventually persuaded of the need to design programming notations so as to maximize the number of errors which cannot be made, or if made, can be reliably detected at compile time.
+- C.A.R. Hoare
+
+In the development of the understanding of complex phenomena, the most powerful tool available to the human intellect is abstraction. Abstraction arises from the recognition of similarities between certain objects, situations, or processes in the real world and the decision to concentrate on these similarities and to ignore, for the time being, their differences.
+- C.A.R. Hoare
+
+Inside every well-written large program is a well-written small program.
+- C.A.R. Hoare
+
+Premature optimization is the root of all evil in programming.
+- C.A.R. Hoare
+
+The unavoidable price of reliability is simplicity.
+- C.A.R. Hoare
+
+There are two ways of constructing a software design. One way is to make it so simple that there are obviously no deficiencies. And the other way is to make it so complicated that there are no obvious deficiencies.
+- C.A.R. Hoare
+
+What is the central core of the subject [computer science]? What is it that distinguishes it from the separate subjects with which it is related? What is the linking thread which gathers these disparate branches into a single discipline. My answer to these questions is simple -it is the art of programming a computer. It is the art of designing efficient and elegant methods of getting a computer to solve problems, theoretical or practical, small or large, simple or complex. It is the art of translating this design into an effective and accurate computer program.
+- C.A.R. Hoare
+
+When examining the detail of the algorithm, it seems probable that the proof will be helpful in explaining not only what is happening but why.
+- C.A.R. Hoare (in "An Axiomatic Basis for Computer Programming", 1969)
+
+You cannot teach beginners top-down programming, because they don't know which end is up.
+- C.A.R. Hoare (private communication)
+
+All thought is a kind of computation.
+- D. Hobbes
+
+The problem is never how to get new, innovative thoughts into your mind, but how to get old ones out!
+- D. Hock (founder of VISA)
+
+Using a language we may create models of phenomena of interest, and by using models, phenomena may be studied for purposes of understanding or prediction. Models may be used for analysis focused on a close examination of individual parts of the model and for synthesis aimed at understanding the interplay of the parts, that is, understanding the model as a whole. A novel is like a model of the real world expressed in a written language like English. In a novel, the characters may be analyzed and the interaction between people may be displayed and studied. (in "Dreams of Calculus: Perspectives on Mathematics Education")
+- J. Hoffman, C. Johnson, A. Logg
+
+The ability to simplify means to eliminate the unnecessary so that the necessary may speak.
+- H. Hofmann (in "Introduction to the Bootstrap")
+
+This sequence [of languages, SP/1 through SP/8] solves one of the perennial problems of introductory programming. As J.J. Horning once put it, the subject requires that everything must be taught first.
+- R. Holt, D. Wortman, D. Barnard and J. Cordy (quoting J.J. Horning) in "SP/k: A System for Teaching Computer Programming", CACM 20/5 (May 77) pg. 303
+
+A ship in port is safe, but that is not what ships are built for. I want all the youngsters to sail out to sea and be good ships.
+- G. Hopper
+
+When you have a good idea and you've tried it and you know it's going to work, go ahead and do it -because it's much easier to apologize afterwards than it is to get permission.
+- G. Hopper
+
+Computer Science is the only discipline in which we view adding a new wing to a building as being maintenance.
+- J. Horning
+
+To treat programming scientifically, it must be possible to specify the required properties of programs precisely. Formality is certainly not an end in itself. The importance of formal specifications must ultimately rest in their utility -in whether or not they are used to improve the quality of software or to reduce the cost of producing and maintaining software.
+- J. Horning
+
+One purpose of CRC cards [a design tool] is to fail early, to fail often, and to fail inexpensively. It is a lot cheaper to tear up a bunch of cards that it would be to reorganize a large amount of source code.
+- C. Horstmann (in Object-Oriented Design with Java)
+
+An examination should not be confused with an education.
+- C. Hsi
+
+We [teachers] make the road, others will make the journey.
+- V. Hugo
+
+The greatest mistake you can make in life is to be continually fearing you will make one.
+- E. Hubbard
+
+There were really just two main things [relating to programming languages]. One was simplicity and the other was practicality. But when after 16 years [in 1995] we're still fighting to teach the world about these simple things,..., you begin to realize the siple things are not obvious.
+- A. Iverson
+
+Rules of Optimization:
+  Rule 1: Don't do it.
+  Rule 2 (for experts only): Don't do it yet.
+- M. A. Jackson
+
+In the practical use of our intellect, forgetting is as important as remembering.
+- W. James
+
+"Do you want to sell sugar water for the rest of your life, or do you want to change the world?" (what Steve Jobs said to John Sculley when trying to recruit him from Pepsi to work at Apple in 1983).
+- S. Jobs
+
+Everybody in this country should learn to program a computer, because it teaches you how to think.
+- S. Jobs
+
+"Learning to program teaches you how to think. Computer science is a liberal art"
+- S. Jobs
+
+That simplicity is the ultimate sophistication. What we meant by that was when you start looking at a problem and it seems really simple with all these simple solutions, you don't really understand the complexity of the problem. And your solutions are way too oversimplified, and they don't work. Then you get into the problem, and you see it's really complicated. And you come up with all these convoluted solutions. That's sort of the middle, and that's where most people stop, and the solutions tend to work for a while. But the really great person will keep on going and find, sort of, the key, underlying principle of the problem. And come up with a beautiful elegant solution that works.
+- S. Jobs (in "The Perfect Thing" by Steven Levy, pg. 67-68)
+
+That's been one of my mantras -focus and simplicity. Simple can be harder than complex: you have to work hard to get your thinking clean to make it simple. But it's worth it in the end because once you get there, you can move mountains.
+- S. Jobs (BusinessWeek interview, May 1998)
+
+The only problem with Microsoft is they just have no taste. They have absolutely no taste. What that means is -I don't mean that in a small way; I mean that in a big way- is the sense that they don't think of original ideas. They don't bring much culture into their product. ... So I guess I am saddened not by Microsoft's success -I have no problem with their success; they've earned their success (for the most part). I have a problem with the fact that the just make really third-rate products.
+- S. Jobs (transcribed from "Triumph of the Nerds")
+
+Before software can be reusable it first has to be usable.
+- R. Johnson
+
+What we hope ever to do with ease, we must first learn to do with diligence.
+- S. Johnson
+
+The fastest algorithm can frequently be replaced by one that is almost as fast and much easier to understand.
+- D. Jones
+
+To teach is to learn twice.
+- J. Joubert
+
+The honest truth is that having a lot of people staring at the code does not find the really nasty bugs. The really nasty bugs are found by a couple of really smart people who just kill themselves. (also see "Given enough eyeballs..." by E. Raymond).
+- B. Joy
+
+We don't manage our time as well as we manage our space. There's an overhead of starting and an overhead of stopping a project because you kind of lose your momentum. And you've got to bracket and put aside all the things you're already doing. So you need reasonably large blocks of uninterrupted time if you're going to be successful at doing some of these things. That's why hackers tend to stay up late.
+If you stay up late and you have another hour of work to do, you can just stay up another hour later without running into a wall and having to stop. Whereas it might take three or four hours if you start over, you might finish if you just work that extra hour. If you're a morning person, the day always intrudes a fixed amount of time in the future. So it's much less efficient. Which is why I think computer people tend to be night people -because a machine doesn't get sleepy.
+
+- B. Joy
+
+In the particular is contained the universal.
+- J. Joyce
+
+Mistakes are the portals of discovery.
+- J. Joyce
+
+Following the thin song of mathematics and not the heavy voice of experience proved to be another victory for engineering science.
+- T. von Karman
+
+90% of code written today is getting around other people's mistakes.
+- A. Kay
+
+Computer Science today keeps reinventing the flat tire.
+- A. Kay
+
+Computers are to computing as instruments are to music. Software is the score whose interpretations amplifies our reach and lifts our spirits. Leonardo da Vinci called music the shaping of the invisible, and his phrase is even more apt as a description of software.
+- A. Kay
+
+[In a programming language] Simple things should be simple and complex things should be possible.
+- A. Kay
+
+The best way to predict the future is to invent it.
+- A. Kay
+
+Once we start learning something, it is very hard for us to see what else is going on... Probably the most disastrous thing that you can ever learn is your first programming language, even if it is a good programming language. And the reason is that it tends to become computing. [And] So it might be a better idea to learn two or three programming languages at the same time, even though that is a different kind of struggle, but it would at least relativize what people think computing might be.
+- A. Kay
+
+Until real software engineering is developed, the next best practice is to develop with a dynamic system that has extreme late binding in all aspects.
+- A. Kay
+
+When you can measure what you are speaking about, and express it in numbers, you know something about it; but when you cannot measure it, when you cannot express it in numbers, your knowledge is of a meager and unsatisfactory kind.
+- Lord Kelvin
+
+Should array indices start at 0 or 1? My compromise of 0.5 was rejected without, I thought, proper consideration.
+- S. Kelly-Bootle
+
+If you have a large number of unrelated ideas, you have to get quite a distance away from them to get a view of all of them, and this is the role of abstraction. If you look at each too closely you see too many details. If you get far away things may appear simpler because you can only see the large, broad outlines; you do not get lost in petty details.
+- J. Kemeny (co-creator of the BASIC programming language)
+
+Act in haste and repent at leisure; code too soon and debug forever.
+- R. Kennington
+
+Carver [Mead] had a gift for telling a carefully callibrated sequence of lies about how circuits worked. The simplest version was that when a red line crossed over a green line, that made a transistor. Of course this gross over-simplification was unmasked, to be replace by another more sohisticaed lie, which in turn would be further refined. As a result of this excellent instruciton, everyone in Carver's class [on VLSI design] was able to design and build some kind of experimental chip after a couple of weeks of training.
+- B. Kernighan (in Unix a History and Memoir, pp. 127)
+
+People sometimes talk of software productivity in term of the number of line of code written: in the Unix world, productivity was often measured by the number of special cases or lines of code that were removed.
+- B. Kernighan (in Unix a History and Memoir, pp. 168)
+
+Everyone knows that debugging is twice as hard as writing a program in the first place. So if you are as clever as you can be when you write it, how will you ever debug it?
+- B. Kernighan
+
+Everyone knows that debugging is twice as hard as writing a program in the first place. So if you are as clever as you can be when you write it, how will you ever debug it?
+- B. Kernighan
+
+The most effective debugging tool is still careful thought, coupled with judiciously placed print statements.
+- B. Kernighan
+
+Another effective [debugging] technique is to explain your code to someone else. This will often cause you to explain the bug to yourself. Sometimes it takes no more than a few sentences, followed by an embarrassed "Never mind, I see what's wrong. Sorry to bother you." This works remarkably well; you can even use non-programmers as listeners. One university computer center kept a teddy bear near the help desk. Students with mysterious bugs were required to explain them to the bear before they could speak to a human counselor.
+- B. Kernighan & D. Pike (in "The Practice of Programming" pp. 123)
+
+The only way to learn a new programming language is by writing programs in it.
+- B. Kernighan & D. Ritchie
+
+Can writing be taught? It can be learned, but I'm not sure it can be taught. It's a self-taught kind of thing.
+- S. King (writer; answering a question when interviewed on PBS)
+
+The study of law is something new and unfamiliar to most of you -unlike any schooling you have ever been through before. We use the Socratic method here: I call on you, ask you a question, and you answer it. Why don't I just give you a lecture? Because through my questions you learn to teach yourselves. Through this method of questioning-answering, questioning-answering, we seek to develop in you the ability to analyze that vast complex of facts that constitute the relationships of members within a given society.
+Questioning and answering. At times, you may feel that you have found the correct answer. I assure you that this is a total delusion on your part. You will never find the correct, absolute, and final answer. In my classroom, there is always another question, another question to follow your answer. Yes, you are on a treadmill. My little questions spin the tumblers of your mind. You are on an operating table; my little questions are the fingers probing your brain. We do brain surgery here. You teach yourselves the law, but I train your mind. You come in here with a skull full of mush, and you leave thinking like a lawyer.
+
+- Professor Kingsfield (addressing 1st year Harvard Law Students in "The Paper Chase")
+
+A charlatan makes obscure what is clear; a thinker makes clear what is obscure.
+- H. Kingsmill
+
+I made mistakes, but I never did make the same mistake.
+- B. Kirk
+
+The best theory is motivated by practice, and the set practice is motivated by theory.
+- D. Knuth
+
+Beware of bugs in the above code; I have only proved it correct, not tried it.
+- D. Knuth
+
+Computers are good at following instructions, but not at reading your mind.
+- D. Knuth (Tex, pg. 9)
+
+Debugging is an art that needs much further study .... The most effective debugging techniques seem to be those which are designed and built into the program itself -many of today's best programmers will devote nearly half of their programs to facilitating the debugging process on the other half; the first half... will eventually be thrown away, but the net result is a surprising gain in productivity.
+Another good debugging practice is to keep a record of every mistake that is made. Even though this will probably be quite embarrassing, such information is invaluable to anyone doing research on the debugging problem, and it will also help you learn how to reduce the number of future errors.
+
+- D. Knuth (The Art of Computer Programming, Volume 1)
+
+Let us change our traditional attitude to the construction of programs. Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on explaining to human beings what we want a computer to do.
+- D. Knuth
+
+...methods are more important than facts. The educational value of a problem given to a student depends mostly on how often the thought processes that are invoked to solve it will be helpful in later situations. It has little to do with how useful the answer to the problem may be. On the other hand, a good problem must also motivate the students; they should be interested in seeing the answer. Since students differ so greatly, I cannot expect everyone to like the problems that please me.
+- D. Knuth (in "Are Toy Problems Useful", Chapter 10 of "Selected Papers on Computer Science", pg. 176)
+
+...One of the most important lessons, perhaps, is the fact that SOFTWARE IS HARD. From now on I shall have significantly greater respect for every successful software tool that I encounter. During the past decade I was surprised to learn that the writing of programs for TeX and Metafont proved to be much more difficult than all the other things I had done (like proving theorems or writing books). The creation of good software demands a significantly higher standard of accuracy than those other things do, and it requires a longer attention span than other intellectual tasks.
+- D. Knuth (in "Selected Papers on Computer Science", pp 161)
+
+Programming is the art of telling another human being what one wants the computer to do.
+- D. Knuth
+
+We should continually be striving to transform every art into a science, and in the process to advance the art.
+- D. Knuth
+
+We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil.
+- D. Knuth
+
+When I speak about computer programming as an art, I am thinking primarily of it as an art form, in an aesthetic sense. The chief goal of my work as an educator and author is to help people learn how to write beautiful programs...My feeling is that when we prepare a program, the experience can be just like composing poetry or music...Some programs are elegant, some are exquisite, some are sparkling. My claim is that it is possible to write grand programs, noble programs, truly magnificent ones!...computer programming is an art, because it applies accumulated knowledge to the world, because it requires skill and ingenuity, and especially because it produces objects of beauty. Programmers who subconsciously view themselves as artists will enjoy what they do and will do it better.
+- D. Knuth (Computer Programming as an Art. Turing Award Speech 1974)
+
+When certain concepts of TeX are introduced informally, general rules will be stated; afterwards you will find that the rules aren't strictly true. In general, the later chapters contain more reliable information than the earlier ones do. The author feels that this technique of deliberate lying will actually make it easier for you to learn the ideas. Once you understand a simple but false rule, it will not be hard to supplement that rule with its exceptions.
+- D. Knuth (Tex, pg. vi)
+
+Steve [Jobs] wanted to see if we couldn't make it [the circuit board of the first Mac] more aesthetic...He wanted the inside of the computer to look good even if no one would see it.
+- D. Kottke (early Apple Engineer)
+
+If we really understand the problem, the answer will come out of it, because the answer is not separate from the problem.
+- J. Krishnamurti
+
+Any sufficiently advanced bug is indistinguishable from a feature.
+- R. Kulawiec
+
+There is a race between the increasing complexity of the systems we build and our ability to develop intellectual tools for understanding their complexity. If the race is won by our tools, then systems will eventually become easier to use and more reliable. If not, they will continue to become harder to use and less reliable for all but a relatively small set of common tasks. Given how hard thinking is, if those intellectual tools are to succeed, they will have to substitute calculation for thought.
+- L. Lamport
+
+Writing is nature's way of letting you know how sloppy your thinking is.
+- R. Guindon (cartoon, San Francisco Chronincle, January 1989)
+
+Mathematics is nature's way of letting you know how sloppy your writing is.
+- L. Lamport, ("Specifying Systems", 2002, p. 2
+
+Formal mathematics is nature's way of letting you know how sloppy your mathematics is.
+- L. Lamport, ("Specifying Systems", 2002, p. 2
+
+"Where have you performed?" Murray asked me from behind a copy of Variety. "Well, I don't perform, exactly," I answered, "but I have spoken at synagogues, and I lecture from time to time at colleges and universities."
+"Universities?" Murray sputtered. "Did he say universities? Worst audience in the world. I spoke at a university once. They invited me to speak about the hotel industry. Believe me, I've got a pretty good routine on this; I've used it many times before, and I know where I'm supposed to get reactions: chuckles, laughs, applause. Son of a bitch, I stand up there and it's a grim audience! All these young people in jeans and sneakers. I open it up for questions. These bastards are dead serious -they're taking notes! I realized later, they weren't an audience, they were students. They take notes and get grades. They're not there to laugh. Who wants to perform for an audience like that?"
+
+- A. Lansky, relating his experiences lecturing at resorts in the Catskills while raising money for the National Yiddish Book Center (described in his book, "Outwitting History")
+
+We think only through the medium of words. Languages are true analytical methods. Algebra, which is adapted to its purpose in every species of expression, in the most simple, most exact, and best manner possible, is at the same time a language and an analytical method. The art of reasoning is nothing more than a language well arranged.
+- A. Lavoisier
+
+We don't have much time, so we don't teach them; we acquaint them with things that they can learn.
+- C. Leiserson (on "The Undergraduate Practicum" at MIT, from a talk at CMU)
+
+Learning is never done without errors and defeat.
+- V. Lenin
+
+If you want truly to understand something, try to change it.
+- K. Lewin
+
+A vivid confirmation of this analysis [the importance of extra-curricular activities] occurred during a lunchtime conversation I had with three computer science graduates of the classes of 1994/1995 who started a company together and sold it in 1998 for more than $250 million. Over sandwiches I asked them what part of their computer science education had been most important to the success of their software enterprise. After a moment of tight smiles and awkward silence, one of the young graduates spoke up. "The computer science courses I took were really terrific," he said in an attempt to reassure me, "but I didn't learn much that I could not have learned on my own. The most important things I learned were from managing the Quincy House Grill." It made perfect sense -hiring, firing, and inspiring colleagues, working under pressure in close quarters- all were very much the same in the cheeseburger-flipping business he had run at Harvard as in the software business the three had started in a tiny apartment.
+- H. Lewis (in "Excellence Without Soul", pg. 88)
+
+...fielding statistics made sense only as numbers, not as language. Language, not numbers, is what interested him [Bill James, a baseball writer]. Words, and the meaning they were designed to convey. "When the numbers acquire the significance of the language," he later wrote, "they acquire the power to do all the things which language can do: to become fiction and drama and poetry."
+- M. Lewis (in Moneyball: The Art of Winning an Unfair Game, page 67)
+
+Give me six hours to chop down a tree and I will spend the first four sharpening the axe.
+- A. Lincoln
+
+I can't think of a job I'd rather do than computer programming. All day, you create patterns and structure out of the formless void, and you solve dozens of smaller puzzles along the way.
+- P. van Der Linden
+
+Complexity is a sign of technical immaturity. Simplicity of use is the real sign of a well design product whether it is an ATM or a Patriot missile.
+- D. Ling
+
+Gentlemen, we are going to relentlessly chase perfection, knowing full well we will not catch it, because nothing is perfect. But we are going to relentlessly chase it, because in the process we will catch excellence. I am not remotely interested in just being good.
+- V. Lombardi (Greenbay Packers Coach 1959-1967)
+
+Composing computer programs to solve scientific problems is like writing poetry. You must choose every word with care and link it with the other words in perfect syntax. There is no place for verbosity or carelessness. To become fluent in a computer language demands almost the antithesis of modern loose thinking. It requires many interactive sessions, the hands-on use of the device. You do not learn a foreign language from a book, rather you have to live in the country for year to let the language become an automatic part of you, and the same is true for computer languages.
+- James Lovelock (Originator of the Gaia Theory)
+
+In the beginning we must simplify the subject, thus unavoidably falsifying it, and later we must sophisticate away the falsely simple beginning.
+- M. Maimonides
+
+Development is maintenance.
+- B. Marick
+
+A teacher's job is to take a bunch of live wires and see that they are well-grounded.
+- D. Martin
+
+If our designs are failing due to the constant rain of changing requirements, it is our designs that are at fault. We must somehow find a way to make our designs resilient to such changes and protect them from rotting.
+- R. Martin
+
+Real-life experience is instructive, but the tuition is high.
+- A.G. Martinez (in "Chaos Monkeys", Harper Collins, 2015, pg. 40)
+
+If the only tool you have is a hammer, you tend to see every problem as a nail.
+- A. Maslow
+
+Much of the beauty that arises in art comes from the struggle an artist wages with his limited medium.
+- H. Matisse
+
+Optimization is a funny game, the more you optimize the code the uglier it gets. Programs that have been optimized are ... a lot harder to maintain and a lot harder to debug as well.
+- J. . Mattheij
+
+Any clod can have the facts; having opinions is an art.
+- C. McCabe
+
+Good code is its own best documentation. As you're about to add a comment, ask yourself, "How can I improve the code so that this comment isn't needed?" Improve the code and then document it to make it even clearer.
+- S. McConnell
+
+It's hard enough to find an error in your code when you're looking for it; it's even harder when you've assumed your code is error-free.
+- S. McConnell
+
+It's OK to figure out murder mysteries, but you shouldn't need to figure out code. You should be able to read it.
+- S. McConnell
+
+Testing by itself does not improve software quality. Test results are an indicator of quality, but in and of themselves, they don't improve it. Trying to improve software quality by increasing the amount of testing is like try to lose weight by weighing yourself more often. What you eat before you step onto the scale determines how much you will weigh, and the software development techniques you use determine how many errors testing will find. If you want to lose weight, don't buy a new scale; change your diet. If you want to improve your software, don't test more; develop better.
+- S. McConnell
+
+Formal methods will never have a significant impact until they can be used by people who don't understand them.
+- T. Melham
+
+Programming is similar to a game of golf. The point is not getting the ball in the hole but how many strokes it takes.
+- H. Mills
+
+The only way for errors to occur in a program is by being put there by the author. No other mechanisms are known. Programs can't acquire bugs by sitting around with other buggy programs. Right practice aims at preventing insertion of errors and, failing that, removing them before testing or any other running of the program.
+- H. Mills
+
+Making the simple complicated is commonplace; making the complicated simple, awesomely simple, that's creativity.
+- C. Mingus
+
+But the big change was going to thinking of a program as a structure sitting in the computer that another program can manipulate. So this made it possible in principle to make a program that could even think about itself.
+- M. Minsky
+
+A computer is like a violin. You can imagine a novice trying first a phonograph and then a violin. The latter, he says, sounds terrible. That is the argument we have heard from our humanists and most of our computer scientists. Computer programs are good, they say, for particular purposes, but they aren't flexible. Neither is a violin, or a typewriter, until you learn how to use it.
+- M. Minsky (in "Why Programming Is a Good Medium for Expressing Poorly-Understood and Sloppily-Formulated Ideas")
+
+The key to understanding randomness and all of mathematics is not being able to intuit the answer to every problem immediately but merely having the tools to figure out the answer.
+- L. Mlodinow (in "The Drunkar's Walk")
+
+Language designers are not intellectuals. They're not as interested in thinking as you might hope. They just want to get a language done and start using it.
+- D. Moon
+
+He who hasn't hacked assembly language as a youth has no heart. He who does so as an adult has no brain.
+- J Moore
+
+Computer science is to biology what calculus is to physics. It's the natural mathematical technique that best maps the character of the subject.
+- H. Morowitz
+
+A little inaccuracy sometimes saves tons of explanation.
+- H.H. Munro
+
+Computing is not about computers any more. It is about living.
+- N. Negroponte
+
+You have to honor failure, because failure is just the negative space around success.
+- R. Nelson (in Wired 06/2004 page 166)
+
+Between 1892 say, and 1904, movies were made by the cameraman because he understood the equipment. And that is exactly where we are now [in software design]. In 1904 they invented the director; what was the director? It was the guy who didn't have to know how to load the camera didn't have to know how to sew costumes, play a violin, dance, fence, or hang the lights. But, he had to know how to make those effects come together in a unified experience... Why are video games so much better designed than office software? Video games are designed by people who love to play video games. Office software is designed by people who want to do something else on the weekend... What does show business teach you? It teaches you that design is war; it is a power struggle between the producers, directors, authors, everyone who wants to be involved.
+- T. Nelson (transcribed from a talk at Engelbart's Unfinished Revolution a Stanford University Symposium)
+
+Error is viewed, therefore, not as an extraneous and misdirected or misdirecting accident, but as an essential part of the process [learning].
+- J. von Neumann
+
+In mathematics you don't understand things. You just get used to them.
+- J. von Neumann
+
+The sciences do not try to explain, they hardly even try to interpret, they mainly make models. By a model is meant a mathematical construct which, with the addition of certain verbal interpretations, describes observed phenomena. The justification of such a mathematical construct is solely and precisely that it is expected to work - that is correctly to describe phenomena from a reasonably wide area. Furthermore, it must satisfy certain esthetic criteria - that is, in relation to how much it describes, it must be rather simple.
+- J. von Neumann
+
+Millions for compilers, but hardly a penny for understanding human programming language use. Now, programming languages are obviously symmetrical, the computer on one side, the human on the other. In an appropriate science of computer languages, one would expect that half the effort would be on the computer side, understanding how to translate the languages into executable form, and half on the human side, understanding how to design languages that are easy or productive to use. Yet, we do not even have an enumeration of all the psychological functions programing languages serve for the user. Of course, there is lots of programming language design, but it comes from computer scientists. And though technical papers on languages contain mainly appeals to ease of use and learning, they patently contain almost no psychological evidence nor any appeal to psychological science.
+- A. Newell and S. Card
+
+"Two monologues do not make a dialog"...a technology that gives no opportunity for discussion, explanation, or debate is a poor technology.
+- D. Norman (in The Design of Future Things, Basic Books, 2007, pg. 6)
+
+There is no reason anyone would want a computer in their home.
+- K. Olsen (Founder and President, Digital Equipment Corporation), 1977
+
+The best performance improvement is the transition from the nonworking state to the working state
+- J. Osterhout
+
+Complexity kills. It sucks the life out of developers, it makes products difficult to plan, build and test, it introduces security challenges and it causes end-user and administrator frustration. ...[we should] explore and embrace techniques to reduce complexity.
+- R. Ozzie
+
+As a rule, software systems do not work well until they have been used, and have failed repeatedly, in real applications.
+- D. Parnas
+
+A programming language is like a natural, human language in that it favors certain metaphors, images, and ways of thinking.
+- S. Papert (in "Mindstorms: Children, Computers, and Powerful Ideas", 1980)
+
+My basic idea is that programming is the most powerful medium of developing the sophisticated and rigorous thinking needed for mathematics, for grammar, for physics, for statistics, for all the "hard" subjects.... In short, I believe more than ever that programming should be a key part of the intellectual development of people growing up.
+- S. Papert (in "CACM January 2005 (Vol 24, #1, pp38)")
+
+I have made this letter longer than usual, only because I have not had the time to make it shorter.
+- B. Pascal
+
+Chance favors the prepared mind.
+- L. Pasteur
+
+A class, in Java, is where we teach objects how to behave.
+- R. Pattis
+
+Code should run as fast as necessary, but no faster; something important is always traded away to increase speed.
+- R. Pattis
+
+He who runs an av-rage pace,
+runs alone throughout the race.
+[I know I'm teaching at the right pace when I please no one: half the students say I'm going too slow, half too fast.]
+- R. Pattis
+
+If you cannot grok the overall structure of a program while taking a shower [e.g., with no external memory aids], you are not ready to code it.
+- R. Pattis
+
+Mistakes lead to failure only if you don't learn from them.
+- R. Pattis
+
+Paradoxically, it is often harder to understand a program than the programming language in which it is written.
+- R. Pattis
+
+Programming languages, like pizzas, come in only too sizes; too big and too small.
+[this quote often appears on the web as "two sizes", by reposters who don't quite get the wordplay)
+- R. Pattis
+
+The discipline of programming is most like sorcery. Both use precise language to instruct inanimate objects to do our bidding. Small mistakes in programs or spells can lead to completely unforeseen behavior: e.g., see the story, "The Sorcerer's Apprentice". Neither study is easy: "...her [Galinda's] early appetite for sorcery had waned once she'd heard what a grind it was to learn spells and, worse, to understand them." from the book "Wicked" by G. Maguire.
+- R. Pattis
+
+The purpose of brakes on a car is to allow you to go fast. Although the gas pedal makes you go fast, the brake pedal allows you to drive safely while going fast. The purpose of a strict compiler (one that performs type checking, uninitialized variable checking, reachability analysis, etc.) is to allow you to program fast. Programmers -like all humans- have limited intellects: when they focus on one aspect of a program, they must ignore others. Focusing on the right aspect at the right time is critical. By understanding those aspects that the compiler can check, you can ignore them, and focus on more important ones. Some programmers think that such an approach is reckless; they believe that you must pay close attention to everything at once. They are right -for them; but I'm just not that smart, so I must use my tools more effectively.
+- R. Pattis
+
+The structure of a software system provides the ecology in which code is born, matures, and dies. A well-designed habitat allows for the successful evolution of all the components needed in a software system.
+- R. Pattis
+
+The three most important aspects of debugging and real estate are the same: Location, Location, and Location.
+- R. Pattis
+
+There is a famous rule in performance optimization called the 90/10 rule: 90% of a program's execution time is spent in only 10% of its code. The standard inference from this rule is that programmers should find that 10% of the code and optimize it, because that's the only code where improvements make a difference in the overall system performance. But a second inference is just as important: programmers can deoptimize the other 90% of the code (in order to make it easier to use, maintain, etc.), because deterioration (of performance) of that code won't make much of a difference in the overall system performance.
+- R. Pattis
+
+When debugging, novices insert corrective code; experts remove defective code.
+- R. Pattis
+
+When teaching a rapidly changing technology, perspective is more important than content.
+- R. Pattis
+
+When building a complex system, having crackerjack programmers (who can make any design work, even a bad one) can be a liability. The result, after lots of effort, is a working system that cannot be easily maintained or upgraded. Good -but not great- programmers would fail early, causing a realization that the system must be redesigned, and then reimplemented. The extra cost is paid once, early in the system's cycle (when it is cheap), instead of repeatedly paid late in the system's cycle (when it is more expensive).
+- R. Pattis
+
+Don't tell people how to do things. Tell them what to do and let them surprise you with their results.
+- G. Patton
+
+The best way to get a good idea is to get a lot of ideas.
+- L. Pauling
+
+Brick walls are there for a reason. The brick walls are not there to keep us out. The brick walls are there to show how badly we want something. Because the brick walls are there to stop the people who don't want something badly enough. They are there to keep out the other people.
+- R. Pausch (see The Last Lecture)
+
+A good programming language is a conceptual universe for thinking about programming.
+- A. Perlis
+
+A language that doesn't affect the way you think about programming is not worth knowing.
+- A. Perlis
+
+Any noun can be verbed.
+- A. Perlis
+
+Fools ignore complexity; pragmatists suffer it; experts avoid it; geniuses remove it.
+- A. Perlis
+
+I think it is inevitable that people program poorly. Training will not substantially help matters. We have to learn to live with it.
+- A. Perlis
+
+I think that it's extraordinarily important that we in computer science keep fun in computing. When it started out, it was an awful lot of fun. Of course, the paying customers got shafted every now and then, and after a while we began to take their complaints seriously. We began to feel as if we really were responsible for the successful, error-free perfect use of these machines. I don't think we are. I think we're responsible for stretching them, setting them off in new directions, and keeping fun in the house. I hope the field of computer science never loses its sense of fun.
+- A. Perlis
+
+It goes against the grain of modern education to teach students to program. What fun is there to making plans, acquiring discipline, organizing thoughts, devoting attention to detail, and learning to be self critical.
+- A. Perlis
+
+It is easier to write an incorrect program than understand a correct one.
+- A. Perlis
+
+Optimization hinders evolution.
+- A. Perlis
+
+Simplicity does not precede complexity, but follows it.
+- A. Perlis
+
+Software is like nothing else in this world except life itself, in that it is, in effect, subject to evolution...
+- A. Perlis
+
+There are two ways to write error-free programs, but only the third one works.
+- A. Perlis
+
+To understand a program, you must become both the machine and the program.
+- A. Perlis
+
+You think you KNOW when you learn, are more sure when you can write, even more when you can teach, but certain when you can program.
+- A. Perlis
+
+Computers are useless. They only give you answers.
+- P. Picasso
+
+I am always doing that which I cannot do, in order that I may learn how to do it.
+- P. Picasso
+
+Fancy algorithms are slow when N is small, and N is usually small.
+- R. Pike
+
+Fancy optimizers have fancy bugs.
+- R. Pike
+
+Thinking and spoken discourse are the same thing, except that what we call thinking is, precisely, the inward dialog carried on by the mind with itself without spoken sound.
+- Plato
+
+The mind is not a vessel to be filled, but a fire to be ignited.
+- Plutarch (See W.B. Yeats: Education...)
+
+Life is good only for two things: to study mathematics and to teach it.
+- M. Poisson
+
+Computers in the future may weigh no more than 1.5 tons.
+- Popular Science (1959)
+
+Knowledge of a subject means knowledge of the language of that subject, which includes not only what its words mean, but far more important, how its words mean. As one learns the language of a subject, one is also learning what the subject is. It cannot be said often enough that what we call a subject consists mostly, if not entirely, of its language. If you eliminate all the words of a subject, you have eliminated the subject. Biology is not plants and animals. It is language about plants and animals. History is not events. It is language describing and interpreting events. Astronomy is not planets and stars. It is a way of talking about planets and stars.
+- N. Postman
+
+Gates has always understood Moore's Law better than anyone else in the industry. If you can make something run at all, get it out there -it may be slow and clunky, but hardware improvements will bail you out. If you wait until it's running perfectly on the hardware already in the field, it will be obsolete before it's released. This philosophy built Microsoft and is the main reason Microsoft won the war IBM declared back in the OS/2 days.
+- J. Pournelle (Dr. Dobbs Journal, Feb. 2004, pp. 89)
+
+The voyage of discovery is not in seeking new landscapes but in having new eyes.
+- M. Proust
+
+I really hate this darn machine;
+    I wish that they would sell it.
+It won't do what I want it to,
+    but only what I tell it.
+- Programmer's Lament
+
+The underlying complexity of a given problem is constant. It can be hidden, but it does not go away. Complexity is conserved by abstractions. In fact, apparent complexity can be increased by abstractions, but the underlying complexity can never be reduced.
+- M. Quail (in his blog)
+
+Computer Science education cannot make anybody an expert programmer any more than studying brushes and pigment can make somebody an expert painter.
+- E. Raymond
+
+Given enough eyeballs, all bugs are shallow (e.g., given a large enough beta-tester and co-developer base, almost every problem will be characterized quickly and the fix will be obvious to someone). (also see "The honest truth..." by B. Joy).
+- E. Raymond (Lesson 8 in The Cathedral and the Bazaar)
+
+Good programmers know what to write. Great ones know what to use. [I'd add: Exceptional programmers know how to write code that others can use. -REP]
+- E. Raymond
+
+Ugly programs are like ugly suspension bridges: they're much more liable to collapse than pretty ones, because the way humans (especially engineer-humans) perceive beauty is intimately related to our ability to process and understand complexity. A language that makes it hard to write elegant code makes it hard to write good code.
+- E. Raymond
+
+Computer Science is the first engineering discipline in which the complexity of the objects created is limited solely by the skill of the creator, and not by the strength of raw materials.
+- B. Reid
+
+All of us had been trained by Kelly Johnson [designer of the Lockheed SR-71] and believed fanatically in his insistence that an airplane that looked beautiful would fly the same way.
+- B. Rich (in "Skunk Works")
+
+In time of profound change, the learners inherit the earth, while the learned find themselves beautifully equipped to deal with a world that no longer exists.
+- A. Rogers
+
+Children, like laboratory rats, can learn quickly not to experiment with wrong answers.
+- F. Rogers
+
+Deep and simple - that's what matters.
+- F. Rogers
+
+I remember when McFarland wanted to expose the little children ... to the work of a sculptor, she gave these intructions to the artist ..., "I don't want you to teach them sculpting. All I want you to do is to love clay in front of the children". And that's what he did. The children caught his enthusiasm for it, and that's what mattered. Like most good things, teaching has to do with honesty.
+- F. Rogers (in M. King's "The Good Neighbor: The Life and Work of Fred Rogers") pg. 138
+
+One of the major goals of education must be to help students discover a greater awareness of their own unique selves, in order to increase their feelings of personal worth, responsibility, and freeedom.
+- F. Rogers
+
+G-d is in the details.
+- M. van der Rohe
+
+Less is more.
+- M. van der Rohe
+
+Software is abstract and therefore seems as if it should be infinitely malleable. And yet, for all its ethereal flexibility, it can be stubbornly, maddeningly intractable, and it is constantly surprising us with his rigidity.
+- S. Rosenberg (in "Dreaming in Code", pp 58)
+
+Don't you hate code that's not properly indented? Making it [indenting] part of the syntax guarantees that all code is properly indented.
+- G. van Rossum(designer of the Python)
+
+The highest reward for a person's toil is not what they get for it, but what they become by it.
+- J. Ruskin
+
+Language serves not only to express thought but to make possible thoughts which could not exist without it.
+- B. Russell
+
+A designer knows he's achieved perfection not when there is nothing left to add, but when there is nothing left to take away.
+- A. de Saint-Exupery
+
+If you want to build a ship, don't drum up the men to gather wood, divide the work and give orders. Instead, teach them to yearn for the vast and endless sea.
+- A. de Saint-Exupery
+
+Questions are the important thing, answers are less important. Learning to ask a good question is the heart of intelligence. Learning the answer---well, answers are for students. Questions are for thinkers.
+- R. Schank (in "The Connoisseur's Guide to the Mind")
+
+There is one very good reason to learn programming, but it has nothing to do with preparing for high-tech careers or with making sure one is computer literate in order to avoid being cynically manipulated by the computers of the future. The real value of learning to program can only be understood if we look at learning to program as an exercise of the intellect, as a kind of modern-day Latin that we learn to sharpen our minds.
+- R. Schank (in "The Cognitive Computer")
+
+Always do the hard part first. If the hard part is impossible, why waste time on the easy part? Once the hard part is done, you're home free.
+Always do the easy part first. What you think at first is the easy part often turns out to be the hard part. Once the easy part is done, you can concentrate all your efforts on the hard part.
+
+- A. Schapira
+
+The skill of writing is to create a context in which other people can think.
+- E. Schlossberg
+
+Machines are simple: a hammer, a door hinge, a steak knife. Systems are much more complicated; they have components, feedback loops, mean times between failure, infrastructure. Digital systems are daedal; even a simple computer program has hundreds of thousands of lines of computer code doing all sorts of different things. A complex computer program has thousands of components, each of which has to work by itself and in interaction with all the other components. This is why object-oriented programming was developed: to deal with the complexity of digital systems...systems have bugs. A bug is a particular kind of failure...It's different from a malfunction. When something malfunctions, it no longer works properly. When something has a bug, it misbehaves in a particular way, possibly unrepeatable, and possibly unexplainable. Bugs are unique to systems. Machines can break, or fail, or not work, but only a system can have a bug.
+- B. Schneier (in Secrets & Lies: Digital Security in a Networked World).
+
+Microsoft knows that reliable software is not cost effective. According to studies, 90% to 95% of all bugs are harmless. They're never discovered by users, and they don't affect performance. It's much cheaper to release buggy software and fix the 5% to 10% of bugs people find and complain about.
+- B. Schneier
+
+If the code and the comments disagree, then both are probably wrong.
+- N. Schryer
+
+Always to see the general in the particular is the very foundation of genius.
+- A. Schopenhauer
+
+Thus the task is not so much to see what no one has yet seen, but to think what no one has yet thought about that which everybody sees.
+- E. Schrodinger
+
+Data is not information, Information is not knowledge, Knowledge is not understanding, Understanding is not wisdom.
+- G. Schubert (extending Cliff Stoll in "Silicon Snake Oil"). Also see F. Zappa
+
+Any intelligent fool can make things bigger and more complex. It takes a touch of genius -and a lot of courage- to move in the opposite direction
+- E.F. Schumacher
+
+I think that there is a need for more CS textbooks. Web content and other modern artifacts are important, but I believe a textbook written by an expert who is trying to lay out what a student can reasonably learn about a subject in a semester is still a critical component and a basis for effectively disseminating knowledge.
+- R. Sedgewick
+
+And simple truth miscalled simplicity,
+- W. Shakespeare (Sonnet 66)
+
+Almost every problem that you come across is befuddled with all kinds of extraneous data of one sort or another, and if you can bring this problem down into the main issues, you can see more clearly what you're trying to do.
+- C. Shannon
+
+CAESAR (turning to Theodotus). And you, sir, are....?
+THEODOTUS. Theodotus, the King's tutor.
+CAESAR. You teach men how to be kings, Theodotus. That is very clever of you. [If being a king is hard; teaching someone to be a king must be even harder.]
+- G. B. Shaw (Ceaser and Cleopatra)
+
+Learning results from what the student does and thinks, and only from what the student does and thinks. The teacher can advance learning only by influencing the student to learn.
+- H. Simon
+
+Mathematics is a language. We want scientists to be able to read it, speak it, and write it. But we are are not training them to be grammarians.
+- H. Simon
+
+His philosophy of aesthetics reminds me of a quote that went something like this: "Fashion is what seems beautiful now but looks ugly later; art can be ugly at first but it becomes beautiful later." Steve always aspired to make beautiful later.
+- M. Simpson (Steve Jobs' sister, quoted from her eulogy)
+
+I'd rather write programs to write programs than write programs.
+- D. Sites
+
+I cannot teach anybody anything, I can only make them think.
+- Socrates
+
+When you've been writing complicated, its hard to get back to being simple.
+- S. Sondheim (in the documentary "The Best Worst Thing That Ever Coule Have Happened"
+
+All understanding begins with our not accepting the world as it appears.
+- S. Sontag
+
+One must learn by doing the thing; for though you think you know it, you have no certainty, until you try.
+- Sophocles
+
+[On being asked, "How do we hold on to dreams that, statistically, are impossible (like aspiring to be Supreme Court Justice)?"] ... Experience has taught me that you cannot value dreams according to the odds of their coming true. Their real value is in stirring within us the will to aspire. That will, wherever it finally leads, does at least move you forward. And after a time you may recognize that the proper measure of success is not how much you've closed the distance to some far-off goal but the quiality of what you've done today.
+- S. Sotomayor (in "My Beloved World" pp. viii)
+
+I told him [a cousin] how I had been dazzled by his brilliance and his limitless curiosity about how the world works. And how I despaired of ever matching up to him. He looked at me and shook his head. "You don't understand, do you? I've always been in awe of you. There was nothing you couldn't learn if you set your mind to it. You would just study until you figured it out. ... The determination you have is special. It's a different kind of intelligence."
+- S. Sotomayor (in "My Beloved World" pp. 151)
+
+I've spent my whole life learning how to do things that were hard for me. None of it has ever been easy. ... I've honestly never felt fully prepared at the outset. Yet each time I've survived, I've learned, and I've thrived. I'm not intimidated by challenges. My whole life has been one. I look forward to enganging in the work [a judgeship] and learning how to do it well.
+- S. Sotomayor (in "My Beloved World" pp. 288)
+
+Computers do not solve problems -computers carry out solutions, specified by people, to problems.
+- D. D. Spencer
+
+EMACS could not have been reached by a process of careful design, because such processes arrive only at goals which are visible at the outset, and whose desirability is established on the bottom line at the outset. Neither I nor anyone else visualized an extensible editor until I had made one, nor appreciated its value until he had experienced it. EMACS exists because I felt free to make individually useful small improvements on a path whose end was not in sight.
+- R. Stallman
+
+Giving the Linus Torvalds Award to the Free Software Foundation is a bit like giving the Han Solo Award to the Rebel Alliance.
+- R. Stallman
+
+Programm is not a science. Programming is a craft.
+- R. Stallman
+
+Being forced to write comments actually improves code, because it is easier to fix a crock than to explain it.
+- G. Steele
+
+A real failure does not need an excuse. It is an end in itself.
+- G. Stein
+
+[teaching]is rather artificial. The world is complicated and messy, with lots of loose ends, and the teacher's job is to impose order on the confusion, to convert a chaotic set of episodes into a coherent narrative.
+- I. Stewart (in "Letters to a Young Mathematician")
+
+Don't get suckered in by the comments -they can be terribly misleading: Debug only the code.
+- D. Storer
+
+Design and programming are human activities; forget that and all is lost.
+- B. Stroustrup
+
+It is my firm belief that all successful languages are grown and not merely designed from first principles
+- B. Stroustrup (in "The Design and Evolution of C++")
+
+More good code has been written in languages denounced as "bad" than in languages proclaimed "wonderful" -much more.
+- B. Stroustrup (in The Design and Evolution of C++)
+
+The most important single aspect of software development is to be clear about what you are trying to build.
+- B. Stroustrup
+
+There are only two kinds of programming languages: those people always bitch about and those nobody uses.
+- B. Stroustrup
+
+I have learned throughout my life as a composer chiefly through my mistakes and pursuits of false assumptions, not my exposure to founts of wisdom and knowledge.
+- I. Stravinsky
+
+Omit needless words. Vigorous writing is concise. A sentence should contain no unnecessary words, a paragraph no unnecessary sentences, for the same reason that a drawing should have no unnecessary lines and a machine no unnecessary parts.
+- W Strunk Jr (in The Elements of Style)
+
+Rewrite and revise. Do not be afraid to seize what you have and cut it to ribbons ... Good writing means good revising.
+- W Strunk Jr (in The Elements of Style)
+
+For me, great algorithms are the poetry of computation. Just like verse, they can be terse, allusive, dense, and even mysterious. But once unlocked, they cast a brilliant new light on some aspect of computing.
+- F Sullivan
+
+In engineering, as in other creative arts, we must learn to do analysis to support our efforts in synthesis. One cannot build a beautiful and functional bridge without a knowledge of steel and dirt, and a considerable mathematical technique for using this knowledge to compute the properties of structures. Similarly, one cannot build a beautiful computer system without a deep understanding of how to "previsualize" the process generated by the code one writes.
+- G. Sussman
+
+It is a bad plan that admits of no modification.
+- P. Syrus
+
+If you want to succeed in this world you don't have to be much cleverer than other people; you just have to be one day earlier than most people.
+- L. Szilard
+
+In life you must often choose between getting a job done or getting credit for it.
+- L. Szilard
+
+It is better to be clear and wrong than right and confused.
+- L. Szilard
+
+The most important step in getting a job done...is the recognition of the problem.
+- L. Szilard
+
+One cannot acquire Torah who has not failed in it.
+- Talmud (Gittin 43a))
+
+Similarly, Rava said: "The reward for learning the halakhic traditions of the amora'im is for the logical analysis, as the primary reward for studying Talmud was not given for knowing the halakhic conclusions, but for the logical reasoning that led to those conclusions."
+- Talmud (Berakhot 6b)
+
+I'm a great believer in elegance, ingenious simplicity. I try to design algorithms and data structures that are beautiful and simple and maybe there is complexity in the analysis, but the algorithm can be programmed, can be proved correct.
+- R. Tarjan
+
+Once you succeed in writing the programs for [these] complicated algorithms, they usually run extremely fast. The computer doesn't need to understand the algorithm, its task is only to run the programs.
+- R. Tarjan
+
+I believe in excellence. It is a basic need of every human soul. All of us can be excellent, because, fortunately, we are exceedingly diverse in our ambitions and talents.
+- E. Teller
+
+We must learn to live with contradictions, because they lead to deeper and more effective understanding.
+- E. Teller
+
+A programming language is a system of notation for describing computations. A useful programming language must therefore be suited for both description(i.e., for human writers and readers of programs) and for computation (i.e., for efficient implementation on computers). But human beings and computers are so different that it is difficult to find notational devices that are well suited to the capabilities of both.
+- R. Tennant (Principles of Programming Languages, Prentice Hall, 1981)
+
+A lot of people think mastering complexity is the goal. But once you have gotten your Master of Complexity merit badge, you don't have to keep winning it. Complexity is the enemy of computer science and it behooves us, as designers, to minimize it
+- C. Thacker
+
+One of my most productive days was throwing away 1,000 lines of code.
+- K. Thompson
+
+But lo! men have become the tools of their tools.
+- H. Thoreau (in Walden)
+
+Simplify, simplify, simplify!
+- H. Thoreau (in Walden)
+
+Most good programmers do programming not because they expect to get paid or get adulation by the public, but because it is fun to program.
+- L. Torvalds
+
+Character is created by encountering and overcoming failure.
+- P. Tough (in How Children Succeed)
+
+The function of genius is not to give new answers, but to pose new questions which time and mediocrity can resolve.
+- H. Trevor-Howard
+
+It is better to have an approximate answer to the right question than an exact answer to the wrong one.
+- J. Tukey
+
+Unless in communicating with it [a computer] one says exactly what one means, trouble is bound to result.
+- A. Turing
+
+He [John von Neumann] had the invaluable faculty of being able to take the most difficult problem and separate it into its components, whereupon everything looked brilliantly simple.
+- S. Ulam (Bull. of American Mathematical Society, May 1958)
+
+Programming is the art of algorithm design and the craft of debugging errant code.
+- E. Ullman
+
+Real education happens only by failing, changing, challenging, and adjusting. All of those gerunds apply to teachers as well as students. No person is an "educator," because education is not something one person does to another. Education is an imprecise process, a dance, and a collaborative experience.
+Education is the creation of habits of thought and methods of inquiry that yield unpredictable results. We offer diplomas to people upon completion of a rigorous and diverse set of intellectual experiences, not the mere accumulation of a series of facts and techniques. Education is certainly not an injection of information into a passive receptacle.
+
+- S. Vaidhyanathan ( in The Chronicle of Higher Education)
+
+It's easy to cry "bug" when the truth is that you've got a complex system and sometimes it takes a while to get all the components to co-exist peacefully.
+- D. Vargas
+
+The outcome of any serious research can only be to make two questions grow where only one grew before.
+- T. Veblen
+
+The best is the enemy of the good.
+- Voltaire ("Dramatic Art" in _Philosophical Dictionary, 1764)
+
+Judge a man by his questions, rather than his answers.
+- Voltaire
+
+The problem with using C++... is that there's already a strong tendency in the language to require you to know everything before you can do anything.
+- L. Wall
+
+The mediocre teacher tells. The good teacher explains. The superior teacher demonstrates. The great teacher inspires.
+- W. A. Ward
+
+I think there is a world market for maybe five computers.
+- T. J. Watson (Founder and Chairman, IBM), 1943
+
+If you want to increase your success rate, double your failure rate.
+- T. J. Watson
+
+The computer programmer ... is a creator of universes for which he alone is the lawgiver ... universes of virtually unlimited complexity can be created in the form of computer programs. Moreover ... systems so formulated and elaborated act out their programmed scripts. They compliantly obey their laws and vividly exhibit their obedient behavior. No playwright, no stage director, no emperor, however powerful, has ever exercised such absolute authority to arrange a stage or a field of battle and to command such unswervingly dutiful actors or troops.
+- J. Weizenbaum (Computer Power and Human Reason, page 115)
+
+Newton was a genius, but not because of the superior computational power of his brain. Newton's genius was, on the contrary, his ability to simplify, idealize, and streamline the world so that it became, in some measure, tractable to the brains of perfectly ordinary men.
+- G. M. Weinberg
+
+Any problem in computing can be solved by adding another level of indirection. (also see "Any performance problem..." by M. Haertel).
+- D. Wheeler (inventor of the subroutine)
+
+The best writing is rewriting.
+- E. B. White
+
+By relieving the brain of all unnecessary work, a good notation sets it free to concentrate on more advanced problems, and in effect increases the mental power of the race.
+- A. N. Whitehead
+
+It is a profoundly erroneous truism, repeated by all the copybooks, and by eminent people when they are making speeches, that we should cultivate the habit of thinking what we are doing. The precise opposite is the case. Civilization advances by extending the number of operations which we can perform without thinking about them. Operations of thought are like cavalry charges in a battle -they are strictly limited in number, they require fresh horses, and must only be made at decisive moments.
+- A. N. Whitehead (in "An Introduction to Mathematics")
+
+I have never learned anything except from people younger than myself.
+- O. Wilde
+
+As soon as we started programming, we found out to our surprise that it wasn't as easy to get programs right as we had thought. Debugging had to be discovered. I can remember the exact instant when I realized that a large part of my life from then on was going to be spent in finding mistakes in my own programs.
+- M. Wilkes
+
+Furious activity is no substitute for understanding.
+- H. H. Williams
+
+From a programmer's point of view, the user is a peripheral that types when you issue a read request.
+- P. Williams
+
+He knows the course forwards and backwards. He teaches it backwards
+- S. Willoughby (commenting on Garrett Birkhoff's freshman calculus course at Harvard
+in "The Other End of the Log: Memoirs of an Education Rebel")
+
+The main activity of programming is not the origination of new independent programs, but in the integration, modification, and explanation of existing ones.
+- T. Winograd
+
+Complexity has and will maintain a strong fascination for many people. It is true that we live in a complex world and strive to solve inherently complex problems, which often do require complex mechanisms. However, this should not diminish our desire for elegant solutions, which convince by their clarity and effectiveness. Simple, elegant solutions are more effective, but they are harder to find than complex ones, and they require more time, which we too often believe to be unaffordable
+- N. Wirth
+
+It is a sad manifestation of the spirit of modern times, in which an individulal's pride in his/her work has become rare. The idea that one might derive satisfaction from his or her successful work, because that worrk is ingenious, beautiful, or just pleasing, has become ridiculed. Nothing but economic success and monetary reward is acceptable. Hence our occupations have become mere jbos. But quality of work can be expected only through personal satisfaction, dedication, and enjoyment.
+- N. Wirth
+
+Increasingly, people seem to misinterpret complexity as sophistication, which is baffling -the incomprehensible should cause suspicion rather than admiration. Possibly this trend results from a mistaken belief that using a somewhat mysterious device confers an aura of power on the user.
+- N. Wirth
+
+My being a teacher had a decisive influence on making language and systems [that I designed] as simple as possible so that in my teaching, I could concentrate on the essential issues of programming rather than on details of language and notation.
+- N. Wirth
+
+Software gets slower faster than hardware gets faster. (Or, sometimes known by) Grove [the head of Intel] giveth and Gates [the head of Microsoft] taketh away.)
+- N. Wirth
+
+Don't ask what it means, but rather how it is used.
+- L. Wittgenstein
+
+If we spoke a different language, we would perceive a somewhat different world.
+- L. Wittgenstein
+
+The limits of your language are the limits of your world.
+- L. Wittgenstein
+
+What we have loved, others will love, and we will teach them how.
+- W. Wordsworth (The Prelude)
+
+More bugs have been introduced into programs through premature optimization than any other cause, including pure stupidity. (sometimes quoted as, "More computing sins are committed in the name of efficiency (without necessarily achieving it) than for any other single reason -including blind stupidity.")
+- W. Wulf
+
+Education is not the filling of a pail, but the lighting of a fire.
+- W.B. Yeats (See Plutarch: The mind...)
+
+Do or do not...there is no try.
+- Yoda
+
+The greatest teacher, failure is.
+- Yoda
+
+Cutler, armed with a schedule [for finishing MS Windows NT], was urging the team to "eat its own dog food." Part macho stunt and part common sense, the "dog food diet" was the cornerstone of Cutler's philosophy. "We're going to run on the program we build," he insisted. Eating dog food meant there would be no escape from facing the flaws and imperfections of NT. Even while immersed in his own piece of NT, a code writer would confront all of its weaknesses. By controlling the operations of a code writer's computer, NT would define the quality of his life. If at first NT tasted no better than dog food, all the better. Code writers would feel an urgent need to raise the dietary level by quickly fixing the errant code and writing more durable code in the first place.
+- G. P. Zachary (in "Show-Stopper: The Breakneck Race to Create Windows NT and the Next Generation at Microsoft")
+
+Information is not knowledge, Knowledge is not wisdom, Wisdom is not truth, Truth is not beauty, Beauty is not love, Love is not music, and Music is THE BEST.
+- F. Zappa (Packard Goose). Also see G. Schubert
+
+Technical skill is mastery of complexity, while creativity is mastery of simplicity.
+- E. C. Zeeman
+
+One day Chao-Chou fell down in the snow, and called out: "Help me! Help Me!" A monk came and lay down beside him. Chao-Chou got up and went away.
+- Zen koan
+
+Who is wise? He who learns from all people...as it is said: "From all my teachers I gained understanding".
+- B. Zoma (Psalms 119:99)
