@@ -31,14 +31,14 @@ public class ThankHandler extends MessageHandler implements Documentable {
 		long lastRep = guildData.getLong(lastRepKey);
 		long lastRemind = guildData.getLong(lastRemindKey);
 		long remaining = Constants.REPUTATION_INTERVAL - (System.currentTimeMillis() - lastRep);
-		long remindCooldown = Constants.REPUTATION_INTERVAL*2 - (System.currentTimeMillis() - lastRemind);
+		long remindCooldown = Constants.REPUTATION_INTERVAL*4 - (System.currentTimeMillis() - lastRemind);
 		
 		return new TokenizedString(event.getMessage().getContent()).containsAnyTokensIgnoreCase("thanks", "ty", "tyty") && PermissionProfile.fromUser(event.getMessage().getAuthor()) && remaining <= 0 && remindCooldown <= 0;
 	}
 
 	@Override
 	protected void execute(MessageCreateEvent event) {
-		new MessageCreateAction(event.getMessage().getChannel(), "You can thank them by typing `%rep @user`! You can do so every four hours, and will give both of you a ticket for an end-of-quarter raffle.").toMono().block();
+		new MessageCreateAction(event.getMessage().getChannel(), "You can thank them by typing `%rep @user`! You can do so every two hours, and will give them a ticket for an end-of-quarter raffle.").toMono().block();
 	}
 
 	@Override

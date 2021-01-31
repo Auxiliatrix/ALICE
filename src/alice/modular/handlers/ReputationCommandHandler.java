@@ -17,6 +17,7 @@ import alice.framework.handlers.Documentable;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
+import alice.framework.structures.QuantifiedPair;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.EmbedBuilders;
 import alice.framework.utilities.EventUtilities;
@@ -26,11 +27,12 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.rest.util.Color;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
 public class ReputationCommandHandler extends CommandHandler implements Documentable {
-
+	
 	public ReputationCommandHandler() {
 		super("Reputation", true, PermissionProfile.getAnyonePreset().andFromUser().andNotDM());
 		this.aliases.add("rep");
@@ -54,11 +56,11 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 		
 		if( ts.size() == 1 ) {
 			if( !reputationMap.has(ownId) ) {
-				reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(ownId, 0));
+				reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(ownId, 1));
 			}
 			int reputation = reputationMap.getInt(ownId);
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationSelfConstructor(user.get(), reputation)));
-		} else if( !event.getMessage().getUserMentions().collectList().block().isEmpty() ) {
+		} else if( !event.getMessage().getUserMentions().collectList().block().isEmpty()) {
 			String lastRepKey = String.format("%d_lastrep", event.getMessage().getAuthorAsMember().block().getId().asLong());
 			if( !guildData.has(lastRepKey) ) {
 				guildData.put(lastRepKey, System.currentTimeMillis() - (Constants.REPUTATION_INTERVAL+1000));
@@ -74,7 +76,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You can't give reputation to yourself!", EmbedBuilders.ERR_USAGE)));
 				} else {
 					if( !reputationMap.has(target.getId().asString()) ) {
-						reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(target.getId().asString(), 0));
+						reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(target.getId().asString(), 1));
 						// reputationMap.put(target.getId().asString(), 0);
 					}
 					final int targetReputation = reputationMap.getInt(target.getId().asString()) + 1; // blah blah efficiency its O(1) get off my back
@@ -83,13 +85,9 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 					// reputationMap.put(target.getId().asString(), reputation);
 					
 					if( !reputationMap.has(user.get().getId().asString()) ) {
-						reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(user.get().getId().asString(), 0));
+						reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(user.get().getId().asString(), 1));
 						// reputationMap.put(user.get().getId().asString(), 0);
 					}
-					final int userReputation = reputationMap.getInt(user.get().getId().asString()) + 1;
-
-					reputationMap = guildData.modifyJSONObject("reputation_map", jo -> jo.put(user.get().getId().asString(), userReputation));
-					// reputationMap.put(user.get().getId().asString(), reputation);
 					
 					guildData.put(lastRepKey, System.currentTimeMillis());
 					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getReputationChangeConstructor(target, targetReputation)));
@@ -97,19 +95,6 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 			}
 			
 		} else if( ts.containsAnyTokensIgnoreCase("lead", "leader", "leaderboard") ) {
-			class QuantifiedPair<K> implements Comparable<QuantifiedPair<K>>{
-				public K key;
-				public int value;
-				
-				public QuantifiedPair(K key, int value) {
-					this.key = key; this.value = value;
-				}
-
-				@Override
-				public int compareTo(QuantifiedPair<K> arg0) {
-					return arg0.value - this.value;
-				}
-			}
 			int total = 0;
 			List<QuantifiedPair<String>> entries = new ArrayList<QuantifiedPair<String>>();
 			for( String key : new HashSet<String>(reputationMap.keySet()) ) {
@@ -134,7 +119,27 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 				}
 			}
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getLeaderboardConstructor("Reputation", fieldHeaders, fieldBodies, total, entries.size())));
-		} else {
+		} else if( ts.containsAnyTokensIgnoreCase("draw", "select") && PermissionProfile.hasPermission(user, event.getGuild(), Permission.ADMINISTRATOR)) {
+			int total = 0;
+			List<QuantifiedPair<String>> entries = new ArrayList<QuantifiedPair<String>>();
+			for( String key : new HashSet<String>(reputationMap.keySet()) ) {
+				entries.add(new QuantifiedPair<String>(key, reputationMap.getInt(key)));
+				total += reputationMap.getInt(key);
+			}
+			int selection = (int) (Math.random() * total) + 1;
+			int passed = 0;
+			for( QuantifiedPair<String> entry : entries ) {
+				passed += entry.value;
+				if( passed >= selection ) {
+					response.addAction(new MessageCreateAction(channel, EmbedBuilders.getModularConstructor(Color.of(228, 180, 0), ":sparkles: Congratulations!", String.format("%s#%s was selected!", guild.getMemberById(Snowflake.of(entry.key)).block().getUsername(), guild.getMemberById(Snowflake.of(entry.key)).block().getDiscriminator() ))));
+					break;
+				}
+			}
+		} else if( ts.containsAnyTokensIgnoreCase("reset") && PermissionProfile.hasPermission(user, event.getGuild(), Permission.ADMINISTRATOR)) {
+			guildData.put("reputation_map", new JSONObject());
+			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Reputation map reset successfully!")));
+		}
+		else {
 			response.addAction(new MessageCreateAction(channel, EmbedBuilders.getHelpConstructor(user, this)));
 		}
 		
@@ -157,7 +162,7 @@ public class ReputationCommandHandler extends CommandHandler implements Document
 	public DocumentationPair[] getUsage() {
 		return new DocumentationPair[] {
 			new DocumentationPair(String.format("%s", invocation), "Displays your own reputation standing."),
-			new DocumentationPair(String.format("%s <@user>", invocation), "Gives a point of reputation to the given user, as well as yourself. Has a cooldown of four hours."),
+			new DocumentationPair(String.format("%s <@user>", invocation), "Gives a point of reputation to the given user. Has a cooldown of two hours."),
 			new DocumentationPair(String.format("%s lead|leader|leaderboard", invocation), "Displays this server's reputation leaderboard."),
 			//new DocumentationPair(String.format("%s cooldown|cd <", args))
 		};

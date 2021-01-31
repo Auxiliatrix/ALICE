@@ -18,6 +18,7 @@ import alice.framework.utilities.EmbedBuilders;
 import alice.framework.utilities.EventUtilities;
 import alice.framework.utilities.StringUtilities;
 import alice.modular.actions.MessageCreateAction;
+import alice.modular.actions.MessageDeleteAction;
 import alice.modular.actions.RoleAssignAction;
 import alice.modular.actions.RoleUnassignAction;
 import discord4j.common.util.Snowflake;
@@ -73,10 +74,12 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 							for( User user : event.getMessage().getUserMentions().collectList().block() ) {
 								response.addAction(new RoleUnassignAction(user.asMember(event.getGuildId().get()), foundRole));
 							}
-							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role forcefully unassigned successfully!")));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(String.format("Role \"%s\" forcefully unassigned!", foundRole.getName()))));
+							response.addAction(new MessageDeleteAction(event.getMessage()));
 						} else {
 							response.addAction(new RoleUnassignAction(event.getMessage().getAuthorAsMember(), foundRole));
-							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role unassigned successfully!")));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(String.format("Role \"%s\" unassigned from @%s successfully!", foundRole.getName(), event.getMember().get().getDisplayName()))));
+							response.addAction(new MessageDeleteAction(event.getMessage()));
 						}
 					}
 				}
@@ -96,10 +99,12 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 							for( User user : event.getMessage().getUserMentions().collectList().block() ) {
 								response.addAction(new RoleAssignAction(user.asMember(event.getGuildId().get()), foundRole));
 							}
-							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role forcefully assigned successfully!")));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(String.format("Role \"%s\" forcefully assigned!", foundRole.getName()))));
+							response.addAction(new MessageDeleteAction(event.getMessage()));
 						} else {
 							response.addAction(new RoleAssignAction(event.getMessage().getAuthorAsMember(), foundRole));
-							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor("Role assigned successfully!")));
+							response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(String.format("Role \"%s\" assigned to @%s successfully!", foundRole.getName(), event.getMember().get().getDisplayName()))));
+							response.addAction(new MessageDeleteAction(event.getMessage()));
 						}
 					}
 				}
@@ -128,7 +133,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 		};
 	}
 	
-	private Role getRoleByName(Guild guild, String roleName) {
+	public static Role getRoleByName(Guild guild, String roleName) {
 		Role foundRole = null;
 		List<Snowflake> ids = new ArrayList<Snowflake>(guild.getRoleIds());
 		for( Snowflake id : ids ) {
@@ -141,7 +146,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 		return foundRole;
 	}
 	
-	private Role getClosestRoleByName(Guild guild, String roleName, int distance, JSONArray allowRules, JSONArray disallowRules) {
+	public static Role getClosestRoleByName(Guild guild, String roleName, int distance, JSONArray allowRules, JSONArray disallowRules) {
 		Role foundRole = null;
 		List<Snowflake> ids = new ArrayList<Snowflake>(guild.getRoleIds());
 		int minDist = Integer.MAX_VALUE;
@@ -157,7 +162,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 		return foundRole;
 	}
 	
-	private boolean roleAllowed( String roleName, JSONArray allowRules, JSONArray disallowRules ) {
+	public static boolean roleAllowed( String roleName, JSONArray allowRules, JSONArray disallowRules ) {
 		boolean allowed = false;
 		for( Object allowRule : allowRules ) {
 			if( roleName.matches((String) allowRule) ) {
