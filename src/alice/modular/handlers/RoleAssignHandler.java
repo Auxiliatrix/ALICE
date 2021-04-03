@@ -38,7 +38,7 @@ public class RoleAssignHandler extends MentionHandler implements Documentable {
 
 	@Override
 	protected boolean trigger(MessageCreateEvent event) {
-		return new TokenizedString(event.getMessage().getContent()).containsTokenIgnoreCase("role");
+		return new TokenizedString(event.getMessage().getContent()).containsIgnoreCase("role");
 	}
 
 	@Override

@@ -19,9 +19,13 @@ import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.EmbedBuilders;
 import alice.framework.utilities.EventUtilities;
 import alice.modular.actions.MessageCreateAction;
+import alice.modular.actions.RoleAssignAction;
+import alice.modular.actions.RoleUnassignAction;
 import alice.modular.datamanagers.FactionDataManager;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.User;
 import discord4j.rest.util.Permission;
 
@@ -90,11 +94,11 @@ public class FactionHandler extends CommandHandler implements Documentable {
 					} else if( !fdm.has(ts.get(2)) ) {
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("That faction does not exist!", EmbedBuilders.ERR_USAGE)));
 					} else {
-						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), fdm.getFactionProfileConstructor(allegiance)));
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), fdm.getFactionProfileConstructor(ts.get(2))));
 					}
 					break;
 				case "create":
-					if( ts.size() < 3 ) {
+					if( ts.size() < 3 || ts.get(2).equals("") ) {
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You must specify a faction name in quotes!", EmbedBuilders.ERR_USAGE)));
 					} else if( !ownership.equals("") ) {
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You are already the leader of a faction!", EmbedBuilders.ERR_USAGE)));
@@ -114,10 +118,12 @@ public class FactionHandler extends CommandHandler implements Documentable {
 						if( guildData.getJSONObject("reputation_map").getInt(userID+"") < REPUTATION_THRESHOLD && !PermissionProfile.hasPermission(user, event.getGuild(), Permission.ADMINISTRATOR)) {
 							response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You do not have enough reputation to do this!", EmbedBuilders.ERR_PERMISSION)));
 						} else {
-							Faction newFaction = new Faction(ts.get(2), userID, event.getMessage().getTimestamp().toEpochMilli());
+							Role role = guild.createRole(c -> c.setName(ts.get(2))).block();
+							Faction newFaction = new Faction(ts.get(2), userID, role.getId().asLong(), event.getMessage().getTimestamp().toEpochMilli());
 							fdm.addFaction(ts.get(2), newFaction);
 							fdm.setAllegiance(userID, ts.get(2));
 							fdm.setOwnership(userID, ts.get(2));
+							response.addAction(new RoleAssignAction(guild.getMemberById(Snowflake.of(userID)), role));
 							response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("You have successfully created a new faction!")));
 						}
 					}
@@ -135,10 +141,11 @@ public class FactionHandler extends CommandHandler implements Documentable {
 						Faction faction = fdm.getFaction(ts.get(2));
 						for( long member : faction.members ) {
 							fdm.setAllegiance(member, "");
+							response.addAction(new RoleUnassignAction(guild.getMemberById(Snowflake.of(member)), guild.getRoleById(Snowflake.of(faction.role)).block()));
 						}
 						fdm.removeFaction(ts.get(2));
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Faction disbanded successfully!")));
-						// TODO: remove relevant roles
+						response.addMono(guild.getRoleById(Snowflake.of(faction.role)).block().delete());
 					}
 					break;
 				case "join":
@@ -153,9 +160,9 @@ public class FactionHandler extends CommandHandler implements Documentable {
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You have been banned from this faction!", EmbedBuilders.ERR_PERMISSION)));
 					}
 					else {
-						// TODO: add relevant role
 						fdm.addMember(ts.get(2), Long.parseLong(ownId));
 						fdm.setAllegiance(Long.parseLong(ownId), ts.get(2));
+						response.addAction(new RoleAssignAction(event.getMessage().getAuthorAsMember(), guild.getRoleById(Snowflake.of(fdm.getFaction(ts.get(2)).role)).block()));
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Faction joined successfully!")));
 					}
 					break;
@@ -171,6 +178,7 @@ public class FactionHandler extends CommandHandler implements Documentable {
 							fdm.removeOfficer(allegiance, userID);
 						}
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Faction left successfully!")));
+						response.addAction(new RoleUnassignAction(event.getMessage().getAuthorAsMember(), guild.getRoleById(Snowflake.of(fdm.getFaction(allegiance).role)).block()));
 					}
 					break;
 				case "color":
@@ -185,7 +193,6 @@ public class FactionHandler extends CommandHandler implements Documentable {
 					} else {
 						fdm.setColor(allegiance, ts.getNumbers().get(0));
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Color changed successfully!")));
-						// edit role color if applicable
 					}
 					break;
 				case "description":
@@ -208,6 +215,24 @@ public class FactionHandler extends CommandHandler implements Documentable {
 					} else {
 						fdm.setFlag(allegiance, ts.get(2));
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("Flag changed successfully!")));
+					}
+					break;
+				case "transfer":
+					if( ownership.equals("") ) {
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You are not the faction leader!", EmbedBuilders.ERR_PERMISSION)));
+					} else if( event.getMessage().getUserMentions().count().block() == 0 ) {
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You must specify a mentioned user!", EmbedBuilders.ERR_USAGE)));
+					} else {
+						User mentioned = event.getMessage().getUserMentions().blockFirst();
+						long mentionedID = mentioned.getId().asLong();
+						if( !fdm.isMember(allegiance, mentionedID) ) {
+							response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("That user is not in this faction!", EmbedBuilders.ERR_USAGE)));
+						} else if( fdm.isOwner(allegiance, mentionedID) ) {
+							response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("That user is already the faction leader!", EmbedBuilders.ERR_USAGE)));
+						} else {
+							fdm.setOwnership(userID, "");
+							fdm.setOwnership(mentionedID, allegiance);
+						}
 					}
 					break;
 				case "promote":
@@ -252,7 +277,7 @@ public class FactionHandler extends CommandHandler implements Documentable {
 					break;
 				case "ban":
 					if( !fdm.isOfficer(allegiance, userID) ) {
-						
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You are not a faction officer!", EmbedBuilders.ERR_PERMISSION)));
 					} else if( event.getMessage().getUserMentions().count().block() == 0 ) {
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You must specify a mentioned user!", EmbedBuilders.ERR_USAGE)));
 					} else { 
@@ -265,7 +290,7 @@ public class FactionHandler extends CommandHandler implements Documentable {
 						} else {
 							if( fdm.isMember(allegiance, mentionedID) ) {
 								fdm.removeMember(allegiance, mentionedID);
-								fdm.setAllegiance(userID, "");
+								fdm.setAllegiance(mentionedID, "");
 							}
 							fdm.addBanned(allegiance, mentionedID);
 							response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getSuccessConstructor("User banned successfully!")));
@@ -274,7 +299,7 @@ public class FactionHandler extends CommandHandler implements Documentable {
 					break;
 				case "pardon":
 					if( !fdm.isOfficer(allegiance, userID) ) {
-						
+						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You are not a faction officer!", EmbedBuilders.ERR_PERMISSION)));
 					} 
 					if( event.getMessage().getUserMentions().count().block() == 0 ) {
 						response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getErrorConstructor("You must specify a mentioned user!", EmbedBuilders.ERR_USAGE)));
@@ -336,6 +361,7 @@ public class FactionHandler extends CommandHandler implements Documentable {
 				new DocumentationPair(String.format("%s color <rgb>", invocation), "Sets the color of your faction. If your faction has a role, sets the role color as well."),
 				new DocumentationPair(String.format("%s description \"<description>\"", invocation), "Sets the description of your faction."),
 				new DocumentationPair(String.format("%s flag <image_url>", invocation), "Sets the image url for your faction's flag."),	// empty string by default
+				new DocumentationPair(String.format("%s transfer <@user>", invocation), "Transfers control over the faction to the mentioned user."),
 				new DocumentationPair(String.format("%s promote <@user>", invocation), "Promotes the given user to an officer in your faction."),
 				new DocumentationPair(String.format("%s demote <@user>", invocation), "Demotes the given officer to a user in your faction."),
 				new DocumentationPair(String.format("%s ban <@user>", invocation), "Bans the given user from your faction."),

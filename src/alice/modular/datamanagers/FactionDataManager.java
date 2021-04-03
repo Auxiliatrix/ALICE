@@ -16,8 +16,9 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
 
-public class FactionDataManager {
+public class FactionDataManager extends DataManager {
 	
 	private AtomicSaveFile guildDataReference;
 	private Guild guild;
@@ -35,34 +36,22 @@ public class FactionDataManager {
 			return null;
 		} else {
 			JSONObject jFaction = guildDataReference.getJSONObject("faction_map").getJSONObject(factionName.toLowerCase());
-			List<Long> members = new ArrayList<Long>();
-			for( Object member : jFaction.getJSONArray("members") ) {
-				members.add((long) member);
-			}
-			List<Long> officers = new ArrayList<Long>();
-			for( Object officer : jFaction.getJSONArray("officers") ) {
-				officers.add((long) officer);
-			}
-			List<Long> bannedList = new ArrayList<Long>();
-			for( Object banned : jFaction.getJSONArray("banned") ) {
-				bannedList.add((long) banned);
-			}
-			return new Faction (jFaction.getString("name"), jFaction.getLong("leader"), jFaction.getLong("established"))
-								.withColor(jFaction.getInt("color"))
-								.withDescription(jFaction.getString("description"))
-								.withFlag(jFaction.getString("flag"))
-								.withMembers(members)
-								.withOfficers(officers)
-								.withBanned(bannedList);
+			return new Faction(jFaction);
 		}
 	}
 	
+	@Exclusive
 	public void addFaction(String factionName, Faction faction) {
+		DATA_MANAGER_LOCK.lock();
 		guildDataReference.modifyJSONObject("faction_map", j -> j.put(factionName.toLowerCase(), faction.toJSONObject()));
+		DATA_MANAGER_LOCK.unlock();
 	}
-		
+	
+	@Exclusive
 	public void removeFaction(String factionName) {
+		DATA_MANAGER_LOCK.lock();
 		guildDataReference.modifyJSONObject("faction_map", j -> j.remove(factionName.toLowerCase()));
+		DATA_MANAGER_LOCK.unlock();
 	}
 	
 	public List<QuantifiedPair<String>> getSortedFactions() {
@@ -96,28 +85,35 @@ public class FactionDataManager {
 		return guildDataReference.getJSONObject("faction_map").has(factionName.toLowerCase());
 	}
 	
+	@Exclusive
 	public void setDescription(String factionName, String description) {
 		guildDataReference.modifyJSONObject("faction_map", j -> j.put(factionName.toLowerCase(), j.getJSONObject(factionName.toLowerCase()).put("description", description)));
 	}
 	
+	@Exclusive
 	public void setColor(String factionName, int color) {
 		guildDataReference.modifyJSONObject("faction_map", j -> j.put(factionName.toLowerCase(), j.getJSONObject(factionName.toLowerCase()).put("color", color)));
+		guild.getRoleById(Snowflake.of(getFaction(factionName).role)).block().edit(r -> r.setColor(Color.of(color))).block();
 	}
 	
+	@Exclusive
 	public void setFlag(String factionName, String flag) {
 		guildDataReference.modifyJSONObject("faction_map", j -> j.put(factionName.toLowerCase(), j.getJSONObject(factionName.toLowerCase()).put("flag", flag)));
 	}
 	
+	@Exclusive
 	private void addOfficerConsumer(JSONObject factionMap, String factionName, long officer) {
 		JSONArray officers = factionMap.getJSONObject(factionName.toLowerCase()).getJSONArray("officers");
 		officers.put(officer);
 		factionMap.getJSONObject(factionName.toLowerCase()).put("officers", officers);
 	}
 	
+	@Exclusive
 	public void addOfficer(String factionName, long officer) {		
 		guildDataReference.modifyJSONObject("faction_map", j -> addOfficerConsumer(j, factionName, officer));
 	}
 	
+	@Exclusive
 	private void removeOfficerConsumer(JSONObject factionMap, String factionName, long officer) {
 		int index = -1;
 		JSONArray officers = factionMap.getJSONObject(factionName.toLowerCase()).getJSONArray("officers");
@@ -130,20 +126,24 @@ public class FactionDataManager {
 		factionMap.getJSONObject(factionName.toLowerCase()).put("officers", officers);
 	}
 	
+	@Exclusive
 	public void removeOfficer(String factionName, long officer) {
 		guildDataReference.modifyJSONObject("faction_map", j -> removeOfficerConsumer(j, factionName, officer));
 	}
 	
+	@Exclusive
 	private void addMemberConsumer(JSONObject factionMap, String factionName, long member) {
 		JSONArray members = factionMap.getJSONObject(factionName.toLowerCase()).getJSONArray("members");
 		members.put(member);
 		factionMap.getJSONObject(factionName.toLowerCase()).put("members", members);
 	}
 	
+	@Exclusive
 	public void addMember(String factionName, long member) {		
 		guildDataReference.modifyJSONObject("faction_map", j -> addMemberConsumer(j, factionName, member));
 	}
 	
+	@Exclusive
 	private void removeMemberConsumer(JSONObject factionMap, String factionName, long member) {
 		int index = -1;
 		JSONArray members = factionMap.getJSONObject(factionName.toLowerCase()).getJSONArray("members");
@@ -156,20 +156,24 @@ public class FactionDataManager {
 		factionMap.getJSONObject(factionName.toLowerCase()).put("members", members);
 	}
 	
+	@Exclusive
 	public void removeMember(String factionName, long member) {
 		guildDataReference.modifyJSONObject("faction_map", j -> removeMemberConsumer(j, factionName, member));
 	}
 	
+	@Exclusive
 	private void addBannedConsumer(JSONObject factionMap, String factionName, long banned) {
 		JSONArray bannedList = factionMap.getJSONObject(factionName.toLowerCase()).getJSONArray("banned");
 		bannedList.put(banned);
 		factionMap.getJSONObject(factionName.toLowerCase()).put("banned", bannedList);
 	}
 	
+	@Exclusive
 	public void addBanned(String factionName, long banned) {		
 		guildDataReference.modifyJSONObject("faction_map", j -> addBannedConsumer(j, factionName, banned));
 	}
 	
+	@Exclusive
 	private void removeBannedConsumer(JSONObject factionMap, String factionName, long banned) {
 		int index = -1;
 		JSONArray bannedList = factionMap.getJSONObject(factionName.toLowerCase()).getJSONArray("banned");
@@ -182,6 +186,7 @@ public class FactionDataManager {
 		factionMap.getJSONObject(factionName.toLowerCase()).put("banned", bannedList);
 	}
 	
+	@Exclusive
 	public void removeBanned(String factionName, long banned) {
 		guildDataReference.modifyJSONObject("faction_map", j -> removeBannedConsumer(j, factionName, banned));
 	}
@@ -194,6 +199,7 @@ public class FactionDataManager {
 		return guildDataReference.getString(key);
 	}
 	
+	@Exclusive
 	public void setAllegiance(long user, String factionName) {
 		guildDataReference.put(String.format("%d_faction_allegiance", user), factionName.toLowerCase());
 	}
@@ -206,6 +212,7 @@ public class FactionDataManager {
 		return guildDataReference.getString(key);
 	}
 	
+	@Exclusive
 	public void setOwnership(long user, String factionName) {
 		guildDataReference.put(String.format("%d_faction_ownership", user), factionName.toLowerCase());
 	}

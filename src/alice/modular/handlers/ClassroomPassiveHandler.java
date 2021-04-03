@@ -46,18 +46,21 @@ public class ClassroomPassiveHandler extends Handler<VoiceStateUpdateEvent> {
 		AtomicSaveFile guildData = Brain.guildIndex.get(event.getCurrent().getGuild().block().getId().asString());
 		
 		if( EventUtilities.getConnected(event) ) {
+			System.out.println("Connected");
 			VoiceState validState = event.getCurrent();
 			String id = validState.getChannel().block().getId().asString();
 			Mono<Member> member = validState.getMember();
 			if( guildData.getString("classroom_hub_channel").equals(id) ) {
 				String channelName = String.format("%s#%s's Classroom", member.block().getUsername(), member.block().getDiscriminator());
-				VoiceChannel channel = validState.getGuild().block().createVoiceChannel( c -> constructVC( c, validState.getChannel().block().getCategory(), channelName) ).block(); // this line causes errors
-				//response.addAction(new ChannelCreateAction(validState.getGuild(), validState.getChannel().block().getCategory(), channelName, Type.GUILD_VOICE));
-				response.addAction(new MemberMoveChannelAction(member, channel));
-				guildData.put(String.format("%s_classroom", channel.getId().asString()), true);
+				Mono<VoiceChannel> channel = validState.getGuild().block().createVoiceChannel( c -> constructVC( c, validState.getChannel().block().getCategory(), channelName) );
+				response.addMono(channel.flatMap(c -> {
+						guildData.put(String.format("%s_classroom", c.getId().asString()), true);
+						return new MemberMoveChannelAction(member, c).toMono();
+					}));
 			}
 		}
 		if( EventUtilities.getDisconnected(event) ){
+			System.out.println("Disconnected");
 			VoiceState validState = event.getOld().get();
 			String id = validState.getChannel().block().getId().asString();
 			if( !guildData.getString("classroom_hub_channel").equals(id) ) {

@@ -16,7 +16,7 @@ import discord4j.core.object.entity.User;
 public class ChatMuteCommandHandler extends CommandHandler implements Documentable {
 	
 	public ChatMuteCommandHandler() {
-		super("ChatMute", false, PermissionProfile.getAdminPreset());
+		super("ChatMute", false, PermissionProfile.getDeveloperPreset());
 		aliases.add("cm");
 	}
 
