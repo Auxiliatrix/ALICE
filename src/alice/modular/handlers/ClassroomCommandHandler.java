@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
+import alice.framework.features.Documentable;
 import alice.framework.handlers.CommandHandler;
-import alice.framework.handlers.Documentable;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;

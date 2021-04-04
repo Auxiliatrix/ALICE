@@ -1,4 +1,4 @@
-package alice.framework.handlers;
+package alice.framework.features;
 
 public interface Documentable {
 	

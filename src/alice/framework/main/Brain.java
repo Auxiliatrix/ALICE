@@ -14,6 +14,7 @@ import org.reflections.Reflections;
 
 import alice.configuration.calibration.Constants;
 import alice.framework.features.ActiveFeature;
+import alice.framework.features.Documentable;
 import alice.framework.features.Feature;
 import alice.framework.features.HelperFeature;
 import alice.framework.structures.AtomicSaveFile;
@@ -169,4 +170,17 @@ public class Brain {
 		}
 		return null;
 	}
+	
+	@SuppressWarnings("rawtypes")
+	public static Feature getDocumentableByName(String name) {
+		for( PriorityQueue<ActiveFeature> ff : features.get().values() ) {
+			for( Feature f : ff ) {
+				if( f instanceof Documentable && (f.getName().equalsIgnoreCase(name) || f.getAliases().contains(name.toLowerCase())) ) {
+					return f;
+				}
+			}
+		}
+		return null;
+	}
+	
 }

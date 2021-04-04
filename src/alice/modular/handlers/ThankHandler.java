@@ -1,7 +1,7 @@
 package alice.modular.handlers;
 
 import alice.configuration.calibration.Constants;
-import alice.framework.handlers.Documentable;
+import alice.framework.features.Documentable;
 import alice.framework.handlers.MessageHandler;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;

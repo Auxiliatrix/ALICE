@@ -2,7 +2,7 @@ package alice.modular.handlers;
 
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
-import alice.framework.handlers.Documentable;
+import alice.framework.features.Documentable;
 import alice.framework.handlers.MentionHandler;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;

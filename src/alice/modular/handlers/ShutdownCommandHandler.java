@@ -1,8 +1,8 @@
 package alice.modular.handlers;
 
 import alice.framework.actions.VoidAction;
+import alice.framework.features.Documentable;
 import alice.framework.handlers.CommandHandler;
-import alice.framework.handlers.Documentable;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
 import alice.modular.actions.MessageCreateAction;

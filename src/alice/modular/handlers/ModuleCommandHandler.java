@@ -8,8 +8,8 @@ import java.util.Set;
 
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
+import alice.framework.features.Documentable;
 import alice.framework.handlers.CommandHandler;
-import alice.framework.handlers.Documentable;
 import alice.framework.handlers.Handler;
 import alice.framework.handlers.MessageHandler;
 import alice.framework.main.Brain;
