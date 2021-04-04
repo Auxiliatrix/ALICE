@@ -1,4 +1,4 @@
-package alice.configuration.calibration;
+package alice.framework.main;
 
 public class Constants {
 	/* Properties */

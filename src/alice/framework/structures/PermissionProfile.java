@@ -2,7 +2,7 @@ package alice.framework.structures;
 
 import java.util.function.BiPredicate;
 
-import alice.configuration.calibration.Constants;
+import alice.framework.main.Constants;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.rest.util.Permission;

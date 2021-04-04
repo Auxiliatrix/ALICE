@@ -6,12 +6,12 @@ import java.util.function.Consumer;
 
 import org.json.JSONArray;
 
-import alice.configuration.calibration.Constants;
 import alice.framework.actions.Action;
 import alice.framework.actions.NullAction;
 import alice.framework.features.Documentable;
 import alice.framework.handlers.CommandHandler;
 import alice.framework.main.Brain;
+import alice.framework.main.Constants;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;

@@ -5,7 +5,6 @@ import java.util.PriorityQueue;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
 import discord4j.core.event.domain.Event;
-import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 
 public abstract class ActiveFeature<E extends Event> extends Feature<E> implements Comparable<ActiveFeature<E>> {
@@ -22,6 +21,7 @@ public abstract class ActiveFeature<E extends Event> extends Feature<E> implemen
 	protected ActiveFeature(String name, Class<E> type) {
 		super(name, type);
 		withPriority(PriorityClass.STANDARD);
+		withRestriction(PermissionProfile.getAnyonePreset());
 	}
 	
 	protected ActiveFeature<E> withPriority(PriorityClass priority) {
@@ -32,6 +32,10 @@ public abstract class ActiveFeature<E extends Event> extends Feature<E> implemen
 	protected ActiveFeature<E> withRestriction(PermissionProfile restriction) {
 		this.restriction = restriction;
 		return this;
+	}
+	
+	protected boolean isAllowed(Member member) {
+		return restriction.verify(member, member.getGuild().block());
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -45,9 +49,5 @@ public abstract class ActiveFeature<E extends Event> extends Feature<E> implemen
 	@Override
 	public int compareTo(ActiveFeature<E> f) {
 		return priority.ordinal() - f.priority.ordinal();
-	}
-	
-	protected boolean isAllowed(Member member, Guild guild) {
-		return restriction.verify(member, guild);
 	}
 }

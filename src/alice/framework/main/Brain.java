@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.reflections.Reflections;
 
-import alice.configuration.calibration.Constants;
 import alice.framework.features.ActiveFeature;
 import alice.framework.features.Documentable;
 import alice.framework.features.Feature;
@@ -23,6 +22,7 @@ import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
@@ -133,14 +133,14 @@ public class Brain {
 				Mono<Void> process = Mono.fromRunnable(() -> {});
 				
 				for( HelperFeature h : helpers.get().get(event) ) {
-					Mono<Void> response = h.handle((Class) e);
+					Mono<Void> response = h.handle((Event) e);
 					if( response != null ) {
 						process.and(response);
 					}
 				}
 				
 				for( ActiveFeature f : features.get().get(event) ) {
-					Mono<Void> response = f.handle((Class) e);
+					Mono<Void> response = f.handle((Event) e);
 					if( response != null ) {
 						process.and(response);
 						break;

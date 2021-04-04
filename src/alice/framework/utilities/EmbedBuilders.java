@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import alice.configuration.calibration.Constants;
 import alice.framework.features.Documentable;
 import alice.framework.features.Documentable.DocumentationPair;
 import alice.framework.handlers.Handler;
 import alice.framework.main.Brain;
+import alice.framework.main.Constants;
 import alice.framework.structures.PermissionProfile;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateSpec;

@@ -6,7 +6,6 @@ import java.util.List;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
 import discord4j.core.event.domain.Event;
-import discord4j.core.object.entity.Guild;
 import reactor.core.publisher.Mono;
 
 public abstract class Feature<E extends Event> {
@@ -16,10 +15,13 @@ public abstract class Feature<E extends Event> {
 	
 	protected String name;
 	protected List<String> aliases;
+	protected boolean whitelist;
 	
 	protected Feature(String name, Class<E> type) {
 		this.name = name;
 		this.aliases = new ArrayList<String>();
+		this.whitelist = false;
+		addAlias(name);
 		
 		load(type);
 	}
@@ -31,17 +33,22 @@ public abstract class Feature<E extends Event> {
 		return this;
 	}
 	
+	protected Feature<E> withWhitelist() {
+		whitelist = true;
+		return this;
+	}
+	
 	protected abstract void load(Class<E> type);
 	
-	public Mono<Void> handle(Class<E> type) {
+	public Mono<Void> handle(E type) {
 		if( listen(type) ) {
 			return respond(type);
 		}
 		return null;
 	}
 	
-	protected abstract boolean listen(Class<E> type);
-	protected abstract Mono<Void> respond(Class<E> type);
+	protected abstract boolean listen(E type);
+	protected abstract Mono<Void> respond(E type);
 		
 	public String getName() {
 		return name;
@@ -51,12 +58,12 @@ public abstract class Feature<E extends Event> {
 		return new ArrayList<String>(aliases);
 	}
 	
-	public boolean isEnabled( boolean whitelist, Mono<Guild> guild ) {
-		AtomicSaveFile guildData = Brain.guildIndex.get(guild.block().getId().asString());
-		return (!whitelist || guildData.has(String.format(ENABLE_PREFIX + "%", name))) && !guildData.has(String.format(DISABLE_PREFIX + "%", name));
-	}
-	
 	public void addAlias(String alias) {
 		this.aliases.add(alias);
+	}
+	
+	public boolean isEnabled( String guildId ) {
+		AtomicSaveFile guildData = Brain.guildIndex.get(guildId);
+		return (!whitelist || guildData.has(String.format(ENABLE_PREFIX + "%", name))) && !guildData.has(String.format(DISABLE_PREFIX + "%", name));
 	}
 }
