@@ -64,6 +64,6 @@ public abstract class Feature<E extends Event> {
 	
 	public boolean isEnabled( String guildId ) {
 		AtomicSaveFile guildData = Brain.guildIndex.get(guildId);
-		return (!whitelist || guildData.has(String.format(ENABLE_PREFIX + "%", name))) && !guildData.has(String.format(DISABLE_PREFIX + "%", name));
+		return (!whitelist || guildData.has(String.format("%s%s", ENABLE_PREFIX, name))) && !guildData.has(String.format("%s%s", DISABLE_PREFIX, name));
 	}
 }

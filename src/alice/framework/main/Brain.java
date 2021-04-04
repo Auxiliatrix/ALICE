@@ -2,6 +2,7 @@ package alice.framework.main;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,16 @@ public class Brain {
 	@SuppressWarnings("rawtypes")
 	public static AtomicReference<Map<Class, List<HelperFeature>>> helpers = new AtomicReference<Map<Class, List<HelperFeature>>>();
 	
+	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {
 			AliceLogger.error("Please pass the TOKEN as the first argument.");
 			System.exit(0);
 		}
+		
+		features.set(new HashMap<Class, PriorityQueue<ActiveFeature>>());
+		helpers.set(new HashMap<Class, List<HelperFeature>>());
+		
 		while( ALIVE.get() ) {
 			AliceLogger.info("Starting up...");
 			
@@ -118,6 +124,7 @@ public class Brain {
 				continue;
 			}
 			try {
+				AliceLogger.info(String.format("Loaded feature: %s", c.getName()), 2);
 				c.getConstructor().newInstance();
 			} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				e.printStackTrace();
@@ -132,21 +139,25 @@ public class Brain {
 			Brain.client.on(event).flatMap(e -> {
 				Mono<Void> process = Mono.fromRunnable(() -> {});
 				
-				for( HelperFeature h : helpers.get().get(event) ) {
-					Mono<Void> response = h.handle((Event) e);
-					if( response != null ) {
-						process.and(response);
+				if( helpers.get().containsKey(event) ) {
+					for( HelperFeature h : helpers.get().get(event) ) {
+						Mono<Void> response = h.handle((Event) e);
+						if( response != null ) {
+							process = process.and(response);
+						}
 					}
 				}
 				
-				for( ActiveFeature f : features.get().get(event) ) {
-					Mono<Void> response = f.handle((Event) e);
-					if( response != null ) {
-						process.and(response);
-						break;
+				if( features.get().containsKey(event) ) {
+					for( ActiveFeature f : features.get().get(event) ) {
+						Mono<Void> response = f.handle((Event) e);
+						if( response != null ) {
+							process = process.and(response);
+							break;
+						}
 					}
 				}
-				
+
 				return process;
 			}).subscribe();
 		}

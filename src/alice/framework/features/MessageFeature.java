@@ -16,8 +16,8 @@ public abstract class MessageFeature extends ActiveFeature<MessageCreateEvent> {
 	protected boolean checkInvoked;
 	protected boolean checkMentioned;
 	
-	protected MessageFeature(String name, Class<MessageCreateEvent> type) {
-		super(name, type);
+	protected MessageFeature(String name) {
+		super(name, MessageCreateEvent.class);
 		invocation = String.format("%s%s", Constants.COMMAND_PREFIX, name);
 		checkInvoked = false;
 		checkMentioned = false;
@@ -38,7 +38,7 @@ public abstract class MessageFeature extends ActiveFeature<MessageCreateEvent> {
 	@Override
 	protected boolean listen(MessageCreateEvent event) {
 		return isAllowed(event.getMember().get()) 
-				&& isEnabled(event.getGuildId().get().asString())
+				//&& isEnabled(event.getGuildId().get().asString())
 				&& (!checkInvoked || invoked(event.getMessage()))
 				&& (!checkMentioned || mentioned(event.getMessage()));
 	}

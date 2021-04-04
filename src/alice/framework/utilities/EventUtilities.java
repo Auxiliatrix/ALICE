@@ -1,6 +1,5 @@
 package alice.framework.utilities;
 
-import alice.framework.main.Brain;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.Channel.Type;

@@ -17,5 +17,6 @@ public abstract class HelperFeature<E extends Event> extends Feature<E> {
 		if(!Brain.helpers.get().keySet().contains(type)) {
 			Brain.helpers.get().put(type, new ArrayList<HelperFeature>());
 		}
+		Brain.helpers.get().get(type).add(this);
 	}
 }

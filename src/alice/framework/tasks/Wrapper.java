@@ -1,5 +1,6 @@
 package alice.framework.tasks;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,9 +15,15 @@ public class Wrapper<T> {
 	
 	public Wrapper(Mono<T> mono) {
 		this.mono = mono;
+		this.tasks = new ArrayList<Function<T, Mono<Void>>>();
+		this.effects = new ArrayList<Consumer<T>>();
 	}
 	
 	public void addTask(Function<T, Mono<Void>> task) {
+		tasks.add(task);
+	}
+	
+	public void addTask(Task<T> task) {
 		tasks.add(task);
 	}
 	
@@ -28,7 +35,7 @@ public class Wrapper<T> {
 		return mono.flatMap(t -> {
 			Mono<Void> process = Mono.fromRunnable(() -> {});
 			for( Function<T, Mono<Void>> task : tasks ) {
-				process.and(task.apply(t));
+				process = process.and(task.apply(t));
 			}
 			
 			for( Consumer<T> effect : effects ) {

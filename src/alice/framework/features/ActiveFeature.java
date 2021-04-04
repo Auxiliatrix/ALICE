@@ -44,6 +44,7 @@ public abstract class ActiveFeature<E extends Event> extends Feature<E> implemen
 		if(!Brain.features.get().keySet().contains(type)) {
 			Brain.features.get().put(type, new PriorityQueue<ActiveFeature>());
 		}
+		Brain.features.get().get(type).add(this);
 	}
 	
 	@Override
