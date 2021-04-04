@@ -32,7 +32,7 @@ public class ShutdownCommandHandler extends CommandHandler implements Documentab
 	@Override
 	protected void execute(MessageCreateEvent event) {
 		String message = SHUTDOWN_MESSAGES[(int) (Math.random() * SHUTDOWN_MESSAGES.length)];
-		new VoidAction(() -> {Brain.RESTART.set(false);})
+		new VoidAction(() -> {Brain.ALIVE.set(false);})
 				.addAction(new MessageCreateAction(event.getMessage().getChannel(), message))
 				.addAction(new ShutdownAction()).toMono().block();
 	}

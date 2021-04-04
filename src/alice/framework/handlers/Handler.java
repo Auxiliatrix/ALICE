@@ -17,7 +17,7 @@ public abstract class Handler<E extends Event> {
 	
 	protected List<String> aliases;
 	
-	protected Handler(String name, Class<E> type) {
+	private Handler(String name, Class<E> type) {
 		this.name = name;
 		this.aliases = new ArrayList<String>();
 		this.aliases.add(name);

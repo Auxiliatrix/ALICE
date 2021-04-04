@@ -152,7 +152,7 @@ public class PermissionProfile {
 		if( user.isEmpty() ) {
 			return false;
 		}
-		for( long id : Constants.DEVELOPER_IDS ) {
+		for( long id : Constants.DEVELOPERS ) {
 			if( id == user.get().getId().asLong() ) {
 				return true;
 			}
