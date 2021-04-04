@@ -5,6 +5,7 @@ import java.util.function.BiPredicate;
 import alice.framework.main.Constants;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.User;
 import discord4j.rest.util.Permission;
 
 public class PermissionProfile {
@@ -140,9 +141,9 @@ public class PermissionProfile {
 		return !member.isBot();
 	}
 	
-	public static synchronized boolean isDeveloper( Member member ) {
+	public static synchronized boolean isDeveloper( User user ) {
 		for( long id : Constants.DEVELOPERS ) {
-			if( id == member.getId().asLong() ) {
+			if( id == user.getId().asLong() ) {
 				return true;
 			}
 		}

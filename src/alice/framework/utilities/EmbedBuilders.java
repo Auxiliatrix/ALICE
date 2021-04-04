@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
+import alice.framework.features.ActiveFeature;
 import alice.framework.features.Documentable;
 import alice.framework.features.Documentable.DocumentationPair;
-import alice.framework.handlers.Handler;
+import alice.framework.features.Feature;
 import alice.framework.main.Brain;
 import alice.framework.main.Constants;
 import alice.framework.structures.PermissionProfile;
@@ -26,12 +27,12 @@ public class EmbedBuilders {
 		return c -> creditsConstructor(c);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getHelpConstructor(Optional<User> user) {
+	public static synchronized Consumer<EmbedCreateSpec> getHelpConstructor(User user) {
 		return c -> helpConstructor(c, user);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getHelpConstructor(Optional<User> user, Handler<?> module) {
-		return c -> helpConstructor(c, user, module);
+	public static synchronized Consumer<EmbedCreateSpec> getHelpConstructor(User user, Feature<?> feature) {
+		return c -> helpConstructor(c, user, feature);
 	}
 	
 	public static synchronized Consumer<EmbedCreateSpec> getErrorConstructor(String message) {
@@ -66,14 +67,14 @@ public class EmbedBuilders {
 		return c -> blacklistConstructor(c, user, rules);
 	}
 	
-	public static synchronized Consumer<EmbedCreateSpec> getModulesConstructor( List<String> enabledList, List<String> disabledList ) {
-		return c -> modulesConstructor(c, enabledList, disabledList);
+	public static synchronized Consumer<EmbedCreateSpec> getFeaturesConstructor( List<String> enabledList, List<String> disabledList ) {
+		return c -> featuresConstructor(c, enabledList, disabledList);
 	}
 	
-	private static synchronized EmbedCreateSpec modulesConstructor( EmbedCreateSpec spec, List<String> enabledList, List<String> disabledList ) {
+	private static synchronized EmbedCreateSpec featuresConstructor( EmbedCreateSpec spec, List<String> enabledList, List<String> disabledList ) {
 		spec.setColor(Color.of(63, 79, 95));
 		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
-		spec.setTitle(String.format(":gear: Modules -- %s", enabledList != null && disabledList != null ? "All" : (enabledList != null ? "Enabled" : "Disabled")));
+		spec.setTitle(String.format(":gear: Features -- %s", enabledList != null && disabledList != null ? "All" : (enabledList != null ? "Enabled" : "Disabled")));
 		
 		int count = 0;
 		int enabledCount = 0;
@@ -93,7 +94,7 @@ public class EmbedBuilders {
 			}
 		}
 
-		spec.setFooter(String.format("Total active modules: %d | Total enabled modules: %d", count, enabledCount), null);
+		spec.setFooter(String.format("Total active features: %d | Total enabled features: %d", count, enabledCount), null);
 		return spec;
 	}
 	
@@ -165,19 +166,21 @@ public class EmbedBuilders {
 		return spec;
 	}
 	
-	private static synchronized EmbedCreateSpec helpConstructor( EmbedCreateSpec spec, Optional<User> user ) {
+	@SuppressWarnings("rawtypes")
+	private static synchronized EmbedCreateSpec helpConstructor( EmbedCreateSpec spec, User user ) {
 		spec.setColor(Color.of(63, 79, 95));
 		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
 		spec.setTitle(":grey_question: Help -- Categories");
 		Map<String, List<String>> categories = new HashMap<String, List<String>>();
-		for( Handler<?> h : Brain.handlers.get() ) {
-			if( h instanceof Documentable ) {
-				Documentable d = (Documentable) h;
-				String category = d.getCategory();
-				if( !categories.containsKey(category) ) {
-					categories.put(category, new ArrayList<String>());
+		for( PriorityQueue<ActiveFeature> f : Brain.features.get().values() ) {
+			for( ActiveFeature ff : f ) {
+				if( ff instanceof Documentable ) {
+					String category = ((Documentable) ff).getCategory();
+					if( !categories.containsKey(category) ) {
+						categories.put(category, new ArrayList<String>());
+					}
+					categories.get(category).add(ff.getName());
 				}
-				categories.get(category).add(h.getName());
 			}
 		}
 		for( String key : categories.keySet() ) {
@@ -189,21 +192,21 @@ public class EmbedBuilders {
 			for( String name : names ) {
 				nameString.append(String.format(":small_blue_diamond: %s\n", name));
 			}
-			spec.addField(key, nameString.length() == 0 ? "No Modules Exist!" : nameString.toString(), false);
+			spec.addField(key, nameString.length() == 0 ? "No Features Exist!" : nameString.toString(), false);
 		}
 		return spec;
 	}
 	
-	private static synchronized EmbedCreateSpec helpConstructor( EmbedCreateSpec spec, Optional<User> user, Handler<?> module ) {
-		Documentable d = (Documentable) module;
+	private static synchronized EmbedCreateSpec helpConstructor( EmbedCreateSpec spec, User user, Feature<?> feature ) {
+		Documentable d = (Documentable) feature;
 		
 		if( d.getCategory().equals(Documentable.DEVELOPER.name()) && !PermissionProfile.isDeveloper(user) ) {
-			return errorConstructor(spec, "You must be a developer to view this module!", ERR_PERMISSION);
+			return errorConstructor(spec, "You must be a developer to view this feature!", ERR_PERMISSION);
 		}
 		
 		spec.setColor(Color.of(63, 79, 95));
 		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
-		spec.setTitle(String.format(":grey_question: %s -- %s Module", d.getCategory(), module.getName()));
+		spec.setTitle(String.format(":grey_question: %s -- %s Feature", d.getCategory(), feature.getName()));
 		spec.setDescription(d.getDescription());
 		
 		for( DocumentationPair dp : d.getUsage() ) {
@@ -219,8 +222,8 @@ public class EmbedBuilders {
 			spec.addField("Usage", sb.toString(), false);
 		}
 		
-		if( module.getAliases().size() > 1 ) {
-			String aliases = String.join(", ", module.getAliases());
+		if( feature.getAliases().size() > 1 ) {
+			String aliases = String.join(", ", feature.getAliases());
 			spec.setFooter(String.format("Aliases: %s", aliases), null);
 		}
 		return spec;

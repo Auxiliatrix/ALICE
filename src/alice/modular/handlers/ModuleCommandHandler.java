@@ -68,14 +68,14 @@ public class ModuleCommandHandler extends CommandHandler implements Documentable
 		List<String> disabledList = new ArrayList<String>(Arrays.asList(disabledArray));
 		
 		if( ts.size() < 2 ) {
-			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getModulesConstructor(enabledList, disabledList)));
+			response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getFeaturesConstructor(enabledList, disabledList)));
 		} else if( ts.size() < 3 ) {
 			switch( ts.get(1).toLowerCase() ) {
 				case "enabled":
-					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getModulesConstructor(enabledList, null)));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getFeaturesConstructor(enabledList, null)));
 					break;
 				case "disabled":
-					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getModulesConstructor(null, disabledList)));
+					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getFeaturesConstructor(null, disabledList)));
 					break;
 				default:
 					response.addAction(new MessageCreateAction(event.getMessage().getChannel(), EmbedBuilders.getHelpConstructor(event.getMessage().getAuthor(), this)));
