@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.reflections.Reflections;
 
 import alice.configuration.calibration.Constants;
+import alice.framework.features.ActiveFeature;
 import alice.framework.features.Feature;
 import alice.framework.features.HelperFeature;
 import alice.framework.structures.AtomicSaveFile;
@@ -36,7 +38,7 @@ public class Brain {
 	public static MessageChannel reportChannel;
 		
 	@SuppressWarnings("rawtypes")
-	public static AtomicReference<Map<Class, List<Feature>>> features = new AtomicReference<Map<Class, List<Feature>>>();
+	public static AtomicReference<Map<Class, PriorityQueue<ActiveFeature>>> features = new AtomicReference<Map<Class, PriorityQueue<ActiveFeature>>>();
 	@SuppressWarnings("rawtypes")
 	public static AtomicReference<Map<Class, List<HelperFeature>>> helpers = new AtomicReference<Map<Class, List<HelperFeature>>>();
 	
@@ -135,7 +137,7 @@ public class Brain {
 					}
 				}
 				
-				for( Feature f : features.get().get(event) ) {
+				for( ActiveFeature f : features.get().get(event) ) {
 					if( f.filter((Class) e) ) {
 						process.and(f.execute((Class) e));
 						break;
@@ -156,7 +158,7 @@ public class Brain {
 	
 	@SuppressWarnings("rawtypes")
 	public static Feature getFeatureByName(String name) {
-		for( List<Feature> ff : features.get().values() ) {
+		for( PriorityQueue<ActiveFeature> ff : features.get().values() ) {
 			for( Feature f : ff ) {
 				if( f.getName().equalsIgnoreCase(name) || f.getAliases().contains(name.toLowerCase()) ) {
 					return f;

@@ -7,22 +7,13 @@ import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
 public abstract class Feature<E extends Event> {
-
-	// TODO: Bring this up to a super, and change feature in brain accordingly, dont forget to implement comparable and make it a priority queue
-	public static enum PriorityClass {
-		DOMINANT,	// Prevents any other features from activating
-		STANDARD,	// Only the first Standard feature will be activated
-		SUBMISSIVE,	// Will only activate if no other features are activated
-	};
 	
 	protected String name;
 	protected List<String> aliases;
-	protected PriorityClass priority;
 	
 	protected Feature(String name, Class<E> type) {
 		this.name = name;
 		this.aliases = new ArrayList<String>();
-		this.priority = PriorityClass.STANDARD;
 		
 		load(type);
 	}
@@ -31,11 +22,6 @@ public abstract class Feature<E extends Event> {
 		for( String alias : aliases ) {
 			addAlias(alias);
 		}
-		return this;
-	}
-	
-	protected Feature<E> withPriority(PriorityClass priority) {
-		this.priority = priority;
 		return this;
 	}
 	
