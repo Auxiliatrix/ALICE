@@ -132,14 +132,16 @@ public class Brain {
 				Mono<Void> process = Mono.fromRunnable(() -> {});
 				
 				for( HelperFeature h : helpers.get().get(event) ) {
-					if( h.filter((Class) e)) {
-						process.and(h.execute((Class) e));
+					Mono<Void> response = h.handle((Class) e);
+					if( response != null ) {
+						process.and(response);
 					}
 				}
 				
 				for( ActiveFeature f : features.get().get(event) ) {
-					if( f.filter((Class) e) ) {
-						process.and(f.execute((Class) e));
+					Mono<Void> response = f.handle((Class) e);
+					if( response != null ) {
+						process.and(response);
 						break;
 					}
 				}
