@@ -5,6 +5,8 @@ import java.util.PriorityQueue;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
 import discord4j.core.event.domain.Event;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 
 public abstract class ActiveFeature<E extends Event> extends Feature<E> implements Comparable<ActiveFeature<E>> {
 
@@ -43,5 +45,9 @@ public abstract class ActiveFeature<E extends Event> extends Feature<E> implemen
 	@Override
 	public int compareTo(ActiveFeature<E> f) {
 		return priority.ordinal() - f.priority.ordinal();
+	}
+	
+	protected boolean isAllowed(Member member, Guild guild) {
+		return restriction.verify(member, guild);
 	}
 }
