@@ -1,7 +1,8 @@
 package alice.modular.features;
 
 import alice.framework.features.MessageFeature;
-import alice.framework.tasks.Wrapper;
+import alice.framework.tasks.IndependentStacker;
+import alice.framework.tasks.DependentStacker;
 import alice.modular.tasks.MessageSendTask;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -20,13 +21,15 @@ public class PingMessageFeature extends MessageFeature {
 	}
 
 	@Override
-	protected Mono<Void> respond(MessageCreateEvent type) {
-		Mono<Void> response = Mono.fromRunnable(() -> {});
+	protected Mono<?> respond(MessageCreateEvent type) {
+		IndependentStacker response = new IndependentStacker();
 		
-		Wrapper<MessageChannel> channelWrapper = new Wrapper<MessageChannel>(type.getMessage().getChannel());
+		DependentStacker<MessageChannel> channelWrapper = new DependentStacker<MessageChannel>(type.getMessage().getChannel());		
 		channelWrapper.addTask(new MessageSendTask("Pong!"));
-		response = response.and(channelWrapper.toMono());
-		return response;
+		
+		response.append(channelWrapper);
+		
+		return response.toMono();
 	}
 	
 }

@@ -137,11 +137,11 @@ public class Brain {
 	private static void subscribeFeatures() {
 		for( Class event : features.get().keySet() ) {
 			Brain.client.on(event).flatMap(e -> {
-				Mono<Void> process = Mono.fromRunnable(() -> {});
+				Mono<?> process = Mono.fromRunnable(() -> {});
 				
 				if( helpers.get().containsKey(event) ) {
 					for( HelperFeature h : helpers.get().get(event) ) {
-						Mono<Void> response = h.handle((Event) e);
+						Mono<?> response = h.handle((Event) e);
 						if( response != null ) {
 							process = process.and(response);
 						}
@@ -150,7 +150,7 @@ public class Brain {
 				
 				if( features.get().containsKey(event) ) {
 					for( ActiveFeature f : features.get().get(event) ) {
-						Mono<Void> response = f.handle((Event) e);
+						Mono<?> response = f.handle((Event) e);
 						if( response != null ) {
 							process = process.and(response);
 							break;

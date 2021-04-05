@@ -2,6 +2,7 @@ package alice.modular.tasks;
 
 import alice.framework.tasks.Task;
 import discord4j.core.object.entity.channel.MessageChannel;
+import reactor.core.publisher.Mono;
 
 public class MessageSendTask extends Task<MessageChannel> {
 
@@ -11,9 +12,10 @@ public class MessageSendTask extends Task<MessageChannel> {
 		this.message = message;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	protected void execute(MessageChannel t) {
-		t.createMessage(message).block();
+	public Mono apply(MessageChannel t) {
+		return t.createMessage(message);
 	}
 	
 }

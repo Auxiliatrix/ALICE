@@ -40,7 +40,7 @@ public abstract class Feature<E extends Event> {
 	
 	protected abstract void load(Class<E> type);
 	
-	public Mono<Void> handle(E type) {
+	public Mono<?> handle(E type) {
 		if( listen(type) ) {
 			return respond(type);
 		}
@@ -48,7 +48,7 @@ public abstract class Feature<E extends Event> {
 	}
 	
 	protected abstract boolean listen(E type);
-	protected abstract Mono<Void> respond(E type);
+	protected abstract Mono<?> respond(E type);
 		
 	public String getName() {
 		return name;
