@@ -8,6 +8,10 @@ public class ReadWriteReentrantLock {
 	private ReentrantLock readerLock;
 	private int readers;
 
+	public ReadWriteReentrantLock() {
+		this(false);
+	}
+	
 	public ReadWriteReentrantLock(boolean fair) {
 		this.writerLock = new ReentrantLock(fair);
 		this.readerLock = new ReentrantLock(fair);
@@ -24,20 +28,26 @@ public class ReadWriteReentrantLock {
 	
 	public void lockReader() {
 		readerLock.lock();
-		readers++;
-		if( readers == 1 ) {
-			lockWriter();
+		try {
+			readers++;
+			if( readers == 1 ) {
+				lockWriter();
+			}
+		} finally {
+			readerLock.unlock();
 		}
-		readerLock.unlock();
 	}
 	
 	public void unlockReader() {
 		readerLock.lock();
-		readers--;
-		if( readers == 0 ) {
-			unlockWriter();
+		try {
+			readers--;
+			if( readers == 0 ) {
+				unlockWriter();
+			}
+		} finally {
+			readerLock.unlock();
 		}
-		readerLock.unlock();
 	}
 	
 }
