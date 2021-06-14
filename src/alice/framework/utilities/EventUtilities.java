@@ -18,14 +18,7 @@ public class EventUtilities {
 	}
 	
 	public static synchronized VoiceChannel getConnectedVC(MessageCreateEvent event) {
-		VoiceChannel location = null;
-		for( GuildChannel gc : event.getGuild().block().getChannels().filter( c -> c.getType() == Type.GUILD_VOICE ).collectList().block() ) {
-			VoiceChannel vc = (VoiceChannel) gc;
-			if( vc.isMemberConnected(event.getMessage().getAuthorAsMember().block().getId()).block() ) {
-				location = vc;
-			}
-		}
-		return location;
+		return event.getMember().get().getVoiceState().block().getChannel().block();
 	}
 	
 	public static synchronized boolean getConnected(VoiceStateUpdateEvent event) {

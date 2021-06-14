@@ -11,8 +11,8 @@ import discord4j.core.event.domain.guild.MemberUpdateEvent;
 public class NicknamePassiveHandler extends Handler<MemberUpdateEvent> {
 	
 	public NicknamePassiveHandler() {
-		super("Nickname", MemberUpdateEvent.class);
-		aliases.add("nick");
+		super("NicknamePassive", MemberUpdateEvent.class);
+		aliases.add("nickp");
 	}
 
 	@Override

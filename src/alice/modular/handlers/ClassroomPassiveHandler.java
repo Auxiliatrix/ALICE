@@ -19,8 +19,8 @@ import reactor.core.publisher.Mono;
 public class ClassroomPassiveHandler extends Handler<VoiceStateUpdateEvent> {
 
 	public ClassroomPassiveHandler() {
-		super("Classroom", VoiceStateUpdateEvent.class);
-		aliases.add("class");
+		super("ClassroomPassive", VoiceStateUpdateEvent.class);
+		aliases.add("classp");
 	}
 
 	@Override

@@ -43,10 +43,8 @@ public class ClassroomCommandHandler extends CommandHandler implements Documenta
 					VoiceChannel location = EventUtilities.getConnectedVC(event);
 					if( location == null ) {
 						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getErrorConstructor("You must be connected to a voice channel!")));
-						System.out.println("Error");
 					} else {
 						response.addAction(new MessageCreateAction(channel, EmbedBuilders.getSuccessConstructor(String.format("Discord Classrooms Hub now bound to #%s", location.getName()))));
-						System.out.println("Success");
 						guildData.put("classroom_hub_channel", location.getId().asString());
 					}
 					break;

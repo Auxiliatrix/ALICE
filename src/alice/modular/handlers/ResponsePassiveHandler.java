@@ -14,8 +14,8 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 public class ResponsePassiveHandler extends MessageHandler {
 
 	public ResponsePassiveHandler() {
-		super("Response", false, PermissionProfile.getAnyonePreset().andNotDM());
-		aliases.add("resp");
+		super("ResponsePassive", false, PermissionProfile.getAnyonePreset().andNotDM());
+		aliases.add("respp");
 	}
 
 	@Override

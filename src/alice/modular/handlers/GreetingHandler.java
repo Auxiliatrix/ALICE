@@ -6,6 +6,7 @@ import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.retriever.EntityRetrievalStrategy;
 
 public class GreetingHandler extends MentionHandler implements Documentable {
 
