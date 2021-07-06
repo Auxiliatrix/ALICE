@@ -17,6 +17,7 @@ import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.MessageDeleteAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
+@Deprecated
 public class BlacklistPassiveHandler extends MessageHandler {
 
 	public BlacklistPassiveHandler() {

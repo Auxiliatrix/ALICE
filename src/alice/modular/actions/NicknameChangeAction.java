@@ -3,6 +3,7 @@ package alice.modular.actions;
 import alice.framework.actions.Action;
 import discord4j.core.object.entity.Member;
 
+@Deprecated
 public class NicknameChangeAction extends Action {
 		
 	public NicknameChangeAction(Member member, String nickname) {

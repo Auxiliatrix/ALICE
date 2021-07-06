@@ -7,6 +7,7 @@ import alice.framework.structures.PermissionProfile;
 import alice.modular.actions.MessageDeleteAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
+@Deprecated
 public class ChatMutePassiveHandler extends MessageHandler {
 
 	public ChatMutePassiveHandler() {

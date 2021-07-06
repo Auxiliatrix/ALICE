@@ -17,6 +17,7 @@ import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class HelpCommandHandler extends CommandHandler implements Documentable {
 
 	public HelpCommandHandler() {

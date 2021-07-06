@@ -7,6 +7,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.EmbedCreateSpec;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class MessageCreateAction extends Action {
 		
 	public MessageCreateAction(Mono<MessageChannel> channel, String content) {

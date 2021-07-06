@@ -11,6 +11,7 @@ import alice.modular.actions.SayAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.Channel.Type;
 
+@Deprecated
 public class EavesdropPassiveHandler extends MessageHandler implements Documentable {
 
 	public EavesdropPassiveHandler() {

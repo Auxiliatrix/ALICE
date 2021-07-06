@@ -10,6 +10,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class EchoAction extends VoidAction {
 
 	public EchoAction(String message, Optional<User> author, Mono<Guild> guild, Mono<MessageChannel> channel) {

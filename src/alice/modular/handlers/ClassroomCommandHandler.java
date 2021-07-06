@@ -19,6 +19,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class ClassroomCommandHandler extends CommandHandler implements Documentable {
 
 	public ClassroomCommandHandler() {

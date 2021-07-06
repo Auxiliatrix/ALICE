@@ -5,6 +5,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class MessageDeleteBulkAction extends Action {
 	
 	public MessageDeleteBulkAction(Mono<GuildMessageChannel> channel, String start) {

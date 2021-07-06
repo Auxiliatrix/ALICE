@@ -5,6 +5,7 @@ import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class RoleAssignAction extends Action {
 	
 	public RoleAssignAction(Mono<Member> target, Role role) {

@@ -7,6 +7,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.TextChannel;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class SayAction extends VoidAction {
 // 					User recipient = channel.cast(PrivateChannel.class).block().getRecipients().blockFirst();
 	public SayAction(String message, Mono<Guild> guild, Mono<MessageChannel> channel) {

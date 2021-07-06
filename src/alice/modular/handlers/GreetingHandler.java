@@ -7,6 +7,7 @@ import alice.framework.structures.TokenizedString;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
+@Deprecated
 public class GreetingHandler extends MentionHandler implements Documentable {
 
 	public static final String[] GREETINGS_IN = new String[] {

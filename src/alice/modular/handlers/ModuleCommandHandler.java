@@ -23,6 +23,7 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class ModuleCommandHandler extends CommandHandler implements Documentable {
 
 	public ModuleCommandHandler() {

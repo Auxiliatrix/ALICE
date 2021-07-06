@@ -6,6 +6,7 @@ import alice.framework.structures.PermissionProfile;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
+@Deprecated
 public class PingCommandHandler extends CommandHandler implements Documentable {
 	
 	public PingCommandHandler() {

@@ -8,6 +8,7 @@ import alice.modular.actions.MessageCreateAction;
 import alice.modular.actions.ShutdownAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
+@Deprecated
 public class RestartCommandHandler extends CommandHandler implements Documentable {
 	
 	public static final String[] RESTART_MESSAGES = new String[] {

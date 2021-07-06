@@ -6,6 +6,7 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.spec.GuildMemberEditSpec;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class MemberMoveChannelAction extends Action {
 
 	public MemberMoveChannelAction( Mono<Member> member, VoiceChannel channel ) {

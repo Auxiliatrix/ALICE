@@ -14,6 +14,7 @@ import alice.modular.actions.NicknameChangeAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 
+@Deprecated
 public class NicknameHandler extends MentionHandler implements Documentable {
 	
 	public NicknameHandler() {

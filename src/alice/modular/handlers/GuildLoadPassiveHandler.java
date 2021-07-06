@@ -9,6 +9,7 @@ import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
 
+@Deprecated
 public class GuildLoadPassiveHandler extends Handler<GuildCreateEvent> {
 	
 	public GuildLoadPassiveHandler() {

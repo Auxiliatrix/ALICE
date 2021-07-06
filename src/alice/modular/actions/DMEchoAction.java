@@ -7,6 +7,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.PrivateChannel;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class DMEchoAction extends VoidAction {
 
 	public DMEchoAction(String message, Mono<MessageChannel> channel) {

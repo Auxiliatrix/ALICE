@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import alice.framework.utilities.FileIO;
 
+@Deprecated
 public class AtomicSaveFile extends JSONObject {
 		 
 	private String saveFileName;

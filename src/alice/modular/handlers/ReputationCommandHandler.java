@@ -28,6 +28,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.rest.util.Permission;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class ReputationCommandHandler extends CommandHandler implements Documentable {
 
 	public ReputationCommandHandler() {

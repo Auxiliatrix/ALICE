@@ -16,6 +16,7 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.spec.VoiceChannelCreateSpec;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class ClassroomPassiveHandler extends Handler<VoiceStateUpdateEvent> {
 
 	public ClassroomPassiveHandler() {

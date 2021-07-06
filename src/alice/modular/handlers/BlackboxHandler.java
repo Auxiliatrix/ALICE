@@ -20,6 +20,7 @@ import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class BlackboxHandler extends MentionHandler implements Documentable {
 
 	public BlackboxHandler() {

@@ -10,6 +10,7 @@ import alice.framework.structures.TokenizedString;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
+@Deprecated
 public class ThankHandler extends MessageHandler implements Documentable {
 
 	public ThankHandler() {

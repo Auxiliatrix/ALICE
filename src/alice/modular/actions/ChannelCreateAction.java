@@ -8,6 +8,7 @@ import discord4j.core.spec.TextChannelCreateSpec;
 import discord4j.core.spec.VoiceChannelCreateSpec;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class ChannelCreateAction extends Action {
 	
 	public ChannelCreateAction(Mono<Guild> guild, Mono<Category> category, String channelName, Type channelType) {

@@ -1,5 +1,9 @@
 package alice.configuration.references;
 
+/**
+ * A reference file containing synonyms for various commands. Use only to infer commands, not as a primary command structure.
+ * @author Auxiliatrix
+ */
 public class Keywords {
 	
 	public static final String[] CREATE = new String[] {

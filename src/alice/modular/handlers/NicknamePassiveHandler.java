@@ -8,6 +8,7 @@ import alice.framework.structures.AtomicSaveFile;
 import alice.modular.actions.NicknameChangeAction;
 import discord4j.core.event.domain.guild.MemberUpdateEvent;
 
+@Deprecated
 public class NicknamePassiveHandler extends Handler<MemberUpdateEvent> {
 	
 	public NicknamePassiveHandler() {

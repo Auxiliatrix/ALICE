@@ -13,6 +13,7 @@ import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
 
+@Deprecated
 public class ChatMuteCommandHandler extends CommandHandler implements Documentable {
 	
 	public ChatMuteCommandHandler() {

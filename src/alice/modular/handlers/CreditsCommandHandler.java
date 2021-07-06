@@ -7,6 +7,7 @@ import alice.framework.utilities.EmbedBuilders;
 import alice.modular.actions.MessageCreateAction;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 
+@Deprecated
 public class CreditsCommandHandler extends CommandHandler implements Documentable {
 	
 	public CreditsCommandHandler() {

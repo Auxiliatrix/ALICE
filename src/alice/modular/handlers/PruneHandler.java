@@ -17,6 +17,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
 
+@Deprecated
 public class PruneHandler extends MentionHandler implements Documentable {
 
 	public PruneHandler() {

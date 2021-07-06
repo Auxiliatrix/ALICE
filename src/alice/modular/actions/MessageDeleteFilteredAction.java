@@ -8,6 +8,7 @@ import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.GuildMessageChannel;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class MessageDeleteFilteredAction extends Action {
 	
 	public MessageDeleteFilteredAction(Mono<GuildMessageChannel> channel, Snowflake end, Predicate<? super Message> filter) {

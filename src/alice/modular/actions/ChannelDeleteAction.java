@@ -5,6 +5,7 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Guild;
 import reactor.core.publisher.Mono;
 
+@Deprecated
 public class ChannelDeleteAction extends Action {
 	
 	public ChannelDeleteAction(Mono<Guild> guild, Snowflake id) {
