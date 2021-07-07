@@ -93,7 +93,7 @@ public abstract class Feature<E extends Event> {
 	 * @param exclusionClass
 	 * @return the modified Feature
 	 */
-	protected ActiveFeature<E> withExclusionClass(@Nullable ExclusionClass exclusionClass) {
+	protected Feature<E> withExclusionClass(@Nullable ExclusionClass exclusionClass) {
 		this.exclusionClass = exclusionClass;
 		return this;
 	}
