@@ -14,7 +14,7 @@ import reactor.util.annotation.Nullable;
  *
  * @param <E> Event class to activate on
  */
-public abstract class ActiveFeature<E extends Event> extends Feature<E> implements Comparable<ActiveFeature<E>> {
+public abstract class ActiveFeature<E extends Event> extends Feature<E> {
 	
 	/**
 	 * A collection of permissions required in order for a user to trigger this Feature.

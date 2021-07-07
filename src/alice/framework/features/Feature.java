@@ -18,7 +18,7 @@ import reactor.util.annotation.Nullable;
  *
  * @param <E> Event class to respond to
  */
-public abstract class Feature<E extends Event> {
+public abstract class Feature<E extends Event> implements Comparable<Feature<E>> {
 	
 	// TODO: rename documentation variables "type" and "event instance/class" for consistency
 	
@@ -181,5 +181,18 @@ public abstract class Feature<E extends Event> {
 		AtomicSaveFile guildData = Brain.guildIndex.get(guildId);
 			// TODO: exception handling
 		return (!whitelist || guildData.has(String.format("%s%s", ENABLE_PREFIX, name))) && !guildData.has(String.format("%s%s", DISABLE_PREFIX, name));
+	}
+	
+	@Override
+	public int compareTo(Feature<E> f) {
+		if( this.exclusionClass == null && f.getExclusionClass() == null ) {
+			return 0;
+		} else if( this.exclusionClass == null ) {
+			return -1;
+		} else if( f.getExclusionClass() == null ) {
+			return 1;
+		} else {
+			return this.exclusionClass.ordinal() - f.getExclusionClass().ordinal();
+		}
 	}
 }
