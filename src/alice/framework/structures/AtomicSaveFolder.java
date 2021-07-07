@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
+@Deprecated
 @SuppressWarnings("serial")
 public class AtomicSaveFolder extends HashMap<String, AtomicSaveFile> {
 	
