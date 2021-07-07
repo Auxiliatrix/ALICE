@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class StringUtilities {
 
-	public static final String QUOTED_PATTERN = "[\"“”]([^\"“”]+)[\"“”]";
+	public static final String QUOTED_PATTERN = "[\"“”]([^\"“”]+)[\"“”]"; // Any quotation symbol, followed by one or more non-quotation symbols, and ending with a quotation symbol
 	
 	// Taken from https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Java
 	public static int levenshteinDistance(String stringA, String stringB) {                          

@@ -5,47 +5,94 @@ import java.util.List;
 
 import alice.framework.utilities.StringUtilities;
 
+/**
+ * A String wrapper with built in utility functions for parsing instant messages.
+ * @author Auxiliatrix
+ *
+ */
 public class TokenizedString {
 	
+	/**
+	 * The original unalterted content of the message this object was constructed from.
+	 */
 	private String originalString;
 	
+	/**
+	 * The tokens that will currently be returned from this object's functions.
+	 */
 	private List<String> activeTokens;
+	
+	/**
+	 * All the tokens available.
+	 */
 	private List<String> allTokens;
+	
+	/**
+	 * All tokens that are not within quotation marks.
+	 */
 	private List<String> unquotedTokens;
+	
+	/**
+	 * All tokens contained within quotation marks.
+	 */
 	private List<String> quotedTokens;
 	
-	public TokenizedString(String string) {
+	/**
+	 * Construct a TokenizedString object from a given String.
+	 * @param string String to construct from
+	 */
+	public TokenizedString(String string) {								// Given the following String: "Hello" world!
 		originalString = string;
-		
-		allTokens = StringUtilities.getAllTokens(string);
-		unquotedTokens = StringUtilities.getUnquotedTokens(string);
-		quotedTokens = StringUtilities.getQuotedTokens(string);
+																		// The following would contain:
+		allTokens = StringUtilities.getAllTokens(string);				// "Hello", "world!"
+		unquotedTokens = StringUtilities.getUnquotedTokens(string);		// "world!"
+		quotedTokens = StringUtilities.getQuotedTokens(string);			// "Hello"
 		
 		activeTokens = new ArrayList<String>(allTokens);
 	}
 	
+	/**
+	 * Create a copy of this object that only uses the tokens contained within quotation marks.
+	 * @return A copy of this object
+	 */
 	public TokenizedString quotedOnly() {
 		TokenizedString copy = new TokenizedString(originalString);
 		copy.activeTokens = new ArrayList<String>(copy.quotedTokens);
 		return copy;
 	}
 	
+	/**
+	 * Create a copy of this object that only uses the tokens not contained within quotation marks.
+	 * @return A copy of this object
+	 */
 	public TokenizedString unquotedOnly() {
 		TokenizedString copy = new TokenizedString(originalString);
 		copy.activeTokens = new ArrayList<String>(copy.unquotedTokens);
 		return copy;
 	}
 	
+	/**
+	 * Create a copy of this object that uses all of the tokens.
+	 * @return A copy of this object
+	 */
 	public TokenizedString inclusive() {
 		TokenizedString copy = new TokenizedString(originalString);
 		copy.activeTokens = new ArrayList<String>(copy.allTokens);
 		return copy;
 	}
 	
+	/**
+	 * Get the active tokens in this object.
+	 * @return ArrayList of String tokens
+	 */
 	public List<String> getTokens() {
 		return new ArrayList<String>(activeTokens);
 	}
 	
+	/**
+	 * Get the numbered tokens in this object.
+	 * @return Arraylist of Integer tokens
+	 */
 	public List<Integer> getNumbers() {
 		List<Integer> numbers = new ArrayList<Integer>();
 		for( String token : activeTokens ) {
@@ -57,22 +104,46 @@ public class TokenizedString {
 		return numbers;
 	}
 	
+	/**
+	 * Get the token at a certain index.
+	 * @param index int to look up
+	 * @return String token at that index
+	 */
 	public String get(int index) {
 		return activeTokens.get(index);
 	}
 	
+	/**
+	 * Get the number of active tokens.
+	 * @return the number of active tokens
+	 */
 	public int size() {
 		return activeTokens.size();
 	}
 	
+	/**
+	 * Compare whether the original message String is the same as another.
+	 * @param string String to compare to
+	 * @return whether or not the Strings are equal
+	 */
 	public boolean equals(String string) {
 		return originalString.equals(string);
 	}
 	
+	/**
+	 * Compare whether the original message String is the same as another, ignoring case.
+	 * @param string String to compare to
+	 * @return whether or not the Strings are equal ignoring case
+	 */
 	public boolean equalsIgnoreCase(String string) {
 		return originalString.equalsIgnoreCase(string);
 	}
 	
+	/**
+	 * Compare whether the original message String is the same as any of a collection of Strings.
+	 * @param strings String objects to compare to
+	 * @return whether or not this String is equal to one of those given
+	 */
 	public boolean equalsAny(String...strings) {
 		for( String string : strings ) {
 			if( equals(string) ) {
@@ -82,6 +153,11 @@ public class TokenizedString {
 		return false;
 	}
 	
+	/**
+	 * Compare whether the original message String is the same as any of a collection of Strings, ignoring case.
+	 * @param strings String objects to compare to
+	 * @return whether or not this String is equal to one of those given ignoring case
+	 */
 	public boolean equalsAnyIgnoreCase(String...strings) {
 		for( String string : strings ) {
 			if( equalsIgnoreCase(string) ) {
