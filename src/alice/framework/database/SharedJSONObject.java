@@ -28,71 +28,71 @@ public class SharedJSONObject {
 	
 	/* Getter Functions */
 	public Object get(String key) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.get(k), key);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.get(key));
 	}
 	
 	public boolean getBoolean(String key) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.getBoolean(k), key);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getBoolean(key));
 	}
 	
 	public String getString(String key) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.getString(k), key);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getString(key));
 	}
 	
 	public int getInt(String key) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.getInt(k), key);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getInt(key));
 	}
 	
 	public double getDouble(String key) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.getDouble(k), key);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getDouble(key));
 	}
 	
 	public SharedJSONArray getSharedJSONArray(String key) {
-		return new SharedJSONArray(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.getJSONArray(k), key));
+		return new SharedJSONArray(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getJSONArray(key)));
 	}
 	
 	public SharedJSONObject getSharedJSONObject(String key) {
-		return new SharedJSONObject(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.getJSONObject(k), key));
+		return new SharedJSONObject(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getJSONObject(key)));
 	}
 	
 	public boolean has(String key) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.has(k), key);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.has(key));
 	}
 	
 	public Iterator<String> getKeys() {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> object.keys(), null);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.keys());
 	}
 	
 	/* Setter Functions */
 	public void put(String key, Object o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> object.put(k, v), key, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
 	public void putBoolean(String key, boolean o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> object.put(k, v), key, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
 	public void getString(String key, String o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> object.put(k, v), key, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
 	public void putInt(String key, int o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> object.put(k, v), key, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
 	public void putDouble(String key, double o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> object.put(k, v), key, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
 	public void putJSONArray(String key, JSONArray o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> object.put(k, v), key, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
 	public void putJSONObject(String key, JSONObject o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> object.put(k, v), key, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
 	public void remove(String key) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, k -> object.remove(k), key);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.remove(key));
 	}
 }

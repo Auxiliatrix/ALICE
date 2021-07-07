@@ -20,74 +20,104 @@ public class SharedJSONArray {
 		this.array = array;
 	}
 	
+	// TODO: can only put json objects from a shared interface
+	
 	/* Getter Functions */
 	public Object get(int index) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.get(k), index);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.get(index));
 	}
 	
 	public boolean getBoolean(int index) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.getBoolean(k), index);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.getBoolean(index));
 	}
 	
 	public String getString(int index) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.getString(k), index);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.getString(index));
 	}
 	
 	public int getInt(int index) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.getInt(k), index);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.getInt(index));
 	}
 	
 	public double getDouble(int index) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.getDouble(k), index);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.getDouble(index));
 	}
 	
 	public SharedJSONArray getSharedJSONArray(int index) {
-		return new SharedJSONArray(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.getJSONArray(k), index));
+		return new SharedJSONArray(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.getJSONArray(index)));
 	}
 	
 	public SharedJSONObject getSharedJSONObject(int index) {
-		return new SharedJSONObject(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.getJSONObject(k), index));
+		return new SharedJSONObject(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.getJSONObject(index)));
 	}
 	
 	public boolean isNull(int index) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.isNull(k), index);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.isNull(index));
 	}
 	
 	public int length() {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, k -> array.length(), null);
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.length());
 	}
 	
 	/* Setter Functions */
+	public void put(Object o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
+	}
+	
+	public void putBoolean(boolean o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
+	}
+	
+	public void putString(String o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
+	}
+	
+	public void putInteger(int o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
+	}
+	
+	public void putDouble(double o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
+	}
+	
+	public void putJSONArray(JSONArray o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
+	}
+	
+	public void putJSONObject(JSONObject o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
+	}
+	
 	public void put(int index, Object o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> array.put(k, v), index, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
 	public void putBoolean(int index, boolean o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> array.put(k, v), index, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
 	public void getString(int index, String o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> array.put(k, v), index, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
 	public void putInt(int index, int o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> array.put(k, v), index, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
 	public void putDouble(int index, double o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> array.put(k, v), index, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
 	public void putJSONArray(int index, JSONArray o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> array.put(k, v), index, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
 	public void putJSONObject(int index, JSONObject o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, (k, v) -> array.put(k, v), index, o);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
 	public void remove(int index) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, k -> array.remove(k), index);
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.remove(index));
 	}
 	
 }
