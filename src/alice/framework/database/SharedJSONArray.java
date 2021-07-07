@@ -21,7 +21,7 @@ public class SharedJSONArray {
 		this.array = array;
 	}
 	
-	// TODO: type checking
+	// TODO: currently returns object so that it can return null if object not found; might be better to simply cast nulls to 0, or to allow errors to filter through
 	
 	/* Atomic Getter Functions */
 	public Object get(int index) {

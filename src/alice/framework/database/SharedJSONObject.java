@@ -28,6 +28,8 @@ public class SharedJSONObject {
 		this.object = object;
 	}
 	
+	// TODO: currently returns object so that it can return null if object not found; might be better to simply cast nulls to 0, or to allow errors to filter through
+	
 	/* Atomic Getter Functions */
 	public Object get(String key) {
 		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.get(key)); } catch (JSONException j) {return null;}
