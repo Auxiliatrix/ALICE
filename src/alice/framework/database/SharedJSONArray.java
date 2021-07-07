@@ -21,8 +21,9 @@ public class SharedJSONArray {
 	}
 	
 	// TODO: can only put json objects from a shared interface
+	// TODO: type checking
 	
-	/* Getter Functions */
+	/* Atomic Getter Functions */
 	public Object get(int index) {
 		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.get(index));
 	}
@@ -59,7 +60,7 @@ public class SharedJSONArray {
 		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> array.length());
 	}
 	
-	/* Setter Functions */
+	/* Atomic Setter Functions */
 	public void put(Object o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
 	}
@@ -108,12 +109,22 @@ public class SharedJSONArray {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
 	}
 	
+	/**
+	 * Inserts a shallow copy of the given JSONArray into the given index.
+	 * @param index int location to insert the object into
+	 * @param o JSONArray to insert
+	 */
 	public void putJSONArray(int index, JSONArray o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, new JSONArray(o)));
 	}
 	
+	/**
+	 * Inserts a shallow copy of the given JSONObject into the given index.
+	 * @param index int location to insert the object into
+	 * @param o JSONObject to insert
+	 */
 	public void putJSONObject(int index, JSONObject o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, new JSONObject(o)));
 	}
 	
 	public void remove(int index) {

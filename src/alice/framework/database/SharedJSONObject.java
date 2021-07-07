@@ -26,7 +26,7 @@ public class SharedJSONObject {
 		this.object = object;
 	}
 	
-	/* Getter Functions */
+	/* Atomic Getter Functions */
 	public Object get(String key) {
 		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.get(key));
 	}
@@ -63,7 +63,7 @@ public class SharedJSONObject {
 		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.keys());
 	}
 	
-	/* Setter Functions */
+	/* Atomic Setter Functions */
 	public void put(String key, Object o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
@@ -84,14 +84,23 @@ public class SharedJSONObject {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
+	/**
+	 * Associates a shallow copy of the given JSONArray with the given key.
+	 * @param key String to associate the object with
+	 * @param o JSONArray to insert
+	 */
 	public void putJSONArray(String key, JSONArray o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, new JSONArray(o)));
 	}
 	
+	/**
+	 * Associates a shallow copy of the given JSONObject with the given key.
+	 * @param key String to associate the object with
+	 * @param o JSONObject to insert
+	 */
 	public void putJSONObject(String key, JSONObject o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, new JSONObject(o)));
 	}
-	
 	public void remove(String key) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.remove(key));
 	}
