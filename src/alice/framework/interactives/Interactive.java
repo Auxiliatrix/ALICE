@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.reaction.Reaction;
 
+// TODO: this entire thing
 public abstract class Interactive {
 	
 	protected Snowflake id;
