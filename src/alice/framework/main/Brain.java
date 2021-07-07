@@ -16,7 +16,6 @@ import org.reflections.Reflections;
 import alice.framework.features.ActiveFeature;
 import alice.framework.features.Documentable;
 import alice.framework.features.Feature;
-import alice.framework.features.HelperFeature;
 import alice.framework.structures.AtomicSaveFile;
 import alice.framework.structures.AtomicSaveFolder;
 import alice.framework.utilities.AliceLogger;
@@ -44,12 +43,6 @@ public class Brain {
 	/* CLASS SHOULD BE OF TYPE EVENT BUT THIS IS NOT ENFORCED */
 	@SuppressWarnings("rawtypes")	// Maps Events to a list of Features they should trigger, ordered by priority
 	public static AtomicReference<Map<Class, PriorityQueue<ActiveFeature>>> features = new AtomicReference<Map<Class, PriorityQueue<ActiveFeature>>>();
-	@SuppressWarnings("rawtypes")	// Maps Events to a list of helper Features they should trigger, ordered arbitrarily
-	public static AtomicReference<Map<Class, List<HelperFeature>>> helpers = new AtomicReference<Map<Class, List<HelperFeature>>>();
-		/*
-		 * Alternative design patterns:
-		 *  - Make Active/Helper a variable distinction
-		 */
 	
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
@@ -60,14 +53,12 @@ public class Brain {
 		
 		// Initialize Feature maps
 		features.set(new HashMap<Class, PriorityQueue<ActiveFeature>>());
-		helpers.set(new HashMap<Class, List<HelperFeature>>());
 		
 		while( ALIVE.get() ) {		// Primary system loop
 			AliceLogger.info("Starting up...");
 			
 			// Cleanup in case this is a restart
 			features.get().clear();
-			helpers.get().clear();
 			
 			reload();				// Reload guild data
 			login(args[0]);			// Log in to server
@@ -169,21 +160,35 @@ public class Brain {
 			Brain.client.on(event).flatMap(e -> {						// When the event is received
 				Mono<?> process = Mono.fromRunnable(() -> {});
 				
-				if( helpers.get().containsKey(event) ) {
-					for( HelperFeature h : helpers.get().get(event) ) {	// For every associated Helper Feature
-						Mono<?> response = h.handle((Event) e);			// Process the event through the Helper
-						if( response != null ) {
-							process = process.and(response);			// Add the response to the queue
-						}
-					}
-				}
-				
+				// TODO: handle event superclasses also needing to trigger
 				if( features.get().containsKey(event) ) {
+					boolean dominant = false;	// Whether a dominant Feature has activated
+					boolean standard = false;	// Whether a standard Feature has activated
 					for( ActiveFeature f : features.get().get(event) ) {	// For every associated Feature
 						Mono<?> response = f.handle((Event) e);				// Process the event through the Feature
-						if( response != null ) {							// If the Feature produces a response
-							process = process.and(response);				// Add the response to the queue
-							break;											// Don't process any more Features
+						if( response != null ) {
+							switch( f.getExclusionClass() ) {
+							
+								// Handle exclusion cases
+								case DOMINANT:	// Dominant Features activate no matter what
+									process = process.and(response);
+									dominant = true;
+									break;
+								case STANDARD:	// Standard Features activate if no Dominant Features have
+									if( !dominant ) {
+										process = process.and(response);
+										standard = true;
+									}
+									break;
+								case SUBMISSIVE:	// Submissive Features activate if no Dominant or Submissive Features have
+									if( !dominant && !standard ) {
+										process = process.and(response);
+									}
+									break;
+								default:	// Features with no ExclusionClass will activate no matter what, and not affect the activation of other Features
+									process = process.and(response);
+									break;
+							}
 						}
 					}
 				}
