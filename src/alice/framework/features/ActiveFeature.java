@@ -17,22 +17,6 @@ import reactor.util.annotation.Nullable;
 public abstract class ActiveFeature<E extends Event> extends Feature<E> implements Comparable<ActiveFeature<E>> {
 	
 	/**
-	 * Each Exclusion Class that is activated will prevent the activation of any Features in the Exclusion Classes below it.
-	 * @author Auxiliatrix
-	 *
-	 */
-	public static enum ExclusionClass {
-		DOMINANT,	// Prevents non-dominant Features from activating. Best used with Features that alter save data, or important soft-matched Features to prevent overlap with other trigger conditions.
-		STANDARD,	// In most cases, this Feature will be activated as intended. Best used with hard-matched cases that are mostly self-contained.
-		SUBMISSIVE,	// Will only activate if no non-submissive Features are activated. Best used with soft-matching Features to prevent collisions with hard-matched ones.
-	};
-	
-	/**
-	 * What Exclusion Class this Feature belongs to. If set to null, this Feature will not stop any other Features from activating, nor will it be stopped by any other Features.
-	 */
-	protected ExclusionClass exclusionClass;
-	
-	/**
 	 * A collection of permissions required in order for a user to trigger this Feature.
 	 */
 	protected PermissionProfile restriction;
@@ -44,18 +28,7 @@ public abstract class ActiveFeature<E extends Event> extends Feature<E> implemen
 	 */
 	protected ActiveFeature(String name, Class<E> type) {
 		super(name, type);
-		withExclusionClass(null);
 		withRestriction(PermissionProfile.getAnyonePreset());
-	}
-	
-	/**
-	 * Set the Exclusion Class of this Feature. Can be null.
-	 * @param exclusionClass
-	 * @return the modified Feature
-	 */
-	protected ActiveFeature<E> withExclusionClass(@Nullable ExclusionClass exclusionClass) {
-		this.exclusionClass = exclusionClass;
-		return this;
 	}
 	
 	/**

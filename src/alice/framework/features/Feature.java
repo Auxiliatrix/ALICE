@@ -3,10 +3,12 @@ package alice.framework.features;
 import java.util.ArrayList;
 import java.util.List;
 
+import alice.framework.features.ActiveFeature.ExclusionClass;
 import alice.framework.main.Brain;
 import alice.framework.structures.AtomicSaveFile;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 
 /**
  * An objective container for the logic of a subscribed event.
@@ -19,6 +21,22 @@ import reactor.core.publisher.Mono;
 public abstract class Feature<E extends Event> {
 	
 	// TODO: rename documentation variables "type" and "event instance/class" for consistency
+	
+	/**
+	 * Each Exclusion Class that is activated will prevent the activation of any Features in the Exclusion Classes below it.
+	 * @author Auxiliatrix
+	 *
+	 */
+	public static enum ExclusionClass {
+		DOMINANT,	// Prevents non-dominant Features from activating. Best used with Features that alter save data, or important soft-matched Features to prevent overlap with other trigger conditions.
+		STANDARD,	// In most cases, this Feature will be activated as intended. Best used with hard-matched cases that are mostly self-contained.
+		SUBMISSIVE,	// Will only activate if no non-submissive Features are activated. Best used with soft-matching Features to prevent collisions with hard-matched ones.
+	};
+	
+	/**
+	 * What Exclusion Class this Feature belongs to. If set to null, this Feature will not stop any other Features from activating, nor will it be stopped by any other Features.
+	 */
+	protected ExclusionClass exclusionClass;
 	
 	// Constants to check for in guild data to check if module is enabled or disabled
 	protected static final String ENABLE_PREFIX = "module_enable_";
@@ -53,7 +71,7 @@ public abstract class Feature<E extends Event> {
 		this.aliases = new ArrayList<String>();
 		this.whitelist = false;
 		addAlias(name);
-		
+		withExclusionClass(null);
 		load(type);
 	}
 	
@@ -67,6 +85,16 @@ public abstract class Feature<E extends Event> {
 		for( String alias : aliases ) {
 			addAlias(alias);
 		}
+		return this;
+	}
+	
+	/**
+	 * Set the Exclusion Class of this Feature. Can be null.
+	 * @param exclusionClass
+	 * @return the modified Feature
+	 */
+	protected ActiveFeature<E> withExclusionClass(@Nullable ExclusionClass exclusionClass) {
+		this.exclusionClass = exclusionClass;
 		return this;
 	}
 	
@@ -134,6 +162,14 @@ public abstract class Feature<E extends Event> {
 	public void addAlias(String alias) {
 			// TODO: null checking
 		this.aliases.add(alias);
+	}
+	
+	/**
+	 * Get the ExclusionClass for this Feature.
+	 * @return ExclusionClass of this Feature
+	 */
+	public ExclusionClass getExclusionClass() {
+		return exclusionClass;
 	}
 	
 	/**
