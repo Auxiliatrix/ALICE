@@ -1,6 +1,7 @@
 package alice.framework.database;
 
 import java.util.Iterator;
+import java.util.function.Function;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -101,6 +102,35 @@ public class SharedJSONObject {
 	public void putJSONObject(String key, JSONObject o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, new JSONObject(o)));
 	}
+	
+	public void modify(String key, Function<Object, Object> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(object.get(key))));
+	}
+	
+	public void modifyBoolean(String key, Function<Boolean, Boolean> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(object.getBoolean(key))));
+	}
+	
+	public void modifyString(String key, Function<String, String> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(object.getString(key))));
+	}
+	
+	public void modifyInt(String key, Function<Integer, Integer> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(object.getInt(key))));
+	}
+	
+	public void modifyDouble(String key, Function<Double, Double> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(object.getDouble(key))));
+	}
+	
+	public void modifyJSONArray(String key, Function<JSONArray, JSONArray> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(new JSONArray(object.getJSONArray(key)))));	// New JSONArray constructed to prevent copying from within the modifier
+	}
+	
+	public void modifyJSONObject(String key, Function<JSONObject, JSONObject> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(new JSONObject(object.getJSONObject(key)))));
+	}
+	
 	public void remove(String key) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.remove(key));
 	}

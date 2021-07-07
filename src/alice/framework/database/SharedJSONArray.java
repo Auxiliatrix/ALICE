@@ -1,6 +1,6 @@
 package alice.framework.database;
 
-import java.util.Iterator;
+import java.util.function.Function;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -73,7 +73,7 @@ public class SharedJSONArray {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
 	}
 	
-	public void putInteger(int o) {
+	public void putInt(int o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(o));
 	}
 	
@@ -125,6 +125,34 @@ public class SharedJSONArray {
 	 */
 	public void putJSONObject(int index, JSONObject o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, new JSONObject(o)));
+	}
+	
+	public void modify(int index, Function<Object, Object> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, modifyFunction.apply(array.get(index))));
+	}
+	
+	public void modifyBoolean(int index, Function<Boolean, Boolean> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, modifyFunction.apply(array.getBoolean(index))));
+	}
+	
+	public void modifyString(int index, Function<String, String> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, modifyFunction.apply(array.getString(index))));
+	}
+	
+	public void modifyInt(int index, Function<Integer, Integer> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, modifyFunction.apply(array.getInt(index))));
+	}
+	
+	public void modifyDouble(int index, Function<Double, Double> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, modifyFunction.apply(array.getDouble(index))));
+	}
+	
+	public void modifyJSONArray(int index, Function<JSONArray, JSONArray> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, modifyFunction.apply(new JSONArray(array.getJSONArray(index)))));	// New JSONArray constructed to prevent copying from within the modifier
+	}
+	
+	public void modifyJSONObject(int index, Function<JSONObject, JSONObject> modifyFunction) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> array.put(index, modifyFunction.apply(new JSONObject(array.getJSONObject(index)))));
 	}
 	
 	public void remove(int index) {
