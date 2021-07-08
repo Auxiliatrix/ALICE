@@ -1,10 +1,8 @@
 package alice.framework.main;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -13,17 +11,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.reflections.Reflections;
 
+import alice.framework.database.SharedSaveFile;
 import alice.framework.features.ActiveFeature;
 import alice.framework.features.Documentable;
 import alice.framework.features.Feature;
-import alice.framework.structures.AtomicSaveFile;
-import alice.framework.structures.AtomicSaveFolder;
 import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
@@ -35,17 +33,17 @@ public class Brain {
 	public static GatewayDiscordClient client = null;						// Discord client object
 	public static AtomicBoolean ALIVE = new AtomicBoolean(true);			// Global variable to determine if shutdown is a restart command
 
-	public static AtomicSaveFolder guildIndex = new AtomicSaveFolder();		// Map which stores abstracted guild data objects
 	public static MessageChannel reportChannel;								// Hard-coded text channel to send error messages to
 		// TODO: check for null
 		// TODO: move to constants file
-		
+	
 	/* CLASS SHOULD BE OF TYPE EVENT BUT THIS IS NOT ENFORCED */
 	@SuppressWarnings("rawtypes")	// Maps Events to a list of Features they should trigger, ordered by priority
 	public static AtomicReference<Map<Class, PriorityQueue<ActiveFeature>>> features = new AtomicReference<Map<Class, PriorityQueue<ActiveFeature>>>();
 	
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
+		System.out.println("Saved");
 		if ( args.length < 1 ) {	// Checks if a token was passed
 			AliceLogger.error("Please pass the TOKEN as the first argument.");
 			System.exit(0);
@@ -60,8 +58,8 @@ public class Brain {
 			// Cleanup in case this is a restart
 			features.get().clear();
 			
-			reload();				// Reload guild data
 			login(args[0]);			// Log in to server
+			reload();				// Reload guild data
 			subscribeFeatures();	// Run subscription functions for features
 			
 			reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
@@ -75,22 +73,14 @@ public class Brain {
 	}
 	
 	/**
-	 * Reloads guild save data files from a hard-coded directory
+	 * Reloads guild save data files for each registered Guild
 	 */
 	private static void reload() {
 		AliceLogger.info("Reloading save data...");
-
-		File folder = new File(Constants.GUILD_DATA_DIRECTORY);	// Directory path taken from constants file
-			// TODO: Find dynamically or package with directory included
-		if( folder.isDirectory() ) {
-			for( File file : folder.listFiles() ) {
-				String fileName = file.getName();
-				String guildId = fileName.indexOf(".") > 0 ? fileName.substring(0, fileName.indexOf(".")) : fileName;
-
-				String guildFile = String.format("%s%s%s%s%s.json", "tmp", File.separator, "guilds", File.separator, guildId);
-				Brain.guildIndex.put(guildId, new AtomicSaveFile(guildFile));	// Creates a new abstracted save file and saves it to the global guild save data map
-				AliceLogger.info(String.format("Loaded guild data for %s.", guildId), 1);
-			}
+		for( Guild guild : client.getGuilds().collectList().block() ) {
+			@SuppressWarnings("unused")
+			SharedSaveFile guildData = new SharedSaveFile(guild.getId().asLong());
+			AliceLogger.info(String.format("Loaded guild data for %s.", guild.getName()), 1);
 		}
 	}
 	

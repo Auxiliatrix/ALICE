@@ -46,17 +46,21 @@ public class DependentStacker<T> extends Stacker {
 	/**
 	 * Stacks a Task whose executable response depends on the dependency mono.
 	 * @param task Task to stack
+	 * @return Mono<?> cumulated executable response so far
 	 */
-	public void addTask(Function<T, Mono<?>> task) {
+	public Mono<?> addTask(Function<T, Mono<?>> task) {
 		tasks.add(task);
+		return toMono();
 	}
 	
 	/**
 	 * Stacks an effect which depends on the dependency Mono
 	 * @param consumer Consumer effect to stack
+	 * @return Mono<?> cumulated executable response so far
 	 */
-	public void addEffect(Consumer<T> consumer) {
+	public Mono<?> addEffect(Consumer<T> consumer) {
 		effects.add(consumer);
+		return toMono();
 	}
 	
 	@Override

@@ -18,7 +18,10 @@ public class Constants {
 
 
 	/* File System Data */
-	public static final String GUILD_DATA_DIRECTORY = "tmp/guilds";
+	public static final String TEMP_DATA_DIRECTORY = "tmp";
+	public static final String GUILD_DATA_SUBDIRECTORY = "guilds";
+	
+	public static final String DEFAULT_GUILD_DATA = "{}";
 
 	public static final String[] FEATURE_WHITELIST = new String[] {
 			"alice.modular.features",

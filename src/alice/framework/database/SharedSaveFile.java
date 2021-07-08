@@ -1,15 +1,13 @@
 package alice.framework.database;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.json.JSONObject;
 
+import alice.framework.main.Constants;
 import alice.framework.utilities.FileIO;
 import alice.framework.utilities.ReadWriteReentrantLock;
 
@@ -32,13 +30,17 @@ public class SharedSaveFile extends SharedJSONObject {
 	 */
 	protected static Map<String, JSONObject> cache = new HashMap<String, JSONObject>();
 	
+	public SharedSaveFile(long guildId) {
+		this(String.format("%s%s%s%s%s.json", Constants.TEMP_DATA_DIRECTORY, File.separator, Constants.GUILD_DATA_SUBDIRECTORY, File.separator, guildId));
+	}
+	
 	/**
 	 * Constructs an accessing interface for the given save file name.
 	 * It also updates the static maps accordingly.
 	 * @param saveFileName String name of the file being accessed
 	 */
 	public SharedSaveFile(String saveFileName) {
-		super(saveFileName, new JSONObject(FileIO.readFromFile(saveFileName, "")));
+		super(saveFileName, new JSONObject(FileIO.readFromFile(saveFileName, Constants.DEFAULT_GUILD_DATA)));
 
 		if( !lockMap.containsKey(saveFileName) ) {
 			lockMap.put(saveFileName, new ReadWriteReentrantLock(true));

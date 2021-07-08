@@ -3,9 +3,7 @@ package alice.framework.features;
 import java.util.ArrayList;
 import java.util.List;
 
-import alice.framework.features.ActiveFeature.ExclusionClass;
-import alice.framework.main.Brain;
-import alice.framework.structures.AtomicSaveFile;
+import alice.framework.database.SharedSaveFile;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
@@ -177,8 +175,8 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 	 * @param guildId String to identify the Guild in which to check
 	 * @return whether or not this Feature is enabled
 	 */
-	public boolean isEnabled( String guildId ) {
-		AtomicSaveFile guildData = Brain.guildIndex.get(guildId);
+	public boolean isEnabled( long guildId ) {
+		SharedSaveFile guildData = new SharedSaveFile(guildId);
 			// TODO: exception handling
 		return (!whitelist || guildData.has(String.format("%s%s", ENABLE_PREFIX, name))) && !guildData.has(String.format("%s%s", DISABLE_PREFIX, name));
 	}
