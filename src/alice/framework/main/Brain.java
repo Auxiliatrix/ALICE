@@ -156,27 +156,30 @@ public class Brain {
 					for( ActiveFeature f : features.get().get(event) ) {	// For every associated Feature
 						Mono<?> response = f.handle((Event) e);				// Process the event through the Feature
 						if( response != null ) {
-							switch( f.getExclusionClass() ) {
-							
-								// Handle exclusion cases
-								case DOMINANT:	// Dominant Features activate no matter what
-									process = process.and(response);
-									dominant = true;
-									break;
-								case STANDARD:	// Standard Features activate if no Dominant Features have
-									if( !dominant ) {
+							if( f.getExclusionClass() == null ) { // Features with no ExclusionClass will activate no matter what, and not affect the activation of other Features
+								process = process.and(response);
+							} else {
+								switch( f.getExclusionClass() ) {
+									// Handle exclusion cases
+									case DOMINANT:	// Dominant Features activate no matter what
 										process = process.and(response);
-										standard = true;
-									}
-									break;
-								case SUBMISSIVE:	// Submissive Features activate if no Dominant or Submissive Features have
-									if( !dominant && !standard ) {
+										dominant = true;
+										break;
+									case STANDARD:	// Standard Features activate if no Dominant Features have
+										if( !dominant ) {
+											process = process.and(response);
+											standard = true;
+										}
+										break;
+									case SUBMISSIVE:	// Submissive Features activate if no Dominant or Submissive Features have
+										if( !dominant && !standard ) {
+											process = process.and(response);
+										}
+										break;
+									default:	// Features with no ExclusionClass will activate no matter what, and not affect the activation of other Features
 										process = process.and(response);
-									}
-									break;
-								default:	// Features with no ExclusionClass will activate no matter what, and not affect the activation of other Features
-									process = process.and(response);
-									break;
+										break;
+								}
 							}
 						}
 					}
