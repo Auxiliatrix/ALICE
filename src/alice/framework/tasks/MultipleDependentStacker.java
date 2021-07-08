@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 /**
  * A DependentStacker implementation that allows for Tasks and Effects to depend on the results of multiple Monos.
  * This structure allows all the Monos used in the construction of an instance of this object to be executed at once before the production of a Mono response.
+ * 
+ * Consumers added to this stack can access the individual Monos' resolutions by doing .get(index) on the argument of the functional interface and casting appropriately.
  * @author Auxiliatrix
  *
  */
