@@ -43,7 +43,6 @@ public class Brain {
 	
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
-		System.out.println("Saved");
 		if ( args.length < 1 ) {	// Checks if a token was passed
 			AliceLogger.error("Please pass the TOKEN as the first argument.");
 			System.exit(0);
