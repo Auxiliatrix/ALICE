@@ -76,7 +76,7 @@ public class SharedJSONObject {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
-	public void getString(String key, String o) {
+	public void putString(String key, String o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
