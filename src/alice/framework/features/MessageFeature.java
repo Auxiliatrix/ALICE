@@ -15,7 +15,7 @@ import discord4j.core.object.entity.channel.Channel.Type;
  * @author Auxiliatrix
  *
  */
-public abstract class MessageFeature extends ActiveFeature<MessageCreateEvent> {
+public abstract class MessageFeature extends Feature<MessageCreateEvent> {
 
 	/**
 	 * The prefix associated with this Feature's invocation.

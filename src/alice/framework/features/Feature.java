@@ -2,9 +2,13 @@ package alice.framework.features;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import alice.framework.database.SharedSaveFile;
+import alice.framework.main.Brain;
+import alice.framework.structures.PermissionProfile;
 import discord4j.core.event.domain.Event;
+import discord4j.core.object.entity.Member;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 
@@ -42,6 +46,11 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 		// TODO: move to constants file
 	
 	/**
+	 * A collection of permissions required in order for a user to trigger this Feature.
+	 */
+	protected PermissionProfile restriction;
+	
+	/**
 	 * Identifier for Feature.
 	 */
 	protected String name;
@@ -71,6 +80,7 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 		addAlias(name);
 		withExclusionClass(null);
 		load(type);
+		withRestriction(PermissionProfile.getAnyonePreset());
 	}
 	
 	/**
@@ -97,6 +107,26 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 	}
 	
 	/**
+	 * Set the PermissionProfile of this Feature.
+	 * @param restriction PermissionProfile of restrictions to enforce
+	 * @return the modified Feature
+	 */
+	protected Feature<E> withRestriction(PermissionProfile restriction) {
+		// TODO: null checking
+		this.restriction = restriction;
+		return this;
+	}
+	
+	/**
+	 * Check whether the restrictions allow a given Member to activate this Feature.
+	 * @param member Member to check permissions for
+	 * @return whether or not the given Member can activate this Feature
+	 */
+	protected boolean isAllowed(Member member) {
+		return restriction.verify(member, member.getGuild().block());
+	}
+	
+	/**
 	 * Make this Feature enabled by default
 	 * @return the modified Feature
 	 */
@@ -106,10 +136,16 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 	}
 	
 	/**
-	 * Function to run once this class has been constructed. Used to subscribe the Feature and add it to global containers.
+	 * Function to run once this class has been constructed. Used to add the Feature to global containers.
 	 * @param type Event to associate this Feature with
 	 */
-	protected abstract void load(Class<E> type);
+	@SuppressWarnings("rawtypes")
+	protected void load(Class<E> type) {
+		if(!Brain.features.get().keySet().contains(type)) {
+			Brain.features.get().put(type, new PriorityQueue<Feature>());
+		}
+		Brain.features.get().get(type).add(this);
+	}
 	
 	/**
 	 * Simple logic structure for what this Feature should do when it is triggered by an Event.

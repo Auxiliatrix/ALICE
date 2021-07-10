@@ -1,8 +1,8 @@
 package alice.modular.features;
 
 import alice.framework.features.MessageFeature;
-import alice.framework.tasks.IndependentStacker;
 import alice.framework.tasks.DependentStacker;
+import alice.framework.tasks.IndependentStacker;
 import alice.modular.tasks.MessageSendTask;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;

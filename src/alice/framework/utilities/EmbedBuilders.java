@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.function.Consumer;
 
-import alice.framework.features.ActiveFeature;
 import alice.framework.features.Documentable;
 import alice.framework.features.Documentable.DocumentationPair;
 import alice.framework.features.Feature;
@@ -172,8 +171,8 @@ public class EmbedBuilders {
 		spec.setAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
 		spec.setTitle(":grey_question: Help -- Categories");
 		Map<String, List<String>> categories = new HashMap<String, List<String>>();
-		for( PriorityQueue<ActiveFeature> f : Brain.features.get().values() ) {
-			for( ActiveFeature ff : f ) {
+		for( PriorityQueue<Feature> f : Brain.features.get().values() ) {
+			for( Feature ff : f ) {
 				if( ff instanceof Documentable ) {
 					String category = ((Documentable) ff).getCategory();
 					if( !categories.containsKey(category) ) {
@@ -184,7 +183,7 @@ public class EmbedBuilders {
 			}
 		}
 		for( String key : categories.keySet() ) {
-			if( key.equals(Documentable.DEVELOPER.name()) && !PermissionProfile.isDeveloper(user) ) {
+			if( key.equals(Documentable.HelpCategory.DEVELOPER.name()) && !PermissionProfile.isDeveloper(user) ) {
 				continue;
 			}
 			List<String> names = categories.get(key);
@@ -200,7 +199,7 @@ public class EmbedBuilders {
 	private static synchronized EmbedCreateSpec helpConstructor( EmbedCreateSpec spec, User user, Feature<?> feature ) {
 		Documentable d = (Documentable) feature;
 		
-		if( d.getCategory().equals(Documentable.DEVELOPER.name()) && !PermissionProfile.isDeveloper(user) ) {
+		if( d.getCategory().equals(Documentable.HelpCategory.DEVELOPER.name()) && !PermissionProfile.isDeveloper(user) ) {
 			return errorConstructor(spec, "You must be a developer to view this feature!", ERR_PERMISSION);
 		}
 		

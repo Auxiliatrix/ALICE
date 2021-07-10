@@ -16,6 +16,8 @@ import reactor.core.publisher.Mono;
  */
 public class DependentStacker<T> extends Stacker {
 
+	// TODO: Allow multiple dependencies
+	
 	/**
 	 * The Mono that the stacked Monoables depend on.
 	 */

@@ -1,14 +1,19 @@
 package alice.framework.features;
 
+import java.util.List;
+
+import alina.utilities.ExclusiveList;
+
 public interface Documentable {
 	
 	public static enum HelpCategory {
-		ROOT,
 		DEVELOPER,
 		ADMIN,
 		DEFAULT
 	}
 
+	public static List<String> categories = new ExclusiveList<String>();
+	
 	public static final class DocumentationPair {
 		private String usage;
 		private String outcome;
@@ -25,11 +30,6 @@ public interface Documentable {
 			return outcome;
 		}
 	}
-	
-	public static final HelpCategory ROOT = HelpCategory.ROOT;
-	public static final HelpCategory DEVELOPER = HelpCategory.DEVELOPER;
-	public static final HelpCategory ADMIN = HelpCategory.ADMIN;
-	public static final HelpCategory DEFAULT = HelpCategory.DEFAULT;
 	
 	public String getCategory();
 	public String getDescription();
