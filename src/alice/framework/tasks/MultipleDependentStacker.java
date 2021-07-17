@@ -2,6 +2,7 @@ package alice.framework.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -64,19 +65,27 @@ public class MultipleDependentStacker extends Stacker {
 		return toMono();
 	}
 	
+	
+	
 	@Override
 	public Mono<?> toMono() {
-		return super.toMono().and(dependencies.map(m -> m.block()).collectList().flatMap(t -> {	// Resolves Monos in Flux, flattens Flux to Mono of List, and applies resolved List to Effects/Tasks
-			for( Object o : t ) {
-				System.out.println(o);
+		return super.toMono().and(dependencies.map(m -> Optional.ofNullable(m.block())).collectList().flatMap(t -> {
+			List<Object> converted = new ArrayList<Object>();
+			for( Optional<?> o : t ) {
+				if( o.isEmpty() ) {
+					converted.add(null);
+				} else {
+					converted.add(o.get());
+				}
 			}
+			
 			Mono<Void> process = Mono.fromRunnable(() -> {
 				for( Consumer<List<?>> effect : effects ) {
-					effect.accept(t);
+					effect.accept(converted);
 				}
 			});
 			for( Function<List<?>, Mono<?>> task : tasks ) {
-				process = process.and(task.apply(t));
+				process = process.and(task.apply(converted));
 			}
 			
 			return process;
