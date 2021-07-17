@@ -78,7 +78,6 @@ public class Brain {
 		for( Guild guild : client.getGuilds().collectList().block() ) {
 			@SuppressWarnings("unused")
 			SharedSaveFile guildData = new SharedSaveFile(guild.getId().asLong());
-			AliceLogger.info(String.format("Loaded guild data for %s.", guild.getName()), 1);
 		}
 	}
 	

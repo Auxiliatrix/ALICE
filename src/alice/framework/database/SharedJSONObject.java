@@ -17,6 +17,8 @@ public class SharedJSONObject {
 	protected String saveFileName;
 	protected JSONObject object;
 	
+	// TODO: when a new save file is created, the objects are disconnected because it creates two separate instances of sharedjsonobject. therefore, calling a function in one will not edit the other
+	
 	/**
 	 * Construct a SharedJSONObject, linking it with the save file name of the save file it was taken from.
 	 * This object cannot be constructed outside of its package to prevent overlapping saveFileNames.
@@ -76,8 +78,13 @@ public class SharedJSONObject {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
 	}
 	
+	public void test() {
+		System.out.println("test");
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put("test", "value6"));
+	}
+	
 	public void putString(String key, String o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> {object.put(key, o); System.out.println("Modified"); System.out.println(object);});
 	}
 	
 	public void putInt(String key, int o) {

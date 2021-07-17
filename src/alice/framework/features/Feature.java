@@ -83,6 +83,7 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 		withRestriction(PermissionProfile.getAnyonePreset());
 	}
 	
+	
 	/**
 	 * Add aliases to Feature
 	 * @param aliases Strings to add to list of this Feature's aliases

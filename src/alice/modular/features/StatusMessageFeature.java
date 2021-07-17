@@ -3,6 +3,7 @@ package alice.modular.features;
 import java.util.List;
 import java.util.function.Function;
 
+import alice.framework.database.SharedSaveFile;
 import alice.framework.features.MessageFeature;
 import alice.framework.main.Brain;
 import alice.framework.tasks.IndependentStacker;
@@ -47,6 +48,10 @@ public class StatusMessageFeature extends MessageFeature {
 		
 		MultipleDependentStacker mds = new MultipleDependentStacker(Brain.client.getGuilds().collectList(), type.getMessage().getChannel());
 		mds.addTask(args -> new MessageSendTask(statusMessageBuilder.apply((List<Guild>) args.get(0))).apply((MessageChannel) args.get(1)));
+		mds.addEffect(c -> {
+			SharedSaveFile sf = new SharedSaveFile(Long.valueOf("266668506932576256"));
+			sf.test();
+		});
 		
 		response.append(mds);
 		
