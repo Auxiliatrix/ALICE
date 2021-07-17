@@ -1,6 +1,7 @@
 package alice.framework.database;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.json.JSONArray;
@@ -14,8 +15,8 @@ import org.json.JSONObject;
  *
  */
 public class SharedJSONObject {
+	protected SharedJSONObject parent;
 	protected String saveFileName;
-	protected JSONObject object;
 	
 	// TODO: when a new save file is created, the objects are disconnected because it creates two separate instances of sharedjsonobject. therefore, calling a function in one will not edit the other
 	
@@ -25,74 +26,85 @@ public class SharedJSONObject {
 	 * @param saveFileName String reference to the file this JSONObject was taken from
 	 * @param object JSONObject that was pulled
 	 */
-	protected SharedJSONObject(String saveFileName, JSONObject object) {
+	protected SharedJSONObject(String saveFileName) {
+		this(null, saveFileName);
+	}
+	
+	protected SharedJSONObject(SharedJSONObject parent, String saveFileName) {
+		this.parent = parent;
 		this.saveFileName = saveFileName;
-		this.object = object;
 	}
 	
 	// TODO: currently returns object so that it can return null if object not found; might be better to simply cast nulls to 0, or to allow errors to filter through
 	
+	private JSONObject getSelfFromParent(Map<String, JSONObject> origin) {
+		if( parent == null ) {
+			return origin.get(saveFileName);
+		} else {
+			return parent.getSelfFromParent(origin).getJSONObject(saveFileName);
+		}
+	}
+	
 	/* Atomic Getter Functions */
 	public Object get(String key) {
-		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.get(key)); } catch (JSONException j) {return null;}
+		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).get(key)); } catch (JSONException j) {return null;}
 	}
 	
 	public Boolean getBoolean(String key) {
-		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getBoolean(key)); } catch (JSONException j) {return null;}
+		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getBoolean(key)); } catch (JSONException j) {return null;}
 	}
 	
 	public String getString(String key) {
-		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getString(key)); } catch (JSONException j) {return null;}
+		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getString(key)); } catch (JSONException j) {return null;}
 	}
 	
 	public Integer getInt(String key) {
-		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getInt(key)); } catch (JSONException j) {return null;}
+		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getInt(key)); } catch (JSONException j) {return null;}
 	}
 	
 	public Double getDouble(String key) {
-		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getDouble(key)); } catch (JSONException j) {return null;}
+		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getDouble(key)); } catch (JSONException j) {return null;}
 	}
 	
-	public SharedJSONArray getSharedJSONArray(String key) {
-		try { return new SharedJSONArray(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getJSONArray(key))); } catch (JSONException j) {return null;}
-	}
-	
+	@SuppressWarnings("finally")
 	public SharedJSONObject getSharedJSONObject(String key) {
-		try { return new SharedJSONObject(saveFileName, SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.getJSONObject(key))); } catch (JSONException j) {return null;}
+		try {
+			SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getJSONObject(key));
+			return new SharedJSONObject(this, key);
+		} catch (JSONException j) {
+			return null;
+		} finally {
+			return null;
+		}
 	}
 	
 	public boolean has(String key) {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.has(key));
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).has(key));
 	}
 	
 	public Iterator<String> getKeys() {
-		return SharedSaveFile.lockReaderAndExecute(saveFileName, () -> object.keys());
+		return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).keys());
 	}
 	
 	/* Atomic Setter Functions */
 	public void put(String key, Object o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, o));
 	}
 	
 	public void putBoolean(String key, boolean o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
-	}
-	
-	public void test() {
-		System.out.println("test");
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put("test", "value6"));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, o));
 	}
 	
 	public void putString(String key, String o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> {object.put(key, o); System.out.println("Modified"); System.out.println(object);});
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, o));
 	}
 	
 	public void putInt(String key, int o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, o));
 	}
 	
 	public void putDouble(String key, double o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, o));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, o));
 	}
 	
 	/**
@@ -101,7 +113,7 @@ public class SharedJSONObject {
 	 * @param o JSONArray to insert
 	 */
 	public void putJSONArray(String key, JSONArray o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, new JSONArray(o)));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, new JSONArray(o)));
 	}
 	
 	/**
@@ -110,38 +122,38 @@ public class SharedJSONObject {
 	 * @param o JSONObject to insert
 	 */
 	public void putJSONObject(String key, JSONObject o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, new JSONObject(o)));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, new JSONObject(o)));
 	}
 	
 	public void modify(String key, Function<Object, Object> modifyFunction) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(!object.has(key) ? null : object.get(key))));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, modifyFunction.apply(!getSelfFromParent(jo).has(key) ? null : getSelfFromParent(jo).get(key))));
 	}
 	
 	public void modifyBoolean(String key, Function<Boolean, Boolean> modifyFunction) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(!object.has(key) ? null : object.getBoolean(key))));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, modifyFunction.apply(!getSelfFromParent(jo).has(key) ? null : getSelfFromParent(jo).getBoolean(key))));
 	}
 	
 	public void modifyString(String key, Function<String, String> modifyFunction) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(!object.has(key) ? null : object.getString(key))));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, modifyFunction.apply(!getSelfFromParent(jo).has(key) ? null : getSelfFromParent(jo).getString(key))));
 	}
 	
 	public void modifyInt(String key, Function<Integer, Integer> modifyFunction) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(!object.has(key) ? null : object.getInt(key))));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, modifyFunction.apply(!getSelfFromParent(jo).has(key) ? null : getSelfFromParent(jo).getInt(key))));
 	}
 	
 	public void modifyDouble(String key, Function<Double, Double> modifyFunction) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(!object.has(key) ? null : object.getDouble(key))));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, modifyFunction.apply(!getSelfFromParent(jo).has(key) ? null : getSelfFromParent(jo).getDouble(key))));
 	}
 	
 	public void modifyJSONArray(String key, Function<JSONArray, JSONArray> modifyFunction) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(new JSONArray(!object.has(key) ? null : object.getJSONArray(key)))));	// New JSONArray constructed to prevent copying from within the modifier
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, modifyFunction.apply(new JSONArray(!getSelfFromParent(jo).has(key) ? null : getSelfFromParent(jo).getJSONArray(key)))));	// New JSONArray constructed to prevent copying from within the modifier
 	}
 	
 	public void modifyJSONObject(String key, Function<JSONObject, JSONObject> modifyFunction) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.put(key, modifyFunction.apply(new JSONObject(!object.has(key) ? null : object.getJSONObject(key)))));	// New JSONObject constructed to prevent copying from within the modifier
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, modifyFunction.apply(new JSONObject(!getSelfFromParent(jo).has(key) ? null : getSelfFromParent(jo).getJSONObject(key)))));	// New JSONObject constructed to prevent copying from within the modifier
 	}
 	
 	public void remove(String key) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, () -> object.remove(key));
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).remove(key));
 	}
 }

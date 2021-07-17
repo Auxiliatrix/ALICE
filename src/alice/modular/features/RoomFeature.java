@@ -39,36 +39,56 @@ public class RoomFeature extends MessageFeature {
 		@SuppressWarnings("unchecked")
 		@Override
 		protected Mono<?> respond(VoiceStateUpdateEvent type) {
+			System.out.println("respond");
+			
 			IndependentStacker response = new IndependentStacker();
 			
-			MultipleDependentStacker stacker = new MultipleDependentStacker(type.getCurrent().getChannel(), type.getOld().isPresent() ? type.getOld().get().getChannel() : Mono.empty(), type.getCurrent().getGuild(), type.getCurrent().getMember(), type.getOld().isPresent() ? type.getOld().get().getChannel().map(c -> c.getVoiceStates().collectList()) : Mono.empty());
+			MultipleDependentStacker stacker = new MultipleDependentStacker(type.getCurrent().getChannel(), 
+																			type.getOld().isPresent() ? type.getOld().get().getChannel() : Mono.empty(), 
+																			type.getCurrent().getGuild(), 
+																			type.getCurrent().getMember(), 
+																			type.getOld().isPresent() ? type.getOld().get().getChannel().map(c -> c.getVoiceStates().collectList()) : Mono.empty()
+																			);
 			
 			stacker.addTask(a -> {
+				System.out.println("Execution");
 				SharedSaveFile sf = new SharedSaveFile(((Guild) a.get(2)).getId().asString());
 				if( (VoiceChannel) a.get(0) != null && (VoiceChannel) a.get(1) == null ) {	// If joined a voice channel
+					System.out.println("join");
 					if( !sf.has(HUB_CHANNEL_KEY) ) {
+						System.out.println("irrelevant");
 						return Mono.fromRunnable(() -> {});
 					} else if( sf.getString(HUB_CHANNEL_KEY).equals(((VoiceChannel) a.get(0)).getId().asString()) ) {
+						System.out.println("registered");
 						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName("Room")));
 						vcStacker.addEffect(vc -> sf.putBoolean(String.format("%s%s", ROOM_CHANNEL_PREFIX, ((VoiceChannel) a.get(0)).getId().asString()), true));
 						return vcStacker.addTask(new MemberVoiceMoveTask((Member) a.get(3)));
 					} else {
+						System.out.println("incorrect");
 						return Mono.fromRunnable(() -> {});
 					}
 				} else if( (VoiceChannel) a.get(0) != null && (VoiceChannel) a.get(0) != (VoiceChannel) a.get(1) ) {	// If moved from one voice channel to a different one
 					// TODO: Move
+					System.out.println("unimplemented");
 					return Mono.fromRunnable(() -> {});
 				} else if( (VoiceChannel) a.get(0) == null && (VoiceChannel) a.get(1) != null ) {	// If disconnected from a voice channel
+					System.out.println("leave");
 					if( sf.has(String.format("%s%s", ROOM_CHANNEL_PREFIX, ((VoiceChannel) a.get(1)))) ) {
+						System.out.println("counter down");
 						if( ((List<VoiceState>) a.get(4)).size() == 0 ) {
+							System.out.println("delete");
 							return ((VoiceChannel) a.get(1)).delete();
 						}
 					}
+					System.out.println("incorrect");
 					return Mono.fromRunnable(() -> {});
 				} else {
+					System.out.println("not connection");
 					return Mono.fromRunnable(() -> {});
 				}
 			});
+			
+			response.append(stacker);
 			
 			return response.toMono();
 		}
@@ -112,7 +132,6 @@ public class RoomFeature extends MessageFeature {
 						} else {
 							SharedSaveFile sf = new SharedSaveFile(((Guild) a.get(2)).getId().asLong());
 							sf.putString(HUB_CHANNEL_KEY, ((VoiceChannel) a.get(1)).getId().asString());
-							System.out.println("Requested!");
 							return (new MessageSendTask("Room set up successfully!").apply((MessageChannel) a.get(0)));
 						}
 					});

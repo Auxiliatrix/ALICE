@@ -3,7 +3,8 @@ package alice.framework.database;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.json.JSONObject;
 
@@ -41,15 +42,14 @@ public class SharedSaveFile extends SharedJSONObject {
 	 * @param saveFileName String name of the file being accessed
 	 */
 	public SharedSaveFile(String saveFileName) {
-		super(saveFileName, new JSONObject(FileIO.readFromFile(saveFileName, Constants.DEFAULT_GUILD_DATA)));
+		super(saveFileName);
 
 		if( !lockMap.containsKey(saveFileName) ) {
 			AliceLogger.info(String.format("Loaded guild data from %s.", saveFileName), 1);
 			lockMap.put(saveFileName, new ReadWriteReentrantLock(true));
 		}
 		if( !cache.containsKey(saveFileName) ) {
-			cache.put(saveFileName, object);
-			System.out.println(cache.get(saveFileName).toString());
+			cache.put(saveFileName, new JSONObject(FileIO.readFromFile(saveFileName, Constants.DEFAULT_GUILD_DATA)));
 		}
 	}
 	
@@ -76,24 +76,23 @@ public class SharedSaveFile extends SharedJSONObject {
 		} finally {}
 	}
 	
-	public static <O> O lockReaderAndExecute(String fileName, Supplier<O> readFunction) {
+	public static <O> O lockReaderAndExecute(String fileName, Function<Map<String, JSONObject>, O> readFunction) {
 		lockReader(fileName);
 		O out = null;
 		try {
-			out = readFunction.get();
+			out = readFunction.apply(cache);
 		} finally {
 			unlockReader(fileName);
 		}
 		return out;
 	}
 	
-	public static void lockWriterAndExecute(String fileName, Runnable writeFunction) {
+	public static void lockWriterAndExecute(String fileName, Consumer<Map<String, JSONObject>> writeFunction) {
 		lockWriter(fileName);
 		try {
-			writeFunction.run();
+			writeFunction.accept(cache);
 		} finally {
 			FileIO.writeToFile(fileName, cache.get(fileName).toString(1));
-			System.out.println(cache.toString());
 			unlockWriter(fileName);
 		}
 	}
