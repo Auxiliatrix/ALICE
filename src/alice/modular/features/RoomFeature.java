@@ -63,12 +63,31 @@ public class RoomFeature extends MessageFeature {
 						return Mono.fromRunnable(() -> {});
 					}
 				} else if( (VoiceChannel) a.get(0) != null && (VoiceChannel) a.get(0) != (VoiceChannel) a.get(1) ) {	// If moved from one voice channel to a different one
-					// TODO: Move
-					return Mono.fromRunnable(() -> {});
+					Mono<Void> subResponse = Mono.fromRunnable(() -> {});
+					
+					if( sf.has(HUB_CHANNEL_KEY) && sf.getString(HUB_CHANNEL_KEY).equals(((VoiceChannel) a.get(0)).getId().asString()) ) {
+						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName("Room")));
+						vcStacker.addEffect(vc -> sf.putBoolean(String.format("%s%s", ROOM_CHANNEL_PREFIX, vc.getId().asString()), true));
+						subResponse = subResponse.and(vcStacker.addTask(new MemberVoiceMoveTask((Member) a.get(3))));
+					}
+					
+					if( sf.has(String.format("%s%s", ROOM_CHANNEL_PREFIX, ((VoiceChannel) a.get(1)).getId().asLong())) ) {
+						if( ((List<VoiceState>) a.get(4)).size() == 0 ) {
+							subResponse = subResponse.and(((VoiceChannel) a.get(1)).delete())
+									.and(Mono.fromRunnable(() -> {
+										sf.remove(String.format("%s%s", ROOM_CHANNEL_PREFIX, ((VoiceChannel) a.get(1)).getId().asString()));
+									}));
+						}
+					}
+					
+					return subResponse;
 				} else if( (VoiceChannel) a.get(0) == null && (VoiceChannel) a.get(1) != null ) {	// If disconnected from a voice channel
 					if( sf.has(String.format("%s%s", ROOM_CHANNEL_PREFIX, ((VoiceChannel) a.get(1)).getId().asLong())) ) {
 						if( ((List<VoiceState>) a.get(4)).size() == 0 ) {
-							return ((VoiceChannel) a.get(1)).delete();
+							return ((VoiceChannel) a.get(1)).delete()
+									.and(Mono.fromRunnable(() -> {
+										sf.remove(String.format("%s%s", ROOM_CHANNEL_PREFIX, ((VoiceChannel) a.get(1)).getId().asString()));
+									}));
 						}
 					}
 					return Mono.fromRunnable(() -> {});
