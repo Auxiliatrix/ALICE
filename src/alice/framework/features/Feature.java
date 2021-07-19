@@ -1,5 +1,9 @@
 package alice.framework.features;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -119,21 +123,21 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 	}
 	
 	/**
-	 * Check whether the restrictions allow a given Member to activate this Feature.
-	 * @param member Member to check permissions for
-	 * @return whether or not the given Member can activate this Feature
-	 */
-	protected boolean isAllowed(Member member) {
-		return restriction.verify(member, member.getGuild().block());
-	}
-	
-	/**
 	 * Make this Feature enabled by default
 	 * @return the modified Feature
 	 */
 	protected Feature<E> withWhitelist() {
 		whitelist = true;
 		return this;
+	}
+	
+	/**
+	 * Check whether the restrictions allow a given Member to activate this Feature.
+	 * @param member Member to check permissions for
+	 * @return whether or not the given Member can activate this Feature
+	 */
+	protected boolean isAllowed(Member member) {
+		return restriction.verify(member, member.getGuild().block());
 	}
 	
 	/**
@@ -230,4 +234,13 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 			return this.exclusionClass.ordinal() - f.getExclusionClass().ordinal();
 		}
 	}
+	
+	/**
+	 * An annotation to be applied if a Feature is meant to be initialized outside of the initial start up procedure, such as if the Feature is a private inner class of another.
+	 * @author Auxiliatrix
+	 *
+	 */
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	public @interface ManuallyInitialized {}
 }

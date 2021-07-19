@@ -129,11 +129,13 @@ public class Brain {
 				continue;
 			}
 			try {
-				AliceLogger.info(String.format("Loaded feature: %s", c.getName()), 2);
-				c.getConstructor().newInstance();
+				if (c.getAnnotation(Feature.ManuallyInitialized.class) == null ) {
+					c.getConstructor().newInstance();
+					AliceLogger.info(String.format("Loaded feature: %s", c.getName()), 2);
+				}
 			} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				e.printStackTrace();
 				AliceLogger.error(String.format("An error occured while instantiating %s.", c.getName() ), 2);
+				e.printStackTrace();
 			}
 		}
 	}

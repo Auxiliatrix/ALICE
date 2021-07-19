@@ -25,9 +25,10 @@ import reactor.core.publisher.Mono;
 
 public class RoomFeature extends MessageFeature {
 
-	protected class RoomPassiveFeature extends Feature<VoiceStateUpdateEvent> {
+	@ManuallyInitialized
+	private class RoomPassiveFeature extends Feature<VoiceStateUpdateEvent> {
 
-		protected RoomPassiveFeature() {
+		private RoomPassiveFeature() {
 			super("room", VoiceStateUpdateEvent.class);
 		}
 
@@ -88,6 +89,7 @@ public class RoomFeature extends MessageFeature {
 	
 	public RoomFeature() {
 		super("room");
+		@SuppressWarnings("unused")
 		RoomPassiveFeature rpf = new RoomPassiveFeature();
 		withCheckInvoked();
 		withExclusionClass(ExclusionClass.STANDARD);
