@@ -133,7 +133,7 @@ public class RoomFeature extends MessageFeature {
 		if( ts.size() < 2 ) {
 			stacker.addTask(a -> (new EmbedSendTask(EmbedBuilders.getHelpConstructor(type.getMessage().getAuthor().get(), this))).apply((MessageChannel) a.get(0)));
 		} else {
-			switch( ts.get(1).toLowerCase() ) {
+			switch( ts.getString(1).toLowerCase() ) {
 				case "setup":
 					stacker.addTask(a -> {
 						if( (VoiceChannel) a.get(1) == null ) {
