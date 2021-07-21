@@ -17,6 +17,7 @@ import org.json.JSONObject;
 public class SharedJSONObject {
 	protected SharedJSONObject parent;
 	protected String saveFileName;
+	protected String reference;
 	
 	// TODO: when a new save file is created, the objects are disconnected because it creates two separate instances of sharedjsonobject. therefore, calling a function in one will not edit the other
 	
@@ -27,21 +28,22 @@ public class SharedJSONObject {
 	 * @param object JSONObject that was pulled
 	 */
 	protected SharedJSONObject(String saveFileName) {
-		this(null, saveFileName);
+		this(null, saveFileName, saveFileName);
 	}
 	
-	protected SharedJSONObject(SharedJSONObject parent, String saveFileName) {
+	protected SharedJSONObject(SharedJSONObject parent, String saveFileName, String reference) {
 		this.parent = parent;
 		this.saveFileName = saveFileName;
+		this.reference = reference;
 	}
 	
 	// TODO: currently returns object so that it can return null if object not found; might be better to simply cast nulls to 0, or to allow errors to filter through
 	
 	private JSONObject getSelfFromParent(Map<String, JSONObject> origin) {
 		if( parent == null ) {
-			return origin.get(saveFileName);
+			return origin.get(reference);
 		} else {
-			return parent.getSelfFromParent(origin).getJSONObject(saveFileName);
+			return parent.getSelfFromParent(origin).getJSONObject(reference);
 		}
 	}
 	
@@ -66,14 +68,12 @@ public class SharedJSONObject {
 		try { return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getDouble(key)); } catch (JSONException j) {return null;}
 	}
 	
-	@SuppressWarnings("finally")
 	public SharedJSONObject getSharedJSONObject(String key) {
 		try {
 			SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getJSONObject(key));
-			return new SharedJSONObject(this, key);
+			SharedJSONObject result = new SharedJSONObject(this, saveFileName, key);
+			return result;
 		} catch (JSONException j) {
-			return null;
-		} finally {
 			return null;
 		}
 	}
@@ -105,15 +105,6 @@ public class SharedJSONObject {
 	
 	public void putDouble(String key, double o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, o));
-	}
-	
-	/**
-	 * Associates a shallow copy of the given JSONArray with the given key.
-	 * @param key String to associate the object with
-	 * @param o JSONArray to insert
-	 */
-	public void putJSONArray(String key, JSONArray o) {
-		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> getSelfFromParent(jo).put(key, new JSONArray(o)));
 	}
 	
 	/**

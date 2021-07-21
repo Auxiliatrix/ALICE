@@ -42,4 +42,8 @@ public class StringUtilities {
 	    // the distance is the cost for transforming all letters in both strings        
 	    return cost[len0 - 1];                                                          
 	}
+	
+	public static String limitedString(String string, int maxLength) {
+		return string.length() > maxLength ? string.substring(0, maxLength) : string;
+	}
 }

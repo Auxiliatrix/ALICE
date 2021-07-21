@@ -131,13 +131,14 @@ public class RoomFeature extends MessageFeature {
 																		);
 		
 		if( ts.size() < 2 ) {
-			stacker.addTask(a -> (new EmbedSendTask(EmbedBuilders.getHelpConstructor(type.getMessage().getAuthor().get(), this))).apply((MessageChannel) a.get(0)));
+			stacker.addTask(a -> (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You must specify an argument.", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0)));
+//			stacker.addTask(a -> (new EmbedSendTask(spec -> EmbedBuilders.getHelpConstructor(type.getMessage().getAuthor().get(), this))).apply((MessageChannel) a.get(0)));
 		} else {
 			switch( ts.getString(1).toLowerCase() ) {
 				case "setup":
 					stacker.addTask(a -> {
 						if( (VoiceChannel) a.get(1) == null ) {
-							return (new EmbedSendTask(EmbedBuilders.getErrorConstructor("You must be connected to a voice channel!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
+							return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You must be connected to a voice channel!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
 						} else {
 							SharedSaveFile sf = new SharedSaveFile(((Guild) a.get(2)).getId().asLong());
 							sf.putString(HUB_CHANNEL_KEY, ((VoiceChannel) a.get(1)).getId().asString());
@@ -152,12 +153,12 @@ public class RoomFeature extends MessageFeature {
 							sf.remove(HUB_CHANNEL_KEY);
 							return (new MessageSendTask("Room deactivated successfully!").apply((MessageChannel) a.get(0)));
 						} else {
-							return (new EmbedSendTask(EmbedBuilders.getErrorConstructor("You do not have a room hub set up in this server!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
+							return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You do not have a room hub set up in this server!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
 						}
 					});
 					break;
 				default:
-					stacker.addTask(a -> (new EmbedSendTask(EmbedBuilders.getErrorConstructor("Invalid command!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0)));
+					stacker.addTask(a -> (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Invalid command!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0)));
 					break;
 			}
 		}
