@@ -140,20 +140,40 @@ public class SharedJSONArray {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(index, o); cached = getSelfFromParent(jo); });
 	}
 	
-	public void putBoolean(int index, boolean o) {
+	public void put(int index, boolean o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(index, o); cached = getSelfFromParent(jo); });
 	}
 	
-	public void putString(int index, String o) {
+	public void put(int index, String o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(index, o); cached = getSelfFromParent(jo); });
 	}
 	
-	public void putInt(int index, int o) {
+	public void put(int index, int o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(index, o); cached = getSelfFromParent(jo); });
 	}
 	
-	public void putDouble(int index, double o) {
+	public void put(int index, double o) {
 		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(index, o); cached = getSelfFromParent(jo); });
+	}
+	
+	public void put(Object o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(o); cached = getSelfFromParent(jo); });
+	}
+	
+	public void put(boolean o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(o); cached = getSelfFromParent(jo); });
+	}
+	
+	public void put(String o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(o); cached = getSelfFromParent(jo); });
+	}
+	
+	public void put(int o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(o); cached = getSelfFromParent(jo); });
+	}
+	
+	public void put(double o) {
+		SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(o); cached = getSelfFromParent(jo); });
 	}
 	
 	/**
