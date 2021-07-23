@@ -14,7 +14,7 @@ import org.json.JSONObject;
  * @author Auxiliatrix
  *
  */
-public class SharedJSONArray {
+public class SharedJSONArray implements Iterable<Object> {
 	protected SharedJSONArray parentArray;
 	protected SharedJSONObject parentObject;
 	protected String saveFileName;
@@ -131,6 +131,7 @@ public class SharedJSONArray {
 		return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).length());
 	}
 	
+	@Override
 	public Iterator<Object> iterator() {
 		return SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).iterator());
 	}
