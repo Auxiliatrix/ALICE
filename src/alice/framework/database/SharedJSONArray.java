@@ -97,7 +97,7 @@ public class SharedJSONArray {
 			SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getJSONArray(index));
 			return new SharedJSONArray(this, saveFileName, index);
 		} catch (JSONException j) {
-			SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(index, new JSONArray(index)); cached = getSelfFromParent(jo); } );
+			SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(index, new JSONArray()); cached = getSelfFromParent(jo); } );
 			return new SharedJSONArray(this, saveFileName, index);
 		}
 	}
@@ -117,7 +117,7 @@ public class SharedJSONArray {
 			return new SharedJSONObject(this, saveFileName, index);
 		} catch (JSONException j) {
 			SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {
-				getSelfFromParent(jo).put(index, new JSONObject(index));
+				getSelfFromParent(jo).put(index, new JSONObject());
 				if( getSelfFromParent(jo).getJSONObject(index).has("empty") ) {
 					getSelfFromParent(jo).getJSONObject(index).remove("empty");
 				}

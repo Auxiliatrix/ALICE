@@ -35,7 +35,8 @@ public class SharedJSONObject {
 		this.parentObject = null;
 		this.referenceIndex = -1;
 		this.referenceKey = null;
-		try { cached = SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo)); } catch (JSONException j) {cached = new JSONObject();}
+		
+		cached = new JSONObject();
 	}
 	
 	protected SharedJSONObject(SharedJSONArray parent, String saveFileName, int reference) {
@@ -45,6 +46,8 @@ public class SharedJSONObject {
 		this.parentObject = null;
 		this.referenceIndex = reference;
 		this.referenceKey = null;
+		
+		try { cached = SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo)); } catch (JSONException j) {cached = new JSONObject();}
 	}
 	
 	protected SharedJSONObject(SharedJSONObject parent, String saveFileName, String reference) {
@@ -54,6 +57,8 @@ public class SharedJSONObject {
 		this.parentObject = parent;
 		this.referenceIndex = -1;
 		this.referenceKey = reference;
+		
+		try { cached = SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo)); } catch (JSONException j) {cached = new JSONObject();}
 	}
 	
 	// TODO: currently returns object so that it can return null if object not found; might be better to simply cast nulls to 0, or to allow errors to filter through
@@ -107,7 +112,7 @@ public class SharedJSONObject {
 			SharedSaveFile.lockReaderAndExecute(saveFileName, jo -> getSelfFromParent(jo).getJSONArray(key));
 			return new SharedJSONArray(this, saveFileName, key);
 		} catch (JSONException j) {
-			SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(key, new JSONArray(key)); cached = getSelfFromParent(jo); } );
+			SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {getSelfFromParent(jo).put(key, new JSONArray()); cached = getSelfFromParent(jo); } );
 			return new SharedJSONArray(this, saveFileName, key);
 		}
 	}
@@ -127,7 +132,7 @@ public class SharedJSONObject {
 			return new SharedJSONObject(this, saveFileName, key);
 		} catch (JSONException j) {
 			SharedSaveFile.lockWriterAndExecute(saveFileName, jo -> {
-				getSelfFromParent(jo).put(key, new JSONObject(key));
+				getSelfFromParent(jo).put(key, new JSONObject());
 				if( getSelfFromParent(jo).getJSONObject(key).has("empty") ) {
 					getSelfFromParent(jo).getJSONObject(key).remove("empty");
 				}
