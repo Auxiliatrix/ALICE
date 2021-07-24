@@ -25,8 +25,12 @@ public class Stacker implements Monoable {
 	 * Add a Monoable object to the stack of Monos.
 	 * @param monoable Monoable object to add
 	 */
-	public void append(Monoable monoable) {
-		this.sequence = this.sequence.and(monoable.toMono());
+	public void append(Monoable mono) {
+		this.sequence = this.sequence.and(mono.toMono());
+	}
+	
+	public void append(Mono<?> mono) {
+		this.sequence = this.sequence.and(mono);
 	}
 	
 	@Override
