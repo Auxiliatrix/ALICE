@@ -17,8 +17,13 @@ import reactor.core.publisher.Mono;
  * @author Auxiliatrix
  *
  */
-public class MultipleDependentStacker extends Stacker {
+public class MultipleDependentStacker implements Monoable {
 
+	/**
+	 * The Mono being stacked upon. This is returned when toMono() is called.
+	 */
+	protected Mono<?> sequence;
+	
 	/**
 	 * The Monos that the stacked Monoables depend on.
 	 */
@@ -39,7 +44,8 @@ public class MultipleDependentStacker extends Stacker {
 	 * @param dependency Mono to depend on
 	 */
 	public MultipleDependentStacker(Mono<?>... dependencies) {
-		super();
+		sequence = Mono.fromRunnable(() -> {});
+		
 		this.dependencies = Flux.fromArray(dependencies);
 		this.tasks = new ArrayList<Function<List<?>, Mono<?>>>();
 		this.effects = new ArrayList<Consumer<List<?>>>();		
@@ -65,11 +71,9 @@ public class MultipleDependentStacker extends Stacker {
 		return toMono();
 	}
 	
-	
-	
 	@Override
 	public Mono<?> toMono() {
-		return super.toMono().and(dependencies.map(m -> Optional.ofNullable(m.block())).collectList().flatMap(t -> {
+		return sequence.and(dependencies.map(m -> Optional.ofNullable(m.block())).collectList().flatMap(t -> {
 			List<Object> converted = new ArrayList<Object>();
 			for( Optional<?> o : t ) {
 				if( o.isEmpty() ) {

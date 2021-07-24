@@ -14,7 +14,6 @@ import alice.framework.features.MessageFeature;
 import alice.framework.structures.TokenizedString;
 import alice.framework.structures.TokenizedString.Token;
 import alice.framework.tasks.DependentStacker;
-import alice.framework.tasks.IndependentStacker;
 import alice.framework.tasks.MultipleDependentStacker;
 import alice.framework.tasks.Stacker;
 import alice.framework.utilities.EmbedBuilders;
@@ -70,7 +69,7 @@ public class RoleAssignFeature extends MessageFeature {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Mono<?> respond(MessageCreateEvent type) {
-		IndependentStacker response = new IndependentStacker();
+		Stacker response = new Stacker();
 		
 		String message = type.getMessage().getContent();
 		TokenizedString ts = new TokenizedString(message);
@@ -220,24 +219,6 @@ public class RoleAssignFeature extends MessageFeature {
 					break;
 				case "clear":
 					break;
-				case "rules":
-					List<SimpleEntry<String, String>> entries = new ArrayList<SimpleEntry<String, String>>();
-					
-					StringBuilder allowRulesList = new StringBuilder();
-					for( int f=0; f<allowRules.length(); f++ ) {
-						allowRulesList.append(String.format(":small_blue_diamond: **AP%d:** %s\n", f, EventUtilities.escapeMarkdown(allowRules.getString(f))));
-					}
-					
-					StringBuilder denyRulesList = new StringBuilder();
-					for( int f=0; f<denyRules.length(); f++ ) {
-						denyRulesList.append(String.format(":small_orange_diamond: **DP%d:** %s\n", f, EventUtilities.escapeMarkdown(denyRules.getString(f))));
-					}
-					
-					entries.add(new SimpleEntry<String, String>("Allowed Patterns", allowRulesList.toString()));
-					entries.add(new SimpleEntry<String, String>("Denied Patterns", denyRulesList.toString()));
-					
-					channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyListFormat(spec, "Role Patterns", Color.of(253, 185, 200), entries, false, true)));
-					break;
 				case "list":
 					List<SimpleEntry<String, String>> roleEntries = new ArrayList<SimpleEntry<String, String>>();
 					
@@ -256,7 +237,7 @@ public class RoleAssignFeature extends MessageFeature {
 
 					channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyListFormat(spec, "Role List", Color.of(253, 185, 200), roleEntries, false, true)));
 					break;
-				case "rule":
+				case "rules":
 					if( ts.size() > 2 ) {
 						switch( ts.getString(2).toLowerCase() ) {
 							case "allow":
@@ -264,9 +245,9 @@ public class RoleAssignFeature extends MessageFeature {
 									TokenizedString sub = ts.getSubTokens(3);
 									for( Token token : sub.getTokens() ) {
 										if( token.isCoded() ) {
-											response.addRunnable(() -> allowRules.put(token.getContent()));
+											response.append(() -> allowRules.put(token.getContent()));
 										} else {
-											response.addRunnable(() -> allowRoles.put(token.getContent()));
+											response.append(() -> allowRoles.put(token.getContent()));
 										}
 									}
 									channelStacker.addTask(m -> new EmbedSendTask(c -> EmbedBuilders.applySuccessFormat(c, "Role rules added succesfully!")).apply(m));
@@ -279,9 +260,9 @@ public class RoleAssignFeature extends MessageFeature {
 									TokenizedString sub = ts.getSubTokens(3);
 									for( Token token : sub.getTokens() ) {
 										if( token.isCoded() ) {
-											response.addRunnable(() -> denyRules.put(token.getContent()));
+											response.append(() -> denyRules.put(token.getContent()));
 										} else {
-											response.addRunnable(() -> denyRoles.put(token.getContent()));
+											response.append(() -> denyRoles.put(token.getContent()));
 										}
 									}
 									channelStacker.addTask(m -> new EmbedSendTask(c -> EmbedBuilders.applySuccessFormat(c, "Role rules added succesfully!")).apply(m));
@@ -302,7 +283,22 @@ public class RoleAssignFeature extends MessageFeature {
 								break;
 						}
 					} else {
-						channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You have to specify what you want to do with the rules!", EmbedBuilders.ERR_USAGE)));
+						List<SimpleEntry<String, String>> entries = new ArrayList<SimpleEntry<String, String>>();
+						
+						StringBuilder allowRulesList = new StringBuilder();
+						for( int f=0; f<allowRules.length(); f++ ) {
+							allowRulesList.append(String.format(":small_blue_diamond: **AP%d:** %s\n", f, EventUtilities.escapeMarkdown(allowRules.getString(f))));
+						}
+						
+						StringBuilder denyRulesList = new StringBuilder();
+						for( int f=0; f<denyRules.length(); f++ ) {
+							denyRulesList.append(String.format(":small_orange_diamond: **DP%d:** %s\n", f, EventUtilities.escapeMarkdown(denyRules.getString(f))));
+						}
+						
+						entries.add(new SimpleEntry<String, String>("Allowed Patterns", allowRulesList.toString()));
+						entries.add(new SimpleEntry<String, String>("Denied Patterns", denyRulesList.toString()));
+						
+						channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyListFormat(spec, "Role Patterns", Color.of(253, 185, 200), entries, false, true)));
 					}
 					break;
 				default:

@@ -33,6 +33,10 @@ public class Stacker implements Monoable {
 		this.sequence = this.sequence.and(mono);
 	}
 	
+	public void append(Runnable runnable) {
+		this.sequence = this.sequence.and(Mono.fromRunnable(runnable));
+	}
+	
 	@Override
 	public Mono<?> toMono() {
 		return sequence;

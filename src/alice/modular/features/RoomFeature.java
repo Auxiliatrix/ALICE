@@ -7,8 +7,8 @@ import alice.framework.features.Feature;
 import alice.framework.features.MessageFeature;
 import alice.framework.structures.TokenizedString;
 import alice.framework.tasks.DependentStacker;
-import alice.framework.tasks.IndependentStacker;
 import alice.framework.tasks.MultipleDependentStacker;
+import alice.framework.tasks.Stacker;
 import alice.framework.utilities.EmbedBuilders;
 import alice.modular.tasks.EmbedSendTask;
 import alice.modular.tasks.MemberVoiceMoveTask;
@@ -41,7 +41,7 @@ public class RoomFeature extends MessageFeature {
 		@Override
 		protected Mono<?> respond(VoiceStateUpdateEvent type) {
 			
-			IndependentStacker response = new IndependentStacker();
+			Stacker response = new Stacker();
 			
 			MultipleDependentStacker stacker = new MultipleDependentStacker(type.getCurrent().getChannel(), 
 																			type.getOld().isPresent() ? type.getOld().get().getChannel() : Mono.empty(), 
@@ -121,7 +121,7 @@ public class RoomFeature extends MessageFeature {
 
 	@Override
 	protected Mono<?> respond(MessageCreateEvent type) {
-		IndependentStacker response = new IndependentStacker();
+		Stacker response = new Stacker();
 		String message = type.getMessage().getContent();
 		TokenizedString ts = new TokenizedString(message);
 		

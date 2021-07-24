@@ -5,8 +5,8 @@ import java.util.function.Function;
 
 import alice.framework.features.MessageFeature;
 import alice.framework.main.Brain;
-import alice.framework.tasks.IndependentStacker;
 import alice.framework.tasks.MultipleDependentStacker;
+import alice.framework.tasks.Stacker;
 import alice.modular.tasks.MessageSendTask;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -28,7 +28,7 @@ public class StatusMessageFeature extends MessageFeature {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Mono<?> respond(MessageCreateEvent type) {
-		IndependentStacker response = new IndependentStacker();
+		Stacker response = new Stacker();
 		
 		Function<List<Guild>, String> statusMessageBuilder = gs -> {
 			StringBuilder message = new StringBuilder("Guilds loaded: ");

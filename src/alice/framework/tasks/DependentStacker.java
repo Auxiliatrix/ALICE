@@ -14,9 +14,12 @@ import reactor.core.publisher.Mono;
  *
  * @param <T> Return type of the Mono being depended on
  */
-public class DependentStacker<T> extends Stacker {
+public class DependentStacker<T> implements Monoable {
 
-	// TODO: Allow multiple dependencies
+	/**
+	 * The Mono being stacked upon. This is returned when toMono() is called.
+	 */
+	protected Mono<?> sequence;
 	
 	/**
 	 * The Mono that the stacked Monoables depend on.
@@ -38,7 +41,7 @@ public class DependentStacker<T> extends Stacker {
 	 * @param dependency Mono to depend on
 	 */
 	public DependentStacker(Mono<T> dependency) {
-		super();
+		sequence = Mono.fromRunnable(() -> {});
 		
 		this.dependency = dependency;
 		this.tasks = new ArrayList<Function<T, Mono<?>>>();
@@ -67,7 +70,7 @@ public class DependentStacker<T> extends Stacker {
 	
 	@Override
 	public Mono<?> toMono() {
-		return super.toMono().and(dependency.flatMap(t -> {
+		return sequence.and(dependency.flatMap(t -> {
 			Mono<Void> process = Mono.fromRunnable(() -> {
 				for( Consumer<T> effect : effects ) {
 					effect.accept(t);
