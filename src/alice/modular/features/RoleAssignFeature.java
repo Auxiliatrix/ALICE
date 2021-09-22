@@ -66,6 +66,30 @@ public class RoleAssignFeature extends MessageFeature {
 		return false;
 	}
 	
+	protected Mono<?> addRolesToMember(Member member, List<Role> rolesToAdd, MessageChannel channel) {
+		Stacker tasks = new Stacker();
+		List<String> addedRoleNames = new ArrayList<String>();
+		for( Role role : rolesToAdd ) {
+			addedRoleNames.add(role.getName());
+			tasks.append(member.addRole(role.getId()));
+		}
+		String added = String.join(", ", addedRoleNames);
+		tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've given you the following roles: `%s`!", added)))).apply(channel));
+		return tasks.toMono();
+	}
+	
+	protected Mono<?> removeRolesFromMember(Member member, List<Role> rolesToRemove, MessageChannel channel) {
+		Stacker tasks = new Stacker();
+		List<String> removedRoleNames = new ArrayList<String>();
+		for( Role role : rolesToRemove ) {
+			removedRoleNames.add(role.getName());
+			tasks.append(member.removeRole(role.getId()));
+		}
+		String removed = String.join(", ", removedRoleNames);
+		tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've taken away from you the following roles: `%s`!", removed)))).apply(channel));
+		return tasks.toMono();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected Mono<?> respond(MessageCreateEvent type) {
@@ -76,8 +100,6 @@ public class RoleAssignFeature extends MessageFeature {
 		
 		DependentStacker<MessageChannel> channelStacker = new DependentStacker<MessageChannel>(type.getMessage().getChannel());
 		DependentStacker<Member> memberStacker = new DependentStacker<Member>(type.getMessage().getAuthorAsMember());
-		MultipleDependentStacker roleStacker = new MultipleDependentStacker(type.getMember().get().getRoles().collectList(), type.getMessage().getChannel());
-		MultipleDependentStacker guildRoleStacker = new MultipleDependentStacker(type.getGuild().flatMap(g -> g.getRoles().collectList()), type.getMessage().getChannel());		
 		
 		SharedSaveFile ssf = new SharedSaveFile(type.getGuildId().get().asLong());
 		SharedJSONArray allowRules = ssf.getOrDefaultSharedJSONArray(ALLOW_RULES_KEY);
@@ -120,11 +142,15 @@ public class RoleAssignFeature extends MessageFeature {
 							}
 						}
 						if( blockedRoles.isEmpty() ) {
+							MultipleDependentStacker guildRoleStacker = new MultipleDependentStacker(type.getGuild().flatMap(g -> g.getRoles().collectList()), type.getMessage().getChannel());		
+
 							guildRoleStacker.addTask(a -> {
+								List<Role> allRoles = (List<Role>) a.get(0);
+								MessageChannel channel = (MessageChannel) a.get(1);
 								Set<String> originalAddedRolesSet = new HashSet<String>(addedRoles);
 								Set<String> addedRolesSet = new HashSet<String>(addedRoles);
 								List<Role> rolesToAdd = new ArrayList<Role>();
-								for( Role role : (List<Role>) a.get(0) ) {
+								for( Role role : allRoles ) {
 									if( originalAddedRolesSet.contains(role.getName().toLowerCase()) ) {
 										rolesToAdd.add(role);
 										addedRolesSet.remove(role.getName().toLowerCase());
@@ -132,19 +158,13 @@ public class RoleAssignFeature extends MessageFeature {
 								}
 								if( addedRolesSet.size() > 0 ) {
 									String missed = String.join(", ", addedRolesSet);
-									return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("I could not find the following roles: `%s`!", missed)))).apply((MessageChannel) a.get(1));
+									return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("I could not find the following roles: `%s`!", missed)))).apply(channel);
 								} else {
-									Stacker tasks = new Stacker();
-									List<String> addedRoleNames = new ArrayList<String>();
-									for( Role role : rolesToAdd ) {
-										addedRoleNames.add(role.getName());
-										tasks.append(type.getMember().get().addRole(role.getId()));
-									}
-									String added = String.join(", ", addedRoleNames);
-									tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've given you the following roles: `%s`!", added)))).apply((MessageChannel) a.get(1)));
-									return tasks.toMono();
+									return addRolesToMember(type.getMember().get(), rolesToAdd, channel);
 								}
 							});
+							
+							response.append(guildRoleStacker);
 						} else {
 							String blocked = String.join(", ", blockedRoles);
 							channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("You cannot manipulate the following roles: `%s`!", blocked))));
@@ -153,6 +173,7 @@ public class RoleAssignFeature extends MessageFeature {
 						channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You have to tell me which roles you want! You can do `%role list` or `%role rules` for some ideas.", EmbedBuilders.ERR_USAGE)));
 					}
 					break;
+				case "remove": // Fall through
 				case "rem":
 					if( ts.size() > 2 ) {
 						List<String> removedRoles = new ArrayList<String>();
@@ -166,11 +187,14 @@ public class RoleAssignFeature extends MessageFeature {
 							}
 						}
 						if( blockedRoles.isEmpty() ) {
+							MultipleDependentStacker roleStacker = new MultipleDependentStacker(type.getMember().get().getRoles().collectList(), type.getMessage().getChannel());
 							roleStacker.addTask(a -> {
+								List<Role> allRoles = (List<Role>) a.get(0);
+								MessageChannel channel = (MessageChannel) a.get(1);
 								Set<String> originalRemovedRolesSet = new HashSet<String>(removedRoles);
 								Set<String> removedRolesSet = new HashSet<String>(removedRoles);
 								List<Role> rolesToRemove = new ArrayList<Role>();
-								for( Role role : (List<Role>) a.get(0) ) {
+								for( Role role : allRoles ) {
 									if( originalRemovedRolesSet.contains(role.getName().toLowerCase()) ) {
 										rolesToRemove.add(role);
 										removedRolesSet.remove(role.getName().toLowerCase());
@@ -178,19 +202,12 @@ public class RoleAssignFeature extends MessageFeature {
 								}
 								if( removedRolesSet.size() > 0 ) {
 									String missed = String.join(", ", removedRolesSet);
-									return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("You don't have the following roles: `%s`!", missed)))).apply((MessageChannel) a.get(1));
+									return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("You don't have the following roles: `%s`!", missed)))).apply(channel);
 								} else {
-									Stacker tasks = new Stacker();
-									List<String> removedRoleNames = new ArrayList<String>();
-									for( Role role : rolesToRemove ) {
-										removedRoleNames.add(role.getName());
-										tasks.append(type.getMember().get().removeRole(role.getId()));
-									}
-									String added = String.join(", ", removedRoleNames);
-									tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've taken away the following roles: `%s`!", added)))).apply((MessageChannel) a.get(1)));
-									return tasks.toMono();
+									return removeRolesFromMember(type.getMember().get(), rolesToRemove, channel);
 								}
 							});
+							response.append(roleStacker);
 						} else {
 							String blocked = String.join(", ", blockedRoles);
 							channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("You cannot manipulate the following roles: `%s`!", blocked))));
@@ -200,24 +217,93 @@ public class RoleAssignFeature extends MessageFeature {
 					}
 					break;
 				case "getall":
-					break;
-				case "remall":
-					break;
-				case "give":
-					if( ts.size() > 3 ) {
+					if( ts.size() > 2 ) {
+						MultipleDependentStacker guildRoleStacker = new MultipleDependentStacker(type.getGuild().flatMap(g -> g.getRoles().collectList()), type.getMessage().getChannel());		
 						
+						String regex = ts.getString(2);
+						Pattern pattern = Pattern.compile(regex);
+						Matcher matcher = pattern.matcher("");
+												
+						guildRoleStacker.addTask(a -> {
+							List<Role> allRoles = (List<Role>) a.get(0);
+							MessageChannel channel = (MessageChannel) a.get(1);
+							List<Role> rolesToGet = new ArrayList<Role>();
+							for( Role role : allRoles ) {
+								matcher.reset(role.getName());
+								if( matcher.matches() ) {
+									if( allowed(role.getName(), allowedRoles, deniedRoles, allowedRules, deniedRules) ) {
+										rolesToGet.add(role);
+									}
+								}
+							}
+							
+							if( rolesToGet.size() == 0 ) {
+								return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "I could not find any roles that matched that pattern!", EmbedBuilders.ERR_USAGE))).apply(channel);
+							} else {
+								return addRolesToMember(type.getMember().get(), rolesToGet, channel);
+							}
+						});
+						
+						response.append(guildRoleStacker);
 					} else {
-						channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You have to tell me who you want to give the roles to, and which roles to give them!", EmbedBuilders.ERR_USAGE)));
+						channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You need to give me a regex pattern of roles you want to get!", EmbedBuilders.ERR_USAGE)));
 					}
 					break;
-				case "take":
-					if( ts.size() > 3 ) {
+				case "removeall": // Fall through
+				case "remall":
+					if( ts.size() > 2 ) {
+						MultipleDependentStacker roleStacker = new MultipleDependentStacker(type.getMember().get().getRoles().collectList(), type.getMessage().getChannel());
 						
+						String regex = ts.getString(2);
+						Pattern pattern = Pattern.compile(regex);
+						Matcher matcher = pattern.matcher("");
+												
+						roleStacker.addTask(a -> {
+							List<Role> allRoles = (List<Role>) a.get(0);
+							MessageChannel channel = (MessageChannel) a.get(1);
+							List<Role> rolesToRemove = new ArrayList<Role>();
+							for( Role role : allRoles ) {
+								matcher.reset(role.getName());
+								if( matcher.matches() ) {
+									if( allowed(role.getName(), allowedRoles, deniedRoles, allowedRules, deniedRules) ) {
+										rolesToRemove.add(role);
+									}
+								}
+							}
+							
+							if( rolesToRemove.size() == 0 ) {
+								return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "I could not find any roles that matched that pattern!", EmbedBuilders.ERR_USAGE))).apply(channel);
+							} else {
+								return removeRolesFromMember(type.getMember().get(), rolesToRemove, channel);
+							}
+						});
+						
+						response.append(roleStacker);
 					} else {
-						channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You have to tell me who you want to take the roles from, and which roles to take!", EmbedBuilders.ERR_USAGE)));
+						channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You need to give me a regex pattern of roles you want to get!", EmbedBuilders.ERR_USAGE)));
 					}
 					break;
 				case "clear":
+					MultipleDependentStacker roleStacker = new MultipleDependentStacker(type.getMember().get().getRoles().collectList(), type.getMessage().getChannel());
+											
+					roleStacker.addTask(a -> {
+						List<Role> allRoles = (List<Role>) a.get(0);
+						MessageChannel channel = (MessageChannel) a.get(1);
+						List<Role> rolesToRemove = new ArrayList<Role>();
+						for( Role role : allRoles ) {
+							if( allowed(role.getName(), allowedRoles, deniedRoles, allowedRules, deniedRules) ) {
+								rolesToRemove.add(role);
+							}
+						}
+						
+						if( rolesToRemove.size() == 0 ) {
+							return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "I can not remove any of the roles you have right now!!", EmbedBuilders.ERR_USAGE))).apply(channel);
+						} else {
+							return removeRolesFromMember(type.getMember().get(), rolesToRemove, channel);
+						}
+					});
+					
+					response.append(roleStacker);
 					break;
 				case "list":
 					List<SimpleEntry<String, String>> roleEntries = new ArrayList<SimpleEntry<String, String>>();
@@ -237,6 +323,7 @@ public class RoleAssignFeature extends MessageFeature {
 
 					channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyListFormat(spec, "Role List", Color.of(253, 185, 200), roleEntries, false, true)));
 					break;
+				case "rule": // Fall through
 				case "rules":
 					if( ts.size() > 2 ) {
 						switch( ts.getString(2).toLowerCase() ) {
@@ -275,7 +362,7 @@ public class RoleAssignFeature extends MessageFeature {
 									TokenizedString sub = ts.getSubTokens(4);
 
 								} else {
-									//  TODO: syntax error
+									channelStacker.addTask(new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You need to specify which rules to delete!", EmbedBuilders.ERR_USAGE)));
 								}
 								break;
 							default:
@@ -311,9 +398,7 @@ public class RoleAssignFeature extends MessageFeature {
 				
 		response.append(channelStacker);
 		response.append(memberStacker);
-		response.append(roleStacker);
-		response.append(guildRoleStacker);
-		
+
 		return response.toMono();
 	}
 	

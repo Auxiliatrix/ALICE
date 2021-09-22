@@ -33,6 +33,11 @@ public abstract class MessageFeature extends Feature<MessageCreateEvent> {
 	protected boolean checkMentioned;
 	
 	/**
+	 * Whether this Feature should check if this message was sent in a non-private message..
+	 */
+	protected boolean checkPublic;
+	
+	/**
 	 * Construct a Feature with the given name.
 	 * @param name String used to refer to this Feature
 	 */
@@ -62,6 +67,15 @@ public abstract class MessageFeature extends Feature<MessageCreateEvent> {
 	}
 	
 	/**
+	 * If called, this Feature will check if it is receiving a message that is not in a DM.
+	 * @return the modified Feature
+	 */
+	protected MessageFeature withCheckPublic() {
+		this.checkPublic = true;
+		return this;
+	}
+	
+	/**
 	 * An abstraction of the conditions to be met in order for this Feature to be activated.
 	 * @param event Event instance this Feature was called on
 	 * @return whether or not this Feature should create a response to the given Event
@@ -73,7 +87,8 @@ public abstract class MessageFeature extends Feature<MessageCreateEvent> {
 		return isAllowed(event.getMember().get()) 
 				//&& isEnabled(event.getGuildId().get().asString())
 				&& (!checkInvoked || invoked(event.getMessage()))
-				&& (!checkMentioned || mentioned(event.getMessage()));
+				&& (!checkMentioned || mentioned(event.getMessage()))
+				&& (!checkPublic && (event.getMember().isPresent() && isAllowed(event.getMember().get()) || event.getMember().isEmpty()) || event.getMember().isPresent() && isAllowed(event.getMember().get()));
 	}
 	
 	/**

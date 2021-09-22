@@ -19,6 +19,8 @@ import reactor.core.publisher.Mono;
  */
 public class MultipleDependentStacker implements Monoable {
 
+	//  TODO: use map instead of list
+	
 	/**
 	 * The Mono being stacked upon. This is returned when toMono() is called.
 	 */

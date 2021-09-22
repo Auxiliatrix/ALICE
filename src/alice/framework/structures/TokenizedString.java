@@ -25,12 +25,14 @@ public class TokenizedString {
 		
 		protected boolean quoted;
 		protected boolean coded;
+		protected boolean mentioned;
 		
 		public Token(String content, int index) {
 			this.content = content;
 			this.index = index;
 			this.quoted = false;
 			this.coded = false;
+			this.mentioned = false;
 		}
 		
 		public Token withQuoted() {
@@ -43,6 +45,11 @@ public class TokenizedString {
 			return this;
 		}
 		
+		public Token withMentioned() {
+			mentioned = true;
+			return this;
+		}
+		
 		public boolean isQuoted() {
 			return this.quoted;
 		}
@@ -51,8 +58,12 @@ public class TokenizedString {
 			return this.coded;
 		}
 		
+		public boolean isMentioned() {
+			return this.mentioned;
+		}
+		
 		public boolean isPlain() {
-			return !this.quoted && !this.isCoded();
+			return !this.quoted && !this.isCoded() && !this.isMentioned();
 		}
 		
 		public boolean isInteger() {
@@ -161,6 +172,9 @@ public class TokenizedString {
 						if( inQuote ) {
 							inQuote = false;
 							Token token = new Token(word.toString(), wordStartIndex);
+							if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+								token = token.withMentioned();
+							}
 							token = token.withQuoted();
 							tokens.add(token);
 							word = new StringBuilder();
@@ -168,6 +182,9 @@ public class TokenizedString {
 						} else if( !inCode && globalIndex != string.length()-1 && verifyClosed(string.substring(globalIndex+1), '\"')) {
 							if( word.length() > 0 ) {
 								Token token = new Token(word.toString(), wordStartIndex);
+								if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+									token = token.withMentioned();
+								}
 								tokens.add(token);
 							}
 							word = new StringBuilder();
@@ -181,6 +198,9 @@ public class TokenizedString {
 						if( inCode ) {
 							inCode = false;
 							Token token = new Token(word.toString(), wordStartIndex);
+							if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+								token = token.withMentioned();
+							}
 							token = token.withCoded();
 							tokens.add(token);
 							word = new StringBuilder();
@@ -188,6 +208,9 @@ public class TokenizedString {
 						} else if( !inQuote && globalIndex != string.length()-1 && verifyClosed(string.substring(globalIndex+1), '`')) {
 							if( word.length() > 0 ) {
 								Token token = new Token(word.toString(), wordStartIndex);
+								if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+									token = token.withMentioned();
+								}
 								tokens.add(token);
 							}
 							word = new StringBuilder();
@@ -206,6 +229,9 @@ public class TokenizedString {
 			}
 			if( (!inQuote && !inCode || f == segments.length-1) && word.length() > 0 ) {
 				Token token = new Token(word.toString(), wordStartIndex);
+				if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+					token = token.withMentioned();
+				}
 				tokens.add(token);
 				word = new StringBuilder();
 				wordStartIndex = globalIndex+1;
