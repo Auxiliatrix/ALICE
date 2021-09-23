@@ -56,7 +56,7 @@ public class RoomFeature extends MessageFeature {
 					if( !sf.has(HUB_CHANNEL_KEY) ) {
 						return Mono.fromRunnable(() -> {});
 					} else if( sf.getString(HUB_CHANNEL_KEY).equals(((VoiceChannel) a.get(0)).getId().asString()) ) {
-						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName("Room")));
+						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName(String.format("%s#%s's Room", ((Member) a.get(3)).getUsername(), ((Member) a.get(3)).getDiscriminator())).setParentId(((VoiceChannel) a.get(0)).getCategoryId().get())));
 						vcStacker.addEffect(vc -> sf.putBoolean(String.format("%s%s", ROOM_CHANNEL_PREFIX, vc.getId().asString()), true));
 						return vcStacker.addTask(new MemberVoiceMoveTask((Member) a.get(3)));
 					} else {
@@ -66,7 +66,7 @@ public class RoomFeature extends MessageFeature {
 					Mono<Void> subResponse = Mono.fromRunnable(() -> {});
 					
 					if( sf.has(HUB_CHANNEL_KEY) && sf.getString(HUB_CHANNEL_KEY).equals(((VoiceChannel) a.get(0)).getId().asString()) ) {
-						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName("Room")));
+						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName(String.format("%s#%s's Room", ((Member) a.get(3)).getUsername(), ((Member) a.get(3)).getDiscriminator())).setParentId(((VoiceChannel) a.get(0)).getCategoryId().get())));
 						vcStacker.addEffect(vc -> sf.putBoolean(String.format("%s%s", ROOM_CHANNEL_PREFIX, vc.getId().asString()), true));
 						subResponse = subResponse.and(vcStacker.addTask(new MemberVoiceMoveTask((Member) a.get(3))));
 					}
@@ -140,9 +140,13 @@ public class RoomFeature extends MessageFeature {
 						if( (VoiceChannel) a.get(1) == null ) {
 							return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You must be connected to a voice channel!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
 						} else {
-							SharedSaveFile sf = new SharedSaveFile(((Guild) a.get(2)).getId().asLong());
-							sf.putString(HUB_CHANNEL_KEY, ((VoiceChannel) a.get(1)).getId().asString());
-							return (new MessageSendTask("Room set up successfully!").apply((MessageChannel) a.get(0)));
+							if( ((VoiceChannel) a.get(1)).getCategoryId().isEmpty() ) {
+								return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Voice channel must be inside a channel category!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
+							} else {
+								SharedSaveFile sf = new SharedSaveFile(((Guild) a.get(2)).getId().asLong());
+								sf.putString(HUB_CHANNEL_KEY, ((VoiceChannel) a.get(1)).getId().asString());
+								return (new MessageSendTask("Room set up successfully!").apply((MessageChannel) a.get(0)));
+							}
 						}
 					});
 					break;

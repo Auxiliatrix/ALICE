@@ -75,13 +75,14 @@ public class MultipleDependentStacker implements Monoable {
 	
 	@Override
 	public Mono<?> toMono() {
-		return sequence.and(dependencies.map(m -> Optional.ofNullable(m.block())).collectList().flatMap(t -> {
+		
+		return sequence.and(dependencies.collectList().flatMap(t -> {
 			List<Object> converted = new ArrayList<Object>();
-			for( Optional<?> o : t ) {
-				if( o.isEmpty() ) {
+			for( Mono<?> o : t ) {
+				try {
+					converted.add(o.block());
+				} catch( Exception e) {
 					converted.add(null);
-				} else {
-					converted.add(o.get());
 				}
 			}
 			
@@ -96,6 +97,28 @@ public class MultipleDependentStacker implements Monoable {
 			
 			return process;
 		}));
+		
+//		return sequence.and(dependencies.map(m -> Optional.ofNullable(m.block())).collectList().flatMap(t -> {
+//			List<Object> converted = new ArrayList<Object>();
+//			for( Optional<?> o : t ) {
+//				if( o.isEmpty() ) {
+//					converted.add(null);
+//				} else {
+//					converted.add(o.get());
+//				}
+//			}
+//			
+//			Mono<Void> process = Mono.fromRunnable(() -> {
+//				for( Consumer<List<?>> effect : effects ) {
+//					effect.accept(converted);
+//				}
+//			});
+//			for( Function<List<?>, Mono<?>> task : tasks ) {
+//				process = process.and(task.apply(converted));
+//			}
+//			
+//			return process;
+//		}));
 	}
 	
 }

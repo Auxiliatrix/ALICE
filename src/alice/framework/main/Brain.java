@@ -1,6 +1,7 @@
 package alice.framework.main;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,6 +26,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.rest.util.Image;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class Brain {
@@ -33,6 +35,7 @@ public class Brain {
 	public static AtomicBoolean ALIVE = new AtomicBoolean(true);			// Global variable to determine if shutdown is a restart command
 
 	public static MessageChannel reportChannel;								// Hard-coded text channel to send error messages to
+	public static MessageChannel upkeepChannel;								// Hard-coded text channel to send upkeep messages to
 		// TODO: check for null
 		// TODO: move to constants file
 	
@@ -51,22 +54,29 @@ public class Brain {
 		features.set(new HashMap<Class, PriorityQueue<Feature>>());
 		
 		while( ALIVE.get() ) {		// Primary system loop
-			AliceLogger.info("Starting up...");
-			
-			// Cleanup in case this is a restart
-			features.get().clear();
-			
-			login(args[0]);			// Log in to server
-			reload();				// Reload guild data
-			subscribeFeatures();	// Run subscription functions for features
-			
-			reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
-				// TODO: move to constants file
-			
-			client.onDisconnect().block();	// Wait until disconnected
-			client = null;
-			
-			AliceLogger.info("Shutting down...");
+			try {
+				AliceLogger.info("Starting up...");
+				
+				// Cleanup in case this is a restart
+				features.get().clear();
+				
+				login(args[0]);			// Log in to server
+				reload();				// Reload guild data
+				
+				upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
+				reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
+				
+				setup();
+				
+				subscribeFeatures();	// Run subscription functions for features
+				
+				client.onDisconnect().block();	// Wait until disconnected
+				client = null;
+				
+				AliceLogger.info("Shutting down...");
+			} catch (Exception e) {
+				AliceLogger.info("Recovering...");
+			}
 		}
 	}
 	
@@ -79,6 +89,19 @@ public class Brain {
 			@SuppressWarnings("unused")
 			SharedSaveFile guildData = new SharedSaveFile(guild.getId().asLong());
 		}
+	}
+	
+	/**
+	 * Sets up hard-coded Discord channels for maintenance purposes
+	 */
+	private static void setup() {
+		client.on(ReadyEvent.class)
+		.flatMap(
+				event -> Flux.defer( 
+						() -> upkeepChannel.createMessage("Running upkeep").and(Mono.delay(Duration.ofMinutes(5))).repeat()
+					)
+			)
+		.subscribe();
 	}
 	
 	/**
