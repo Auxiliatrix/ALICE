@@ -68,25 +68,33 @@ public class RoleAssignFeature extends MessageFeature {
 	
 	protected Mono<?> addRolesToMember(Member member, List<Role> rolesToAdd, MessageChannel channel) {
 		Stacker tasks = new Stacker();
-		List<String> addedRoleNames = new ArrayList<String>();
-		for( Role role : rolesToAdd ) {
-			addedRoleNames.add(role.getName());
-			tasks.append(member.addRole(role.getId()));
+		if( rolesToAdd.size() > 5 ) {
+			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Tha's too many roles!", EmbedBuilders.ERR_GENERAL))).apply(channel));
+		} else {
+			List<String> addedRoleNames = new ArrayList<String>();
+			for( Role role : rolesToAdd ) {
+				addedRoleNames.add(role.getName());
+				tasks.append(member.addRole(role.getId()));
+			}
+			String added = String.join(", ", addedRoleNames);
+			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've given you the following roles: `%s`!", added)))).apply(channel));
 		}
-		String added = String.join(", ", addedRoleNames);
-		tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've given you the following roles: `%s`!", added)))).apply(channel));
 		return tasks.toMono();
 	}
 	
 	protected Mono<?> removeRolesFromMember(Member member, List<Role> rolesToRemove, MessageChannel channel) {
 		Stacker tasks = new Stacker();
-		List<String> removedRoleNames = new ArrayList<String>();
-		for( Role role : rolesToRemove ) {
-			removedRoleNames.add(role.getName());
-			tasks.append(member.removeRole(role.getId()));
+		if( rolesToRemove.size() > 5 ) {
+			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Tha's too many roles!", EmbedBuilders.ERR_GENERAL))).apply(channel));
+		} else {
+			List<String> removedRoleNames = new ArrayList<String>();
+			for( Role role : rolesToRemove ) {
+				removedRoleNames.add(role.getName());
+				tasks.append(member.removeRole(role.getId()));
+			}
+			String removed = String.join(", ", removedRoleNames);
+			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've taken away from you the following roles: `%s`!", removed)))).apply(channel));
 		}
-		String removed = String.join(", ", removedRoleNames);
-		tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applySuccessFormat(spec, String.format("I've taken away from you the following roles: `%s`!", removed)))).apply(channel));
 		return tasks.toMono();
 	}
 	
