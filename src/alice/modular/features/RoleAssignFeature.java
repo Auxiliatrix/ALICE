@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import alice.framework.database.SharedJSONArray;
 import alice.framework.database.SharedSaveFile;
 import alice.framework.features.MessageFeature;
+import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.structures.TokenizedString.Token;
 import alice.framework.tasks.DependentStacker;
@@ -33,10 +34,13 @@ public class RoleAssignFeature extends MessageFeature {
 	public static final String DENY_ROLES_KEY = ".role_deny_roles";
 	public static final String DENY_RULES_KEY = ".role_deny_rules";
 	
+	public static final int MAX_ADD_ROLES = 5;
+	public static final int MAX_REMOVE_ROLES = 10;
 	
 	public RoleAssignFeature() {
 		super("Role");
 		withCheckInvoked();
+		withRestriction(PermissionProfile.getAnyonePreset().andFromUser());
 	}
 
 	@Override
@@ -68,8 +72,8 @@ public class RoleAssignFeature extends MessageFeature {
 	
 	protected Mono<?> addRolesToMember(Member member, List<Role> rolesToAdd, MessageChannel channel) {
 		Stacker tasks = new Stacker();
-		if( rolesToAdd.size() > 5 ) {
-			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Tha's too many roles!", EmbedBuilders.ERR_GENERAL))).apply(channel));
+		if( rolesToAdd.size() >= MAX_ADD_ROLES ) {
+			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("That's too many roles! I can add at most %d!", MAX_ADD_ROLES), EmbedBuilders.ERR_GENERAL))).apply(channel));
 		} else {
 			List<String> addedRoleNames = new ArrayList<String>();
 			for( Role role : rolesToAdd ) {
@@ -84,8 +88,8 @@ public class RoleAssignFeature extends MessageFeature {
 	
 	protected Mono<?> removeRolesFromMember(Member member, List<Role> rolesToRemove, MessageChannel channel) {
 		Stacker tasks = new Stacker();
-		if( rolesToRemove.size() > 5 ) {
-			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Tha's too many roles!", EmbedBuilders.ERR_GENERAL))).apply(channel));
+		if( rolesToRemove.size() >= MAX_REMOVE_ROLES ) {
+			tasks.append((new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, String.format("That's too many roles! I can remove at most %d!", MAX_REMOVE_ROLES), EmbedBuilders.ERR_GENERAL))).apply(channel));
 		} else {
 			List<String> removedRoleNames = new ArrayList<String>();
 			for( Role role : rolesToRemove ) {
