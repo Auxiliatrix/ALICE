@@ -98,7 +98,7 @@ public class Brain {
 		client.on(ReadyEvent.class)
 		.flatMap(
 				event -> Flux.defer( 
-						() -> upkeepChannel.createMessage("Running upkeep").and(Mono.delay(Duration.ofMinutes(5))).repeat()
+						() -> upkeepChannel.createMessage("Running upkeep").and(Mono.delay(Duration.ofMinutes(5))).onErrorContinue((e, o) -> { e.printStackTrace(); }).repeat()
 					)
 			)
 		.subscribe();
@@ -215,7 +215,7 @@ public class Brain {
 			}
 
 			return process;											// Return the queue to be executed
-		}).subscribe();
+		}).onErrorContinue((e, o) -> { /* TODO: tell event it broke */ }).subscribe();
 	}
 	
 	/**
@@ -227,7 +227,7 @@ public class Brain {
 			spec.setAvatar(Image.ofUrl(url).block());
 				// TODO: verify image exists
 			AliceLogger.info("Avatar updated.");
-		}).subscribe();
+		}).onErrorResume(error -> { error.printStackTrace(); return Mono.empty(); }).subscribe();
 	}
 	
 	/**

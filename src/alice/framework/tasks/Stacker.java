@@ -40,6 +40,7 @@ public class Stacker implements Monoable {
 	@Override
 	public Mono<?> toMono() {
 		return sequence;
+		//return sequence.onErrorContinue((t, o) -> {});
 	}
 	
 }
