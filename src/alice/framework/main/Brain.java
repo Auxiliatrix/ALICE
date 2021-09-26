@@ -25,6 +25,10 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
+import discord4j.rest.request.RouteMatcher;
+import discord4j.rest.request.RouterOptions;
+import discord4j.rest.response.ResponseFunction;
+import discord4j.rest.route.Routes;
 import discord4j.rest.util.Image;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -66,7 +70,7 @@ public class Brain {
 				upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
 				reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
 				
-				setup();
+				// setup();
 				
 				subscribeFeatures();	// Run subscription functions for features
 				
@@ -110,8 +114,10 @@ public class Brain {
 	 */
 	private static void login(String token) {
 		AliceLogger.info("Logging in...");
-
-		client = DiscordClientBuilder.create(token).build().login().block();
+		
+		client = DiscordClientBuilder.create(token)
+				.onClientResponse(ResponseFunction.emptyOnErrorStatus(RouteMatcher.any(), 1006))
+				.build().login().block();
 		client.updatePresence(Presence.online(Activity.listening("%help"))).block();	// Sets Discord bot presence and status
 			// TODO: turn into a variable
 		client.on(ReadyEvent.class)	// Once the Ready event is received from the server
@@ -215,7 +221,12 @@ public class Brain {
 			}
 
 			return process;											// Return the queue to be executed
-		}).onErrorContinue((e, o) -> { /* TODO: tell event it broke */ }).subscribe();
+		})
+		.doOnError(e -> {
+				System.err.println("Propagated error detected. Reconnecting client.");
+				client.logout().block();
+			})
+		.subscribe();
 	}
 	
 	/**

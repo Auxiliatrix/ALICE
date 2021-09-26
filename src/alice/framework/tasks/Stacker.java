@@ -1,5 +1,6 @@
 package alice.framework.tasks;
 
+import alice.framework.main.Brain;
 import reactor.core.publisher.Mono;
 
 /**
@@ -39,8 +40,14 @@ public class Stacker implements Monoable {
 	
 	@Override
 	public Mono<?> toMono() {
-		return sequence;
-		//return sequence.onErrorContinue((t, o) -> {});
+		return sequence
+				.doOnError(e -> {
+					System.err.println("Propagated error detected. Reconnecting client.");
+					Brain.client.logout().block();
+				});
+//				.onErrorContinue((e, o) -> {
+//						e.printStackTrace(); System.err.println("Unhandled error caught during execution of Stacker.");
+//					});
 	}
 	
 }
