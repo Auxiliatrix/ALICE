@@ -1,1 +1,1 @@
-web: java -jar target/rehaul.jar
+web: java -jar target/rehaul.jar $BOT_TOKEN
