@@ -12,7 +12,7 @@
 bin/
 
 # Local Data Files
-tmp/
+# tmp/
 test/
 *Exp.java
 

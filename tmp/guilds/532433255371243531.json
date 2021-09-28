@@ -1,0 +1,32 @@
+{
+ ".role_allow_roles": [
+  "rainbow-egg",
+  "she/her",
+  "he/him",
+  "they/them",
+  "WEEB",
+  "any pronouns"
+ ],
+ ".room_child_id_890538531791982645": true,
+ ".role_deny_rules": [],
+ ".room_hub_id": "827399115684053002",
+ ".role_allow_rules": [
+  "(?i)EECS.*",
+  "(?i)INF.*",
+  "(?i)Stats.*",
+  "(?i)ICS.*",
+  "(?i)CSE.*",
+  "(?i)CS.*",
+  "(?i)(interest).*",
+  "(?i)ENGR.*"
+ ],
+ ".role_deny_roles": [
+  "Endorsed Poster",
+  "Moderator",
+  "Admin",
+  "Babysitter",
+  "Janitor",
+  "Legacy",
+  "Founder"
+ ]
+}
