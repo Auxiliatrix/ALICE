@@ -1,1 +1,1 @@
-web: java -jar target/rehaul.jar $TOKEN
+worker: java -jar target/rehaul.jar $TOKEN
