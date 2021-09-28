@@ -47,9 +47,14 @@ public class Brain {
 		
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
-		if ( args.length < 1 ) {	// Checks if a token was passed
-			AliceLogger.error("Please pass the TOKEN as the first argument.");
-			System.exit(0);
+		String token = System.getenv("TOKEN");
+		if( token == null ) {
+			if ( args.length < 1 ) {	// Checks if a token was passed
+				AliceLogger.error("Please pass the TOKEN as the first argument.");
+				System.exit(0);
+			} else {
+				token = args[0];
+			}
 		}
 		
 		// Initialize Feature maps

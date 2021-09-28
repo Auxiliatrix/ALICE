@@ -1,1 +1,1 @@
-web: java -jar target/rehaul.jar $TOKEN
+web: java -jar target/rehaul.jar
