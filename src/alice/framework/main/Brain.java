@@ -26,9 +26,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.presence.Activity;
 import discord4j.core.object.presence.Presence;
 import discord4j.rest.request.RouteMatcher;
-import discord4j.rest.request.RouterOptions;
 import discord4j.rest.response.ResponseFunction;
-import discord4j.rest.route.Routes;
 import discord4j.rest.util.Image;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,7 +44,7 @@ public class Brain {
 	/* CLASS SHOULD BE OF TYPE EVENT BUT THIS IS NOT ENFORCED */
 	@SuppressWarnings("rawtypes")	// Maps Events to a list of Features they should trigger, ordered by priority
 	public static AtomicReference<Map<Class, PriorityQueue<Feature>>> features = new AtomicReference<Map<Class, PriorityQueue<Feature>>>();
-	
+		
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 		if ( args.length < 1 ) {	// Checks if a token was passed
@@ -56,7 +54,7 @@ public class Brain {
 		
 		// Initialize Feature maps
 		features.set(new HashMap<Class, PriorityQueue<Feature>>());
-		
+				
 		while( ALIVE.get() ) {		// Primary system loop
 			try {
 				AliceLogger.info("Starting up...");
@@ -70,7 +68,7 @@ public class Brain {
 				upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
 				reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
 				
-				// setup();
+				setup();
 				
 				subscribeFeatures();	// Run subscription functions for features
 				

@@ -37,6 +37,7 @@ public class CrashFeature extends MessageFeature {
 		DependentStacker<MessageChannel> mcs = new DependentStacker<MessageChannel>(type.getMessage().getChannel());
 		mcs.addTask(new MessageSendTask("Crashing!"));
 		mcs.addEffect(mc -> {
+				System.out.println("Crashing!");
 				throw new RuntimeException("Crashing!");
 			});
 		
