@@ -47,7 +47,7 @@ public class Brain {
 		
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
-		String token = System.getenv("TOKEN");
+		String token = System.getenv("BOT_TOKEN");
 		if( token == null ) {
 			if ( args.length < 1 ) {	// Checks if a token was passed
 				AliceLogger.error("Please pass the TOKEN as the first argument.");
