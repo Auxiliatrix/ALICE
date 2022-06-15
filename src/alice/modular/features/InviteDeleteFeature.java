@@ -45,7 +45,7 @@ public class InviteDeleteFeature extends Feature<InviteDeleteEvent> {
 		String code = type.getCode();
 		stacker.append(target.addRole(Snowflake.of(roleID)));
 		stacker.append(() -> {
-			FileIO.appendToFile("user_associations.csv", String.format("%s,%s#%s,%s\n", code, target.getUsername(), target.getDiscriminator(), target.getId().asString()));
+			FileIO.appendToFile("tmp/user_associations.csv", String.format("%s,%s#%s,%s\n", code, target.getUsername(), target.getDiscriminator(), target.getId().asString()));
 			System.out.println(target.getUsername() + "#" + target.getDiscriminator());
 		});
 		
