@@ -1,0 +1,44 @@
+apply plugin:'java'
+apply plugin:'application'
+apply plugin:'idea'
+apply plugin:'eclipse'
+
+mainClassName = "alice/framework/main/Brain"
+
+run {
+	if (project.hasProperty("runArgs")) {
+        args Eval.me(runArgs)
+    }
+}
+
+repositories {
+	jcenter()
+	maven {
+		url  "https://jitpack.io"
+	}
+	mavenCentral()
+}
+
+dependencies {
+	implementation "com.discord4j:discord4j-core:3.2.2"
+	implementation 'org.reflections:reflections:0.9.11'
+	implementation group: 'org.json', name: 'json', version: '20200518'
+}
+
+sourceSets {
+   main {
+      java {
+         srcDirs = ['src']
+      }
+   }
+}
+
+jar {
+	// Needs to be after dependencies
+	manifest {
+		attributes 'Main-Class': mainClassName
+		attributes (
+			"Class-Path": configurations.runtimeClasspath.collect { it.getName() }.join(' ')
+		)
+	}
+}

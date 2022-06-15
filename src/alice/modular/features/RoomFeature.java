@@ -20,6 +20,7 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
+import discord4j.core.spec.VoiceChannelCreateSpec;
 import reactor.core.publisher.Mono;
 
 
@@ -56,7 +57,7 @@ public class RoomFeature extends MessageFeature {
 					if( !sf.has(HUB_CHANNEL_KEY) ) {
 						return Mono.fromRunnable(() -> {});
 					} else if( sf.getString(HUB_CHANNEL_KEY).equals(((VoiceChannel) a.get(0)).getId().asString()) ) {
-						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName(String.format("%s#%s's Room", ((Member) a.get(3)).getUsername(), ((Member) a.get(3)).getDiscriminator())).setParentId(((VoiceChannel) a.get(0)).getCategoryId().get())));
+						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(VoiceChannelCreateSpec.builder().name(String.format("%s#%s's Room", ((Member) a.get(3)).getUsername(), ((Member) a.get(3)).getDiscriminator())).parentId(((VoiceChannel) a.get(0)).getCategoryId().get()).build()));
 						vcStacker.addEffect(vc -> sf.putBoolean(String.format("%s%s", ROOM_CHANNEL_PREFIX, vc.getId().asString()), true));
 						return vcStacker.addTask(new MemberVoiceMoveTask((Member) a.get(3)));
 					} else {
@@ -66,7 +67,7 @@ public class RoomFeature extends MessageFeature {
 					Mono<Void> subResponse = Mono.fromRunnable(() -> {});
 					
 					if( sf.has(HUB_CHANNEL_KEY) && sf.getString(HUB_CHANNEL_KEY).equals(((VoiceChannel) a.get(0)).getId().asString()) ) {
-						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(c -> c.setName(String.format("%s#%s's Room", ((Member) a.get(3)).getUsername(), ((Member) a.get(3)).getDiscriminator())).setParentId(((VoiceChannel) a.get(0)).getCategoryId().get())));
+						DependentStacker<VoiceChannel> vcStacker = new DependentStacker<VoiceChannel>(((Guild) a.get(2)).createVoiceChannel(VoiceChannelCreateSpec.builder().name(String.format("%s#%s's Room", ((Member) a.get(3)).getUsername(), ((Member) a.get(3)).getDiscriminator())).parentId(((VoiceChannel) a.get(0)).getCategoryId().get()).build()));
 						vcStacker.addEffect(vc -> sf.putBoolean(String.format("%s%s", ROOM_CHANNEL_PREFIX, vc.getId().asString()), true));
 						subResponse = subResponse.and(vcStacker.addTask(new MemberVoiceMoveTask((Member) a.get(3))));
 					}
@@ -131,17 +132,17 @@ public class RoomFeature extends MessageFeature {
 																		);
 		
 		if( ts.size() < 2 ) {
-			stacker.addTask(a -> (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You must specify an argument.", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0)));
-//			stacker.addTask(a -> (new EmbedSendTask(spec -> EmbedBuilders.getHelpConstructor(type.getMessage().getAuthor().get(), this))).apply((MessageChannel) a.get(0)));
+			stacker.addTask(a -> (new EmbedSendTask(EmbedBuilders.applyErrorFormat("You must specify an argument.", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0)));
+//			stacker.addTask(a -> (new EmbedSendTask(EmbedBuilders.getHelpConstructor(type.getMessage().getAuthor().get(), this))).apply((MessageChannel) a.get(0)));
 		} else {
 			switch( ts.getString(1).toLowerCase() ) {
 				case "setup":
 					stacker.addTask(a -> {
 						if( (VoiceChannel) a.get(1) == null ) {
-							return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You must be connected to a voice channel!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
+							return (new EmbedSendTask(EmbedBuilders.applyErrorFormat("You must be connected to a voice channel!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
 						} else {
-							if( ((VoiceChannel) a.get(1)).getCategoryId().isEmpty() ) {
-								return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Voice channel must be inside a channel category!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
+							if( !((VoiceChannel) a.get(1)).getCategoryId().isPresent() ) {
+								return (new EmbedSendTask(EmbedBuilders.applyErrorFormat("Voice channel must be inside a channel category!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
 							} else {
 								SharedSaveFile sf = new SharedSaveFile(((Guild) a.get(2)).getId().asLong());
 								sf.putString(HUB_CHANNEL_KEY, ((VoiceChannel) a.get(1)).getId().asString());
@@ -157,12 +158,12 @@ public class RoomFeature extends MessageFeature {
 							sf.remove(HUB_CHANNEL_KEY);
 							return (new MessageSendTask("Room deactivated successfully!").apply((MessageChannel) a.get(0)));
 						} else {
-							return (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "You do not have a room hub set up in this server!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
+							return (new EmbedSendTask(EmbedBuilders.applyErrorFormat("You do not have a room hub set up in this server!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0));
 						}
 					});
 					break;
 				default:
-					stacker.addTask(a -> (new EmbedSendTask(spec -> EmbedBuilders.applyErrorFormat(spec, "Invalid command!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0)));
+					stacker.addTask(a -> (new EmbedSendTask(EmbedBuilders.applyErrorFormat("Invalid command!", EmbedBuilders.ERR_USAGE))).apply((MessageChannel) a.get(0)));
 					break;
 			}
 		}

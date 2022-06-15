@@ -17,14 +17,19 @@ import alice.framework.features.Documentable;
 import alice.framework.features.Feature;
 import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
+import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
+import discord4j.core.object.presence.ClientActivity;
+import discord4j.core.object.presence.ClientPresence;
+import discord4j.core.spec.UserEditSpec;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.request.RouteMatcher;
 import discord4j.rest.response.ResponseFunction;
 import discord4j.rest.util.Image;
@@ -44,7 +49,9 @@ public class Brain {
 	/* CLASS SHOULD BE OF TYPE EVENT BUT THIS IS NOT ENFORCED */
 	@SuppressWarnings("rawtypes")	// Maps Events to a list of Features they should trigger, ordered by priority
 	public static AtomicReference<Map<Class, PriorityQueue<Feature>>> features = new AtomicReference<Map<Class, PriorityQueue<Feature>>>();
-		
+	
+	public static AtomicReference<String> token_ref = new AtomicReference<String>();
+	
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 		String token = System.getenv("BOT_TOKEN");
@@ -56,6 +63,8 @@ public class Brain {
 				token = args[0];
 			}
 		}
+
+		token_ref.set(token);
 		
 		// Initialize Feature maps
 		features.set(new HashMap<Class, PriorityQueue<Feature>>());
@@ -117,11 +126,10 @@ public class Brain {
 	 */
 	private static void login(String token) {
 		AliceLogger.info("Logging in...");
-		
 		client = DiscordClientBuilder.create(token)
 				.onClientResponse(ResponseFunction.emptyOnErrorStatus(RouteMatcher.any(), 1006))
 				.build().login().block();
-		client.updatePresence(Presence.online(Activity.listening("%help"))).block();	// Sets Discord bot presence and status
+		client.updatePresence(ClientPresence.online(ClientActivity.listening("%help"))).block();
 			// TODO: turn into a variable
 		client.on(ReadyEvent.class)	// Once the Ready event is received from the server
 			.subscribe( event -> {
@@ -132,6 +140,16 @@ public class Brain {
 			});
 		
 		AliceLogger.info("Log in successful.");
+	}
+	
+	public static Flux<Member> getMembers(Snowflake guildId) {
+		return DiscordClient.create(token_ref.get())
+	            .gateway()
+	            .setEnabledIntents(IntentSet.of(Intent.GUILD_MEMBERS))
+	            .login()
+	            .flatMapMany(gateway ->
+	                gateway.requestMembers(guildId)
+	            );
 	}
 	
 	/**
@@ -237,11 +255,8 @@ public class Brain {
 	 * @param url to retrieve image from
 	 */
 	public static void updateAvatar(String url) {
-		client.edit(spec -> {
-			spec.setAvatar(Image.ofUrl(url).block());
-				// TODO: verify image exists
-			AliceLogger.info("Avatar updated.");
-		}).onErrorResume(error -> { error.printStackTrace(); return Mono.empty(); }).subscribe();
+		client.edit(UserEditSpec.builder().avatar(Image.ofUrl(url).block()).build())
+			.onErrorResume(error -> { error.printStackTrace(); return Mono.empty(); }).subscribe();
 	}
 	
 	/**

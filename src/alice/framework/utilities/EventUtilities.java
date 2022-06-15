@@ -24,7 +24,7 @@ public class EventUtilities {
 	}
 	
 	public static synchronized boolean getDisconnected(VoiceStateUpdateEvent event) {
-		return !event.getOld().isEmpty();
+		return event.getOld().isPresent();
 	}
 	
 	public static synchronized String escapeMarkdown(String message) {

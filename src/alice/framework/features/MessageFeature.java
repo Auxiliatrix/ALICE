@@ -84,7 +84,7 @@ public abstract class MessageFeature extends Feature<MessageCreateEvent> {
 	
 	@Override
 	protected boolean listen(MessageCreateEvent event) {
-		return (!checkPublic && (event.getMember().isPresent() && isAllowed(event.getMember().get()) || event.getMember().isEmpty()) || event.getMember().isPresent() && isAllowed(event.getMember().get()))
+		return (!checkPublic && (event.getMember().isPresent() && isAllowed(event.getMember().get()) || !event.getMember().isPresent()) || event.getMember().isPresent() && isAllowed(event.getMember().get()))
 				//&& isEnabled(event.getGuildId().get().asString())
 				&& (!checkInvoked || invoked(event.getMessage()))
 				&& (!checkMentioned || mentioned(event.getMessage()));
