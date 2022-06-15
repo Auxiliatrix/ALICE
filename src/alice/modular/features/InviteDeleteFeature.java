@@ -45,7 +45,7 @@ public class InviteDeleteFeature extends Feature<InviteDeleteEvent> {
 		String code = type.getCode();
 		stacker.append(target.addRole(Snowflake.of(roleID)));
 		stacker.append(() -> {
-			FileIO.writeToFile("user_associations", String.format("%s,%s#%s\n", code, target.getUsername(), target.getDiscriminator()));
+			FileIO.appendToFile("user_associations.csv", String.format("%s,%s#%s,%s\n", code, target.getUsername(), target.getDiscriminator(), target.getId().asString()));
 			System.out.println(target.getUsername() + "#" + target.getDiscriminator());
 		});
 		
@@ -53,7 +53,11 @@ public class InviteDeleteFeature extends Feature<InviteDeleteEvent> {
 	}
 	
 	public static void trackCustomInvites(Guild guild) {
-		List<String> invites = guild.getInvites().filter(ei -> Brain.client.getSelfId().equals(ei.getInviterId().get())).map(ei -> ei.getCode()).collectList().block();
+//		List<String> invites = guild.getInvites().filter(ei -> Brain.client.getSelfId().equals(ei.getInviterId().get())).map(ei -> ei.getCode()).collectList().block();
+		List<String> invites = guild.getInvites().filter(ei -> 
+			Snowflake.of("367437754034028545").equals(ei.getInviterId().get())
+			|| Brain.client.getSelfId().equals(ei.getInviterId().get())
+			).map(ei -> ei.getCode()).collectList().block();
 		System.out.println(invites.size());
 		uniqueCodes = invites;
 	}
