@@ -6,6 +6,7 @@ import java.util.List;
 import alice.framework.features.Feature;
 import alice.framework.main.Brain;
 import alice.framework.tasks.Stacker;
+import alice.framework.utilities.FileIO;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.InviteDeleteEvent;
 import discord4j.core.object.entity.Guild;
@@ -41,8 +42,10 @@ public class InviteDeleteFeature extends Feature<InviteDeleteEvent> {
 			public int compare(Member o1, Member o2) {
 				return -o1.getJoinTime().get().compareTo(o2.getJoinTime().get());
 			}}).blockFirst();
+		String code = type.getCode();
 		stacker.append(target.addRole(Snowflake.of(roleID)));
 		stacker.append(() -> {
+			FileIO.writeToFile("user_associations", String.format("%s,%s#%s\n", code, target.getUsername(), target.getDiscriminator()));
 			System.out.println(target.getUsername() + "#" + target.getDiscriminator());
 		});
 		
