@@ -24,6 +24,22 @@ public class FileIO {
 		}
 	}
 	
+	public static synchronized void appendToFile(String fileName, String content) {
+		File outfile = new File(fileName);
+		if( outfile.getParentFile() != null ) {
+			outfile.getParentFile().mkdirs();
+		}
+		try {
+			outfile.createNewFile();
+		} catch (IOException e) {}
+		
+		try ( FileWriter fileWriter = new FileWriter(outfile, true) ) {
+			fileWriter.write(content);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static synchronized String readFromFile(String fileName) {
 		return readFromFile(fileName, "");
 	}
