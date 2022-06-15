@@ -1,15 +1,15 @@
 package alice.framework.database;
 
-import discord4j.core.object.entity.Guild;
+import discord4j.common.util.Snowflake;
 
 public class DataManager {
 
-	protected Guild guild;
+	protected Snowflake guildId;
 	protected SharedSaveFile saveFile;
 	
-	public DataManager(Guild guild) {
-		this.guild = guild;
-		this.saveFile = new SharedSaveFile(guild.getId().asLong());
+	public DataManager(Snowflake guildId) {
+		this.guildId = guildId;
+		this.saveFile = new SharedSaveFile(guildId.asLong());
 	}
 		
 }
