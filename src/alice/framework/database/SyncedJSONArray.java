@@ -18,7 +18,7 @@ import alice.framework.database.SaveSyncProxy.Redirects;
 import alice.framework.database.SaveSyncProxy.ReturnsSelf;
 import alice.framework.database.SaveSyncProxy.WriteLock;
 
-public interface SaveArrayInterface {
+public interface SyncedJSONArray {
 
     public Object get(int index) throws JSONException;
     public boolean getBoolean(int index) throws JSONException;
@@ -30,9 +30,9 @@ public interface SaveArrayInterface {
     public BigInteger getBigInteger (int index) throws JSONException;
     public int getInt(int index) throws JSONException;
     @RecursiveLock
-    public SaveArrayInterface getJSONArray(int index) throws JSONException;
+    public SyncedJSONArray getJSONArray(int index) throws JSONException;
     @RecursiveLock
-    public SaveFileInterface getJSONObject(int index) throws JSONException;
+    public SyncedJSONObject getJSONObject(int index) throws JSONException;
     public long getLong(int index) throws JSONException;
     public String getString(int index) throws JSONException;
     public boolean isNull(int index);
@@ -128,26 +128,26 @@ public interface SaveArrayInterface {
     }
     @ReturnsSelf
     @Redirects(type=RedirectType.SAIputJSONObject)
-    public default SaveArrayInterface putJSONObject(int index) throws JSONException {
+    public default SyncedJSONArray putJSONObject(int index) throws JSONException {
     	return null;
     }
     @ReturnsSelf
     @Redirects(type=RedirectType.SAIputJSONArray)
-    public default SaveArrayInterface putJSONArray(int index) throws JSONException {
+    public default SyncedJSONArray putJSONArray(int index) throws JSONException {
     	return null;
     }
     
     @WriteLock
 	@ReturnsSelf
 	@Redirects(type=RedirectType.SAIputObject)
-    public default SaveFileInterface put(int index, String value) throws JSONException {
+    public default SyncedJSONObject put(int index, String value) throws JSONException {
     	return null;
     }
     
     @WriteLock
 	@ReturnsSelf
 	@Redirects(type=RedirectType.SAIappendObject)
-    public default SaveFileInterface put(String value) throws JSONException {
+    public default SyncedJSONObject put(String value) throws JSONException {
     	return null;
     }
 }

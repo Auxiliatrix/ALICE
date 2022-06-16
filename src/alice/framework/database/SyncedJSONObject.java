@@ -18,12 +18,12 @@ import alice.framework.database.SaveSyncProxy.Redirects;
 import alice.framework.database.SaveSyncProxy.ReturnsSelf;
 import alice.framework.database.SaveSyncProxy.WriteLock;
 
-public interface SaveFileInterface {
+public interface SyncedJSONObject {
 
 //	@WriteLock
 //  public SaveFileInterface accumulate(String key, Object value) throws JSONException;
 	@WriteLock
-	public SaveFileInterface append(String key, Object value) throws JSONException;
+	public SyncedJSONObject append(String key, Object value) throws JSONException;
 	public Object get(String key) throws JSONException;
 	public <E extends Enum<E>> E getEnum(Class<E> clazz, String key) throws JSONException;
 	public boolean getBoolean(String key) throws JSONException;
@@ -34,15 +34,15 @@ public interface SaveFileInterface {
     public Number getNumber(String key) throws JSONException;
     public int getInt(String key) throws JSONException;
 	@RecursiveLock
-	public SaveArrayInterface getJSONArray(String key) throws JSONException;
+	public SyncedJSONArray getJSONArray(String key) throws JSONException;
     @RecursiveLock
-    public SaveFileInterface getJSONObject(String key) throws JSONException;
+    public SyncedJSONObject getJSONObject(String key) throws JSONException;
     public long getLong(String key) throws JSONException;
     public String getString(String key) throws JSONException;
     public boolean has(String key);
 	@WriteLock
 	@ReturnsSelf
-    public SaveFileInterface increment(String key) throws JSONException;
+    public SyncedJSONObject increment(String key) throws JSONException;
     public boolean isNull(String key);
     public int length();
     public boolean isEmpty();
@@ -70,25 +70,25 @@ public interface SaveFileInterface {
     public String optString(String key, String defaultValue);
 	@WriteLock
 	@ReturnsSelf
-    public SaveFileInterface put(String key, boolean value) throws JSONException;
+    public SyncedJSONObject put(String key, boolean value) throws JSONException;
 	@WriteLock
 	@ReturnsSelf
-    public SaveFileInterface put(String key, Collection<?> value) throws JSONException;
+    public SyncedJSONObject put(String key, Collection<?> value) throws JSONException;
 	@WriteLock
 	@ReturnsSelf
-	public SaveFileInterface put(String key, double value) throws JSONException;
+	public SyncedJSONObject put(String key, double value) throws JSONException;
 	@WriteLock
 	@ReturnsSelf
-	public SaveFileInterface put(String key, float value) throws JSONException;
+	public SyncedJSONObject put(String key, float value) throws JSONException;
 	@WriteLock
 	@ReturnsSelf
-    public SaveFileInterface put(String key, int value) throws JSONException;
+    public SyncedJSONObject put(String key, int value) throws JSONException;
 	@WriteLock
 	@ReturnsSelf
-    public SaveFileInterface put(String key, long value) throws JSONException;
+    public SyncedJSONObject put(String key, long value) throws JSONException;
 	@WriteLock
 	@ReturnsSelf
-    public SaveFileInterface put(String key, Map<?, ?> value) throws JSONException;
+    public SyncedJSONObject put(String key, Map<?, ?> value) throws JSONException;
 //	@RestrictLock
 //    public SaveFileInterface put(String key, Object value) throws JSONException;
 //	@RestrictLock
@@ -116,14 +116,14 @@ public interface SaveFileInterface {
     @WriteLock
     @ReturnsSelf
     @Redirects(type=RedirectType.SFIputJSONObject)
-    public default SaveFileInterface putJSONObject(String key) throws JSONException {
+    public default SyncedJSONObject putJSONObject(String key) throws JSONException {
     	return null;
     }
     
     @WriteLock
     @ReturnsSelf
     @Redirects(type=RedirectType.SFIputJSONArray)
-    public default SaveFileInterface putJSONArray(String key) throws JSONException {
+    public default SyncedJSONObject putJSONArray(String key) throws JSONException {
     	return null;
     }
     
@@ -140,7 +140,7 @@ public interface SaveFileInterface {
     @WriteLock
 	@ReturnsSelf
 	@Redirects(type=RedirectType.SFIputObject)
-    public default SaveFileInterface put(String key, String value) throws JSONException {
+    public default SyncedJSONObject put(String key, String value) throws JSONException {
     	return null;
     }
     

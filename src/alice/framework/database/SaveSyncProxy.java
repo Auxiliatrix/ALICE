@@ -16,8 +16,6 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import alice.framework.main.Constants;
-import alice.framework.utilities.AliceLogger;
 import alice.framework.utilities.FileIO;
 import alice.framework.utilities.ReadWriteReentrantLock;
 import alina.utilities.WrappingProxy;
@@ -57,43 +55,25 @@ public class SaveSyncProxy extends WrappingProxy {
 	};
 	
 	protected static Map<String, ReadWriteReentrantLock> lockMap = new HashMap<String, ReadWriteReentrantLock>();
-	protected static Map<String, SaveFileInterface> cache = new HashMap<String, SaveFileInterface>();
+	protected static Map<String, SyncedJSONObject> cache = new HashMap<String, SyncedJSONObject>();
 	
-	protected Map<JSONObject, SaveFileInterface> recursiveCache;
-	protected Map<JSONArray, SaveArrayInterface> recursiveArrayCache;
+	protected Map<JSONObject, SyncedJSONObject> recursiveCache;
+	protected Map<JSONArray, SyncedJSONArray> recursiveArrayCache;
 	
 	protected String key;
-	
-	public static SaveFileInterface of(String key) {
-		if( !lockMap.containsKey(key) ) {
-			AliceLogger.info(String.format("Loaded guild data from %s.", key), 1);
-			lockMap.put(key, new ReadWriteReentrantLock(true));
-		}
-		
-		if( cache.containsKey(key) ) {
-			return cache.get(key);
-		} else {
-			SaveFileInterface sfi = (SaveFileInterface) Proxy.newProxyInstance(
-					SaveSyncProxy.class.getClassLoader(), 
-					new Class[] {SaveFileInterface.class}, 
-					new SaveSyncProxy(key, new JSONObject(FileIO.readFromFile(key, Constants.DEFAULT_GUILD_DATA))));
-			cache.put(key, sfi);
-			return sfi;
-		}
-	}
 	
 	protected SaveSyncProxy(String key, JSONObject target) {
 		super(target);
 		this.key = key;
-		recursiveCache = new HashMap<JSONObject, SaveFileInterface>();
-		recursiveArrayCache = new HashMap<JSONArray, SaveArrayInterface>();
+		recursiveCache = new HashMap<JSONObject, SyncedJSONObject>();
+		recursiveArrayCache = new HashMap<JSONArray, SyncedJSONArray>();
 	}
 	
 	protected SaveSyncProxy(String key, JSONArray target) {
 		super(target);
 		this.key = key;
-		recursiveCache = new HashMap<JSONObject, SaveFileInterface>();
-		recursiveArrayCache = new HashMap<JSONArray, SaveArrayInterface>();
+		recursiveCache = new HashMap<JSONObject, SyncedJSONObject>();
+		recursiveArrayCache = new HashMap<JSONArray, SyncedJSONArray>();
 	}
 	
 	@Override
@@ -178,34 +158,34 @@ public class SaveSyncProxy extends WrappingProxy {
 			}
 			
 			if( method.isAnnotationPresent(ReturnsSelf.class) ) {
-				if( method.getReturnType().equals(SaveFileInterface.class) ) {
+				if( method.getReturnType().equals(SyncedJSONObject.class) ) {
 					return recursiveCache.get(target);
-				} else if( method.getReturnType().equals(SaveArrayInterface.class) ) {
+				} else if( method.getReturnType().equals(SyncedJSONArray.class) ) {
 					return recursiveArrayCache.get(target);
 				}
 				return proxy;
 			}
 			
 			if( method.isAnnotationPresent(RecursiveLock.class) ) {
-				if( method.getReturnType().equals(SaveFileInterface.class) ) {
+				if( method.getReturnType().equals(SyncedJSONObject.class) ) {
 					JSONObject intermediary = (JSONObject) result;
 					if( recursiveCache.containsKey(intermediary) ) {
 						return recursiveCache.get(intermediary);
 					} else {
 						SaveSyncProxy intermediaryProxy = new SaveSyncProxy(key, intermediary);
-						result = (SaveFileInterface) Proxy.newProxyInstance(SaveSyncProxy.class.getClassLoader(), new Class[] {SaveFileInterface.class}, intermediaryProxy);
-						intermediaryProxy.recursiveCache.put(intermediary, (SaveFileInterface) result);
-						recursiveCache.put(intermediary, (SaveFileInterface) result);
+						result = (SyncedJSONObject) Proxy.newProxyInstance(SaveSyncProxy.class.getClassLoader(), new Class[] {SyncedJSONObject.class}, intermediaryProxy);
+						intermediaryProxy.recursiveCache.put(intermediary, (SyncedJSONObject) result);
+						recursiveCache.put(intermediary, (SyncedJSONObject) result);
 					}
-				} else if( method.getReturnType().equals(SaveArrayInterface.class) ) {
+				} else if( method.getReturnType().equals(SyncedJSONArray.class) ) {
 					JSONArray intermediary = (JSONArray) result;
 					if( recursiveArrayCache.containsKey(intermediary) ) {
 						return recursiveArrayCache.get(intermediary);
 					} else {
 						SaveSyncProxy intermediaryProxy = new SaveSyncProxy(key, intermediary);
-						result = (SaveArrayInterface) Proxy.newProxyInstance(SaveSyncProxy.class.getClassLoader(), new Class[] {SaveArrayInterface.class}, intermediaryProxy);
-						intermediaryProxy.recursiveArrayCache.put(intermediary, (SaveArrayInterface) result);
-						recursiveArrayCache.put(intermediary, (SaveArrayInterface) result);
+						result = (SyncedJSONArray) Proxy.newProxyInstance(SaveSyncProxy.class.getClassLoader(), new Class[] {SyncedJSONArray.class}, intermediaryProxy);
+						intermediaryProxy.recursiveArrayCache.put(intermediary, (SyncedJSONArray) result);
+						recursiveArrayCache.put(intermediary, (SyncedJSONArray) result);
 					}
 				} else {
 				}
