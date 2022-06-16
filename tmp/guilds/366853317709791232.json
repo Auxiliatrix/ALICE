@@ -1,13 +1,1 @@
-{
- ".role_allow_roles": [
-  "test 1",
-  "test2"
- ],
- ".role_deny_rules": [],
- ".room_hub_id": "756179628804276315",
- ".role_allow_rules": [
-  "test 3",
-  "(?i)Stats.*"
- ],
- ".role_deny_roles": []
-}
+{}

@@ -13,6 +13,7 @@ bin/
 
 # Local Data Files
 tmp/
+tmp/guilds/
 lab/
 test/
 *Exp.java
