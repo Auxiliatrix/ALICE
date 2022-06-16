@@ -11,22 +11,19 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONPointer;
 
-import alice.framework.database.SFISyncProxy.RecursiveLock;
-import alice.framework.database.SFISyncProxy.RedirectType;
-import alice.framework.database.SFISyncProxy.Redirects;
-import alice.framework.database.SFISyncProxy.ReferenceLock;
-//import alice.framework.database.SynchronizedSaveFileProxy.RestrictLock;
-import alice.framework.database.SFISyncProxy.ReturnsSelf;
-import alice.framework.database.SFISyncProxy.WriteLock;
+import alice.framework.database.SaveSyncProxy.RecursiveLock;
+import alice.framework.database.SaveSyncProxy.RedirectType;
+import alice.framework.database.SaveSyncProxy.Redirects;
+import alice.framework.database.SaveSyncProxy.ReturnsSelf;
+import alice.framework.database.SaveSyncProxy.WriteLock;
 
 public interface SaveFileInterface {
 
-//	@RestrictLock
-//    public SaveFileInterface accumulate(String key, Object value) throws JSONException;
-//	@RestrictLock
-//	public SaveFileInterface append(String key, Object value) throws JSONException;
+//	@WriteLock
+//  public SaveFileInterface accumulate(String key, Object value) throws JSONException;
+	@WriteLock
+	public SaveFileInterface append(String key, Object value) throws JSONException;
 	public Object get(String key) throws JSONException;
 	public <E extends Enum<E>> E getEnum(Class<E> clazz, String key) throws JSONException;
 	public boolean getBoolean(String key) throws JSONException;
@@ -36,8 +33,8 @@ public interface SaveFileInterface {
     public float getFloat(String key) throws JSONException;
     public Number getNumber(String key) throws JSONException;
     public int getInt(String key) throws JSONException;
-//    @RestrictLock
-//    public JSONArray getJSONArray(String key) throws JSONException;
+	@RecursiveLock
+	public SaveArrayInterface getJSONArray(String key) throws JSONException;
     @RecursiveLock
     public SaveFileInterface getJSONObject(String key) throws JSONException;
     public long getLong(String key) throws JSONException;
@@ -47,10 +44,6 @@ public interface SaveFileInterface {
 	@ReturnsSelf
     public SaveFileInterface increment(String key) throws JSONException;
     public boolean isNull(String key);
-    @ReferenceLock
-    public Iterator<String> keys();
-    @ReferenceLock
-    public Set<String> keySet();
     public int length();
     public boolean isEmpty();
     public JSONArray names();
@@ -67,8 +60,7 @@ public interface SaveFileInterface {
     public float optFloat(String key, float defaultValue);
     public int optInt(String key);
     public int optInt(String key, int defaultValue);
-//    @RestrictLock
-//    public JSONArray optJSONArray(String key);
+    public JSONArray optJSONArray(String key);
     public JSONObject optJSONObject(String key);
     public long optLong(String key);
     public long optLong(String key, long defaultValue);
@@ -112,18 +104,44 @@ public interface SaveFileInterface {
 //	@RestrictLock
 //	public Object optQuery(JSONPointer jsonPointer);
 	@WriteLock
+	// TODO: decouple
     public Object remove(String key);
     public boolean similar(Object other);
-//    @RestrictLock
-//    public JSONArray toJSONArray(JSONArray names) throws JSONException;
     public String toString();
     public String toString(int indentFactor) throws JSONException;
     public Writer write(Writer writer) throws JSONException;
     public Writer write(Writer writer, int indentFactor, int indent);
     public Map<String, Object> toMap();
     
+    @WriteLock
     @ReturnsSelf
-    @Redirects(type=RedirectType.putJSONObject)
-    public default void putJSONObject(String key) throws JSONException {}
+    @Redirects(type=RedirectType.SFIputJSONObject)
+    public default SaveFileInterface putJSONObject(String key) throws JSONException {
+    	return null;
+    }
+    
+    @WriteLock
+    @ReturnsSelf
+    @Redirects(type=RedirectType.SFIputJSONArray)
+    public default SaveFileInterface putJSONArray(String key) throws JSONException {
+    	return null;
+    }
+    
+    @Redirects(type=RedirectType.SFIkeys)
+    public default Iterator<String> keys() {
+    	return null;
+    }
+    
+    @Redirects(type=RedirectType.SFIkeySet)
+    public default Set<String> keySet() {
+    	return null;
+    }
+    
+    @WriteLock
+	@ReturnsSelf
+	@Redirects(type=RedirectType.SFIputObject)
+    public default SaveFileInterface put(String key, String value) throws JSONException {
+    	return null;
+    }
     
 }
