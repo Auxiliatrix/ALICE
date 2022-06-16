@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import alice.framework.features.MessageFeature;
 import alice.framework.main.Brain;
+import alice.framework.structures.PermissionProfile;
 import alice.framework.tasks.MultipleDependentStacker;
 import alice.framework.tasks.Stacker;
 import alice.modular.tasks.MessageSendTask;
@@ -18,6 +19,7 @@ public class StatusMessageFeature extends MessageFeature {
 	public StatusMessageFeature() {
 		super("Status");
 		withCheckInvoked();
+		withRestriction(PermissionProfile.getDeveloperPreset());
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.List;
 import alice.framework.database.SharedSaveFile;
 import alice.framework.features.Feature;
 import alice.framework.features.MessageFeature;
+import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.tasks.DependentStacker;
 import alice.framework.tasks.MultipleDependentStacker;
@@ -113,6 +114,7 @@ public class RoomFeature extends MessageFeature {
 		RoomPassiveFeature rpf = new RoomPassiveFeature();
 		withCheckInvoked();
 		withExclusionClass(ExclusionClass.STANDARD);
+		withRestriction(PermissionProfile.getAdminPreset());
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package alice.modular.features;
 
 import alice.framework.features.MessageFeature;
+import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.structures.TokenizedString.Token;
 import alice.framework.tasks.MultipleDependentStacker;
@@ -17,11 +18,12 @@ public class GermanHighwayFeature extends MessageFeature {
 	public GermanHighwayFeature() {
 		super("germanhighway");
 		withCheckInvoked();
+		withRestriction(PermissionProfile.getDeveloperPreset());
 	}
 	
 	@Override
 	protected boolean condition(MessageCreateEvent event) {
-		return true;
+		return false;
 	}
 	
 	@Override
