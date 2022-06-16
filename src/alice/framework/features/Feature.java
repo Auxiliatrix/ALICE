@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import alice.framework.database.SharedSaveFile;
+import alice.framework.database.SyncedSaveFile;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
 import discord4j.core.event.domain.Event;
@@ -217,7 +217,7 @@ public abstract class Feature<E extends Event> implements Comparable<Feature<E>>
 	 * @return whether or not this Feature is enabled
 	 */
 	public boolean isEnabled( long guildId ) {
-		SharedSaveFile guildData = new SharedSaveFile(guildId);
+		SyncedSaveFile guildData = SyncedSaveFile.ofGuild(guildId);
 			// TODO: exception handling
 		return (!whitelist || guildData.has(String.format("%s%s", ENABLE_PREFIX, name))) && !guildData.has(String.format("%s%s", DISABLE_PREFIX, name));
 	}

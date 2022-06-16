@@ -2,9 +2,8 @@ package alice.modular.features;
 
 import java.util.List;
 
-import alice.framework.database.SaveArrayInterface;
-import alice.framework.database.SaveFileInterface;
-import alice.framework.database.SaveSyncProxy;
+import alice.framework.database.SyncedJSONArray;
+import alice.framework.database.SyncedSaveFile;
 import alice.framework.features.MessageFeature;
 import alice.framework.main.Brain;
 import alice.framework.structures.PermissionProfile;
@@ -36,7 +35,7 @@ public class InviteTrackerActivationFeature extends MessageFeature {
 			if( ts.size() < 2 ) {
 				System.err.println("No role ID provided.");
 			} else {
-				SaveFileInterface sfi = SaveSyncProxy.of("lab/invite_user.csv");
+				SyncedSaveFile sfi = SyncedSaveFile.of("lab/invite_user.csv");
 				if( !sfi.has("invite_map") ) {
 					sfi.putJSONObject("invite_map");
 				}
@@ -53,11 +52,11 @@ public class InviteTrackerActivationFeature extends MessageFeature {
 	}
 	
 	public static void trackCustomInvites(Guild guild) {
-		SaveFileInterface sfi = SaveSyncProxy.of("lab/invite_user.csv");
+		SyncedSaveFile sfi = SyncedSaveFile.of("lab/invite_user.csv");
 		if( !sfi.has("self_invites") ) {
 			sfi.putJSONArray("self_invites");
 		}
-		SaveArrayInterface sai = sfi.getJSONArray("self_invites");
+		SyncedJSONArray sai = sfi.getJSONArray("self_invites");
 		List<String> invites = guild.getInvites().filter(ei -> 
 			Snowflake.of("367437754034028545").equals(ei.getInviterId().get())
 			|| Brain.client.getSelfId().equals(ei.getInviterId().get())

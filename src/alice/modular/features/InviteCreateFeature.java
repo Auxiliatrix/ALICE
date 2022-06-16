@@ -1,8 +1,7 @@
 package alice.modular.features;
 
-import alice.framework.database.SaveArrayInterface;
-import alice.framework.database.SaveFileInterface;
-import alice.framework.database.SaveSyncProxy;
+import alice.framework.database.SyncedJSONArray;
+import alice.framework.database.SyncedSaveFile;
 import alice.framework.features.Feature;
 import alice.framework.main.Brain;
 import alice.framework.tasks.Stacker;
@@ -19,7 +18,7 @@ public class InviteCreateFeature extends Feature<InviteCreateEvent> {
 
 	@Override
 	protected boolean listen(InviteCreateEvent type) {
-		SaveFileInterface sfi = SaveSyncProxy.of("lab/invite_user.csv");
+		SyncedSaveFile sfi = SyncedSaveFile.of("lab/invite_user.csv");
 		if( sfi.has("roleID") && sfi.has("guildID") && sfi.has("invite_map") && sfi.has("self_invites")) {
 			System.out.println("New invite link used.");
 			return sfi.getLong("guildID") == type.getGuildId().get().asLong();
@@ -32,13 +31,13 @@ public class InviteCreateFeature extends Feature<InviteCreateEvent> {
 	@Override
 	protected Mono<?> respond(InviteCreateEvent type) {
 		Stacker stacker = new Stacker();
-		SaveFileInterface sfi = SaveSyncProxy.of("lab/invite_user.csv");
+		SyncedSaveFile sfi = SyncedSaveFile.of("lab/invite_user.csv");
 		
 		String code = type.getCode();
 		if( Snowflake.of("367437754034028545").equals(type.getInviter().get().getId())
 				|| Brain.client.getSelfId().equals(type.getInviter().get().getId()) ) {
 			stacker.append(() -> {
-				SaveArrayInterface inviteMap = sfi.getJSONArray("self_invites");
+				SyncedJSONArray inviteMap = sfi.getJSONArray("self_invites");
 				inviteMap.put(code);
 				FileIO.appendToFile("tmp/codes.csv", String.format("%s\n", code));
 				System.out.println(code);

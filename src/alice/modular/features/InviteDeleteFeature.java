@@ -2,8 +2,8 @@ package alice.modular.features;
 
 import java.util.Comparator;
 
-import alice.framework.database.SaveFileInterface;
-import alice.framework.database.SaveSyncProxy;
+import alice.framework.database.SyncedJSONObject;
+import alice.framework.database.SyncedSaveFile;
 import alice.framework.features.Feature;
 import alice.framework.main.Brain;
 import alice.framework.tasks.Stacker;
@@ -21,7 +21,7 @@ public class InviteDeleteFeature extends Feature<InviteDeleteEvent> {
 
 	@Override
 	protected boolean listen(InviteDeleteEvent type) {
-		SaveFileInterface sfi = SaveSyncProxy.of("lab/invite_user.csv");
+		SyncedSaveFile sfi = SyncedSaveFile.of("lab/invite_user.csv");
 		if( sfi.has("roleID") && sfi.has("guildID") && sfi.has("invite_map") && sfi.has("self_invites")) {
 			System.out.println("New invite link used.");
 			return sfi.getLong("guildID") == type.getGuildId().get().asLong();
@@ -34,7 +34,7 @@ public class InviteDeleteFeature extends Feature<InviteDeleteEvent> {
 	@Override
 	protected Mono<?> respond(InviteDeleteEvent type) {
 		Stacker stacker = new Stacker();
-		SaveFileInterface sfi = SaveSyncProxy.of("lab/invite_user.csv");
+		SyncedSaveFile sfi = SyncedSaveFile.of("lab/invite_user.csv");
 
 		if( sfi.getJSONArray("self_invites").toList().contains(type.getCode()) ) {
 			Member target = Brain.getMembers(type.getGuildId().get()).sort(new Comparator<Member>() {
@@ -45,7 +45,7 @@ public class InviteDeleteFeature extends Feature<InviteDeleteEvent> {
 			String code = type.getCode();
 			stacker.append(target.addRole(Snowflake.of(sfi.getLong("roleID"))));
 			stacker.append(() -> {
-				SaveFileInterface inviteMap = sfi.getJSONObject("invite_map");
+				SyncedJSONObject inviteMap = sfi.getJSONObject("invite_map");
 				inviteMap.put(target.getId().asString(), code);
 				FileIO.appendToFile("tmp/user_associations.csv", String.format("%s,%s#%s,%s\n", code, target.getUsername(), target.getDiscriminator(), target.getId().asString()));
 				System.out.println(target.getUsername() + "#" + target.getDiscriminator());

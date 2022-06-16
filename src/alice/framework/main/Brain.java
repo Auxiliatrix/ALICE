@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.reflections.Reflections;
 
-import alice.framework.database.SharedSaveFile;
+import alice.framework.database.SyncedSaveFile;
 import alice.framework.features.Documentable;
 import alice.framework.features.Feature;
 import alice.framework.utilities.AliceLogger;
@@ -103,7 +103,7 @@ public class Brain {
 		AliceLogger.info("Reloading save data...");
 		for( Guild guild : client.getGuilds().collectList().block() ) {
 			@SuppressWarnings("unused")
-			SharedSaveFile guildData = new SharedSaveFile(guild.getId().asLong());
+			SyncedSaveFile guildData = SyncedSaveFile.ofGuild(guild.getId().asLong());
 		}
 	}
 	
