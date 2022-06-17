@@ -1,6 +1,6 @@
 package alice.modular.tasks;
 
-import alice.framework.tasks.Task;
+import alice.framework.old.tasks.Task;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.core.spec.GuildMemberEditSpec;

@@ -1,8 +1,8 @@
 package alice.modular.features;
 
 import alice.framework.features.MessageFeature;
-import alice.framework.tasks.DependentStacker;
-import alice.framework.tasks.Stacker;
+import alice.framework.old.tasks.DependentStacker;
+import alice.framework.old.tasks.Stacker;
 import alice.modular.tasks.MessageSendTask;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -22,6 +22,7 @@ public class PingMessageFeature extends MessageFeature {
 
 	@Override
 	protected Mono<?> respond(MessageCreateEvent type) {
+		type.getClass().getMethod(name, parameterTypes);
 		Stacker response = new Stacker();
 		
 		DependentStacker<MessageChannel> channelWrapper = new DependentStacker<MessageChannel>(type.getMessage().getChannel());		

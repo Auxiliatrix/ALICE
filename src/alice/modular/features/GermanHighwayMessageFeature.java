@@ -1,11 +1,11 @@
 package alice.modular.features;
 
 import alice.framework.features.MessageFeature;
+import alice.framework.old.tasks.MultipleDependentStacker;
+import alice.framework.old.tasks.Stacker;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.structures.TokenizedString.Token;
-import alice.framework.tasks.MultipleDependentStacker;
-import alice.framework.tasks.Stacker;
 import alice.modular.tasks.MessageSendTask;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -13,9 +13,9 @@ import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 
-public class GermanHighwayFeature extends MessageFeature {
+public class GermanHighwayMessageFeature extends MessageFeature {
 
-	public GermanHighwayFeature() {
+	public GermanHighwayMessageFeature() {
 		super("germanhighway");
 		withCheckInvoked();
 		withRestriction(PermissionProfile.getDeveloperPreset());
@@ -23,7 +23,7 @@ public class GermanHighwayFeature extends MessageFeature {
 	
 	@Override
 	protected boolean condition(MessageCreateEvent event) {
-		return false;
+		return true;
 	}
 	
 	@Override

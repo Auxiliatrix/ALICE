@@ -1,6 +1,7 @@
-package alice.framework.tasks;
+package alice.framework.old.tasks;
 
 import alice.framework.main.Brain;
+import alice.framework.modules.tasks.Monoable;
 import reactor.core.publisher.Mono;
 
 /**

@@ -1,10 +1,11 @@
-package alice.framework.tasks;
+package alice.framework.old.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import alice.framework.modules.tasks.Monoable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

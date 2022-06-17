@@ -4,7 +4,7 @@ import alice.framework.database.SyncedJSONArray;
 import alice.framework.database.SyncedSaveFile;
 import alice.framework.features.Feature;
 import alice.framework.main.Brain;
-import alice.framework.tasks.Stacker;
+import alice.framework.old.tasks.Stacker;
 import alice.framework.utilities.FileIO;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.InviteCreateEvent;

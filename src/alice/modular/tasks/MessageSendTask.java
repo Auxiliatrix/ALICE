@@ -1,6 +1,6 @@
 package alice.modular.tasks;
 
-import alice.framework.tasks.Task;
+import alice.framework.old.tasks.Task;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 

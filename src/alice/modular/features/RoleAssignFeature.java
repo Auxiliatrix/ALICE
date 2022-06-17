@@ -10,13 +10,15 @@ import java.util.regex.Pattern;
 
 import alice.framework.database.SharedJSONArray;
 import alice.framework.database.SharedSaveFile;
+import alice.framework.database.SyncedJSONArray;
+import alice.framework.database.SyncedSaveFile;
 import alice.framework.features.MessageFeature;
+import alice.framework.old.tasks.DependentStacker;
+import alice.framework.old.tasks.MultipleDependentStacker;
+import alice.framework.old.tasks.Stacker;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
 import alice.framework.structures.TokenizedString.Token;
-import alice.framework.tasks.DependentStacker;
-import alice.framework.tasks.MultipleDependentStacker;
-import alice.framework.tasks.Stacker;
 import alice.framework.utilities.EmbedBuilders;
 import alice.framework.utilities.EventUtilities;
 import alice.modular.tasks.EmbedSendTask;
@@ -113,11 +115,11 @@ public class RoleAssignFeature extends MessageFeature {
 		DependentStacker<MessageChannel> channelStacker = new DependentStacker<MessageChannel>(type.getMessage().getChannel());
 		DependentStacker<Member> memberStacker = new DependentStacker<Member>(type.getMessage().getAuthorAsMember());
 		
-		SharedSaveFile ssf = new SharedSaveFile(type.getGuildId().get().asLong());
-		SharedJSONArray allowRules = ssf.getOrDefaultSharedJSONArray(ALLOW_RULES_KEY);
-		SharedJSONArray allowRoles = ssf.getOrDefaultSharedJSONArray(ALLOW_ROLES_KEY);
-		SharedJSONArray denyRules = ssf.getOrDefaultSharedJSONArray(DENY_RULES_KEY);
-		SharedJSONArray denyRoles = ssf.getOrDefaultSharedJSONArray(DENY_ROLES_KEY);
+		SyncedSaveFile ssf = SyncedSaveFile.ofGuild(type.getGuildId().get().asLong());
+		SyncedJSONArray allowRules = ssf.getOrDefaultSharedJSONArray(ALLOW_RULES_KEY);
+		SyncedJSONArray allowRoles = ssf.getOrDefaultSharedJSONArray(ALLOW_ROLES_KEY);
+		SyncedJSONArray denyRules = ssf.getOrDefaultSharedJSONArray(DENY_RULES_KEY);
+		SyncedJSONArray denyRoles = ssf.getOrDefaultSharedJSONArray(DENY_ROLES_KEY);
 				
 		Set<String> allowedRoles = new HashSet<String>();
 		Set<String> deniedRoles = new HashSet<String>();
@@ -125,17 +127,17 @@ public class RoleAssignFeature extends MessageFeature {
 		List<Matcher> allowedRules = new ArrayList<Matcher>();
 		List<Matcher> deniedRules = new ArrayList<Matcher>();
 		
-		for( Object o : allowRoles ) {
+		for( Object o : allowRoles.toList() ) {
 			allowedRoles.add(((String) o).toLowerCase());
 		}
-		for( Object o : denyRoles ) {
+		for( Object o : denyRoles.toList() ) {
 			deniedRoles.add(((String) o).toLowerCase());
 		}
 		
-		for( Object o : allowRules ) {
+		for( Object o : allowRules.toList() ) {
 			allowedRules.add(Pattern.compile((String) o).matcher(""));
 		}
-		for( Object o : denyRules ) {
+		for( Object o : denyRules.toList() ) {
 			deniedRules.add(Pattern.compile((String) o).matcher(""));
 		}
 		

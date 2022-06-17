@@ -5,9 +5,9 @@ import java.util.function.Function;
 
 import alice.framework.features.MessageFeature;
 import alice.framework.main.Brain;
+import alice.framework.old.tasks.MultipleDependentStacker;
+import alice.framework.old.tasks.Stacker;
 import alice.framework.structures.PermissionProfile;
-import alice.framework.tasks.MultipleDependentStacker;
-import alice.framework.tasks.Stacker;
 import alice.modular.tasks.MessageSendTask;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -38,7 +38,7 @@ public class StatusMessageFeature extends MessageFeature {
 				message.append(g.getName());
 				message.append(", ");
 			}
-			return message.toString();
+			return message.toString().substring(0, message.length()-1);
 		};
 		
 //		DependentStacker<List<Guild>> guildsWrapper = new DependentStacker<List<Guild>>(Brain.client.getGuilds().collectList());

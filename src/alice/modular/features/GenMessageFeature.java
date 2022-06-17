@@ -1,9 +1,9 @@
 package alice.modular.features;
 
 import alice.framework.features.MessageFeature;
+import alice.framework.old.tasks.Stacker;
 import alice.framework.structures.PermissionProfile;
 import alice.framework.structures.TokenizedString;
-import alice.framework.tasks.Stacker;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.InviteCreateSpec;
 import discord4j.rest.entity.RestChannel;
@@ -14,7 +14,7 @@ public class GenMessageFeature extends MessageFeature {
     public GenMessageFeature() {
         super("Gen");
         withCheckInvoked();
-        withRestriction(PermissionProfile.getAdminPreset());
+        withRestriction(PermissionProfile.getDeveloperPreset());
     }
 
     @Override

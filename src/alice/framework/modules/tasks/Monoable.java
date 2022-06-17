@@ -1,4 +1,4 @@
-package alice.framework.tasks;
+package alice.framework.modules.tasks;
 
 import reactor.core.publisher.Mono;
 

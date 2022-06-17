@@ -1,4 +1,4 @@
-package alice.framework.tasks;
+package alice.framework.old.tasks;
 
 import java.util.function.Function;
 

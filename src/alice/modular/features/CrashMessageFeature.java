@@ -1,16 +1,16 @@
 package alice.modular.features;
 
 import alice.framework.features.MessageFeature;
+import alice.framework.old.tasks.DependentStacker;
+import alice.framework.old.tasks.MultipleDependentStacker;
+import alice.framework.old.tasks.Stacker;
 import alice.framework.structures.PermissionProfile;
-import alice.framework.tasks.DependentStacker;
-import alice.framework.tasks.MultipleDependentStacker;
-import alice.framework.tasks.Stacker;
 import alice.modular.tasks.MessageSendTask;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import reactor.core.publisher.Mono;
 
-public class CrashFeature extends MessageFeature {
+public class CrashMessageFeature extends MessageFeature {
 
 	@SuppressWarnings("serial")
 	public class CrashException extends Exception {
@@ -19,7 +19,7 @@ public class CrashFeature extends MessageFeature {
 		}
 	}
 	
-	public CrashFeature() {
+	public CrashMessageFeature() {
 		super("Crash");
 		withCheckInvoked();
 		withRestriction(PermissionProfile.getDeveloperPreset());
