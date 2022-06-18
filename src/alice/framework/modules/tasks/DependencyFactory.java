@@ -51,7 +51,7 @@ public class DependencyFactory<E extends Event> {
 				referenceMap.put(retrievers.get(f), a[f]);
 			}
 			return new Dependency<E>(referenceMap);
-		});
+		}).share();
 	}
 	
 }

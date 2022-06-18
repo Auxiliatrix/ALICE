@@ -1,50 +1,143 @@
 package alice.framework.modules.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import alice.framework.modules.tasks.Dependency;
 import alice.framework.modules.tasks.DependencyFactory;
-import alice.framework.modules.tasks.EffectFactory;
-import alice.framework.modules.tasks.MessageSendEffectSpec;
-import alice.framework.modules.tasks.Task;
 import discord4j.core.event.domain.Event;
-import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.channel.MessageChannel;
+import reactor.core.publisher.Mono;
 
-public class Command<E extends Event> {
-
-	private String description;
+public class Command<E extends Event> implements Function<E, Mono<?>> {
 	
-	protected static final class Builder<E2 extends Event> {
-		private String desription;
+	protected DependencyFactory<E> dependencies;
+	protected List<Function<E, Mono<?>>> independentEffects;
+	protected List<Function<Dependency<E>, Mono<?>>> dependentEffects;
+	protected List<Consumer<E>> independentSideEffects;
+	protected List<Consumer<Dependency<E>>> dependentSideEffects;
+	protected List<Supplier<Mono<?>>> suppliers;
+	protected List<Function<E, Boolean>> independentConditions;
+	protected List<Function<Dependency<E>, Boolean>> dependentConditions;
+	
+	protected List<Command<E>> subcommands;
+	
+	public Command(DependencyFactory<E> dependencies) {
+		this.dependencies = dependencies;
+		this.independentEffects = new ArrayList<Function<E, Mono<?>>>();
+		this.dependentEffects = new ArrayList<Function<Dependency<E>, Mono<?>>>();
+		this.independentSideEffects = new ArrayList<Consumer<E>>();
+		this.dependentSideEffects = new ArrayList<Consumer<Dependency<E>>>();
+		this.suppliers = new ArrayList<Supplier<Mono<?>>>();
+		this.independentConditions = new ArrayList<Function<E, Boolean>>();
+		this.dependentConditions = new ArrayList<Function<Dependency<E>, Boolean>>();
 		
-		private Builder() {}
+		subcommands = new ArrayList<Command<E>>();
+	}
 	
-		public Builder<E2> description(String description) {
-			this.desription = description;
-			return this;
+	public Command<E> withSubcommands(Command<E> subcommand) {
+		subcommands.add(subcommand);
+		return this;
+	}
+	
+	public Command<E> withDependentEffect(Function<Dependency<E>, Mono<?>> dependentEffect) {
+		dependentEffects.add(dependentEffect);
+		return this;
+	}
+	
+	public Command<E> withDependentEffect(Consumer<Dependency<E>> effect) {
+		dependentSideEffects.add(effect);
+		return this;
+	}
+	
+	public Command<E> withEffect(Function<E, Mono<?>> effect) {
+		independentEffects.add(effect);
+		return this;
+	}
+	
+	public Command<E> withEffect(Consumer<E> effect) {
+		independentSideEffects.add(effect);
+		return this;
+	}
+	
+	public Command<E> withEffect(Supplier<Mono<?>> effect) {
+		suppliers.add(effect);
+		return this;
+	}
+	
+	public Command<E> withDependentCondition(Function<Dependency<E>, Boolean> dependentCondition) {
+		dependentConditions.add(dependentCondition);
+		return this;
+	}
+	
+	public Command<E> withCondition(Function<E, Boolean> condition) {
+		independentConditions.add(condition);
+		return this;
+	}
+	
+	protected boolean checkConditions(E t) {
+		Mono<Dependency<E>> dependency = dependencies.getDependency(t);
+		
+		boolean result = true;
+		
+		for( Function<Dependency<E>, Boolean> condition : dependentConditions ) {
+			result &= condition.apply(dependency.block());
 		}
 		
-		public Command<E2> build() {
-			return new Command<E2>(this);
+		for( Function<E, Boolean> condition : independentConditions ) {
+			result &= condition.apply(t);
 		}
-	}
-	
-	protected Command(Builder<E> builder) {
-		this.description = builder.desription;
-		DependencyFactory.Builder<MessageCreateEvent> dfb = DependencyFactory.<MessageCreateEvent>builder();
-		dfb.addDependency(mce -> mce.getGuild());
-		EffectFactory<MessageCreateEvent, MessageChannel> ef = dfb.<MessageChannel>addDependency(mce -> mce.getMessage().getChannel());
 		
-		Task<MessageCreateEvent> task = new Task<MessageCreateEvent>(dfb.buildDependencyFactory());
+		return result;
+	}
+	
+	protected Mono<?> executeEffects(E t) {
+		Mono<Dependency<E>> dependency = dependencies.getDependency(t);
 		
-		task.addEffect(ef.getEffect(mc -> mc.createMessage("Hello, world!")));
-		task.addEffect(ef.getEffect(new MessageSendEffectSpec("Hello world!")));
+		Mono<?> result = Mono.fromRunnable(() -> {});
+		
+		for( Function<Dependency<E>, Mono<?>> effect : dependentEffects ) {
+			result = result.and(effect.apply(dependency.block()));
+		}
+		
+		for( Function<E, Mono<?>> effect : independentEffects ) {
+			result = result.and(effect.apply(t));
+		}
+		
+		for( Consumer<Dependency<E>> effect : dependentSideEffects ) {
+			result = result.and(Mono.fromRunnable(() -> {effect.accept(dependency.block());}));
+		}
+		
+		for( Consumer<E> effect : independentSideEffects ) {
+			result = result.and(Mono.fromRunnable(() -> {effect.accept(t);}));
+		}
+		
+		for( Supplier<Mono<?>> effect : suppliers ) {
+			result = result.and(effect.get());
+		}
+		
+		return result;
 	}
 	
-	public static <E2 extends Event> Builder<E2> builder() {
-		return new Builder<E2>();
-	}
-	
-	public String getDescription() {
-		return description;
+	@Override
+	public Mono<?> apply(E t) {
+		Mono<?> result = Mono.fromRunnable(() -> {});
+		
+		boolean overidden = false;
+		for( Command<E> subcommand : subcommands ) {
+			if( subcommand.checkConditions(t) ) {
+				overidden = true;
+				result = result.and(subcommand.apply(t));
+			}
+		}
+		
+		if( !overidden && checkConditions(t) ) {
+			result = result.and(executeEffects(t));
+		}
+		
+		return result;
 	}
 	
 }
