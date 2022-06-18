@@ -1,46 +1,46 @@
 package alice.framework.modules.commands;
 
 import alice.framework.modules.tasks.DependencyFactory;
-import alice.framework.modules.tasks.DependencyFactoryBuilder;
+import alice.framework.modules.tasks.EffectFactory;
+import alice.framework.modules.tasks.MessageSendEffectSpec;
 import alice.framework.modules.tasks.Task;
+import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 
-public class Command {
+public class Command<E extends Event> {
 
 	private String description;
 	
-	protected static final class Builder {
+	protected static final class Builder<E2 extends Event> {
 		private String desription;
 		
 		private Builder() {}
 	
-		public Builder description(String description) {
+		public Builder<E2> description(String description) {
 			this.desription = description;
 			return this;
 		}
 		
-		public Command build() {
-			return new Command(this);
+		public Command<E2> build() {
+			return new Command<E2>(this);
 		}
 	}
 	
-	protected Command(Builder builder) {
+	protected Command(Builder<E> builder) {
 		this.description = builder.desription;
-		DependencyFactoryBuilder<MessageCreateEvent> dfb = new DependencyFactoryBuilder<MessageCreateEvent>();
+		DependencyFactory.Builder<MessageCreateEvent> dfb = DependencyFactory.<MessageCreateEvent>builder();
 		dfb.addDependency(mce -> mce.getGuild());
-		dfb.addDependency(mce -> mce.getMessage().getChannel());
-		DependencyFactory<MessageCreateEvent> df = dfb.build();
-		Task<MessageCreateEvent> task = new Task<MessageCreateEvent>(df);
-		task.addEffect(d -> {
-			return d.<MessageChannel>request(
-					(mce -> mce.getMessage().getChannel())
-				).createMessage("Hello, world!");
-		});
+		EffectFactory<MessageCreateEvent, MessageChannel> ef = dfb.<MessageChannel>addDependency(mce -> mce.getMessage().getChannel());
+		
+		Task<MessageCreateEvent> task = new Task<MessageCreateEvent>(dfb.buildDependencyFactory());
+		
+		task.addEffect(ef.getEffect(mc -> mc.createMessage("Hello, world!")));
+		task.addEffect(ef.getEffect(new MessageSendEffectSpec("Hello world!")));
 	}
 	
-	public static Builder builder() {
-		return new Builder();
+	public static <E2 extends Event> Builder<E2> builder() {
+		return new Builder<E2>();
 	}
 	
 	public String getDescription() {
