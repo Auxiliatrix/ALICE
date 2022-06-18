@@ -21,4 +21,8 @@ public class EffectFactory<E extends Event, T> {
 	public Function<Dependency<E>, Boolean> getCondition(Function<T,Boolean> spec) {
 		return d -> spec.apply(d.<T>request(retriever));
 	}
+	
+	public Function<E,Mono<?>> getRetriever() {
+		return retriever;
+	}
 }

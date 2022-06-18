@@ -9,9 +9,11 @@ import reactor.core.publisher.Mono;
 public class Dependency<E extends Event> {
 
 	private final Map<Function<E,Mono<?>>, Object> referenceMap;
+	protected E event;
 	
-	protected Dependency(Map<Function<E,Mono<?>>, Object> referenceMap) {
+	protected Dependency(Map<Function<E,Mono<?>>, Object> referenceMap, E event) {
 		this.referenceMap = referenceMap;
+		this.event = event;
 	}
 	
 	// TODO: Exception handling
@@ -25,6 +27,10 @@ public class Dependency<E extends Event> {
 			System.out.println("Invalid type requested from DependencyManager.");
 		}
 		return response;
+	}
+	
+	public E getEvent() {
+		return event;
 	}
 	
 }

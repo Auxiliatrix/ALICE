@@ -19,7 +19,7 @@ public interface SyncedSaveFile extends SyncedJSONObject {
 		}
 		
 		if( SaveSyncProxy.cache.containsKey(key) ) {
-			return (SyncedSaveFile) SaveSyncProxy.cache.get(key);
+			return (SyncedJSONObject) SaveSyncProxy.cache.get(key);
 		} else {
 			SyncedJSONObject sfi = (SyncedJSONObject) Proxy.newProxyInstance(
 					SaveSyncProxy.class.getClassLoader(), 
