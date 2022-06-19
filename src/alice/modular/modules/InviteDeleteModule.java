@@ -43,7 +43,7 @@ public class InviteDeleteModule extends Module<InviteDeleteEvent> {
 		});
 		
 		command.withDependentEffect(d -> {
-			List<Member> lm = d.<List<Member>>request(lmef.getRetriever());
+			List<Member> lm = d.<List<Member>>request(lmef);
 			String code = d.getEvent().getCode();
 			lm.sort(new Comparator<Member>() {
 				@Override

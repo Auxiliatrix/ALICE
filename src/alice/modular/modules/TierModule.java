@@ -28,7 +28,7 @@ public class TierModule extends Module<MessageCreateEvent> {
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(mce -> mce.getMessage().getContent().startsWith("%tier"));
 		command.withDependentEffect(d -> {
-			MessageChannel mc = d.<MessageChannel>request(mcef.getRetriever());
+			MessageChannel mc = d.<MessageChannel>request(mcef);
 			MessageCreateEvent mce = d.getEvent();
 			String content = mce.getMessage().getContent();
 			TokenizedString ts = new TokenizedString(content);

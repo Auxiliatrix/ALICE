@@ -35,7 +35,7 @@ public class InviteTrackerModule extends Module<MessageCreateEvent> {
 		command.withCondition(mce -> mce.getMessage().getContent().startsWith("%invact"));
 		command.withDependentEffect(d -> {
 			String content = d.getEvent().getMessage().getContent();
-			Guild guild = d.<Guild>request(gef.getRetriever());
+			Guild guild = d.<Guild>request(gef);
 			TokenizedString ts = new TokenizedString(content);
 			if( ts.size() > 1 ) {
 				if( !sfi.has("invite_map") ) {

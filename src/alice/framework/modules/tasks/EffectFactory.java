@@ -22,7 +22,7 @@ public class EffectFactory<E extends Event, T> {
 		return d -> spec.apply(d.<T>request(retriever));
 	}
 	
-	public Function<E,Mono<?>> getRetriever() {
+	protected Function<E,Mono<?>> getRetriever() {
 		return retriever;
 	}
 }

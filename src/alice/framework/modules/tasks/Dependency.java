@@ -33,4 +33,8 @@ public class Dependency<E extends Event> {
 		return event;
 	}
 	
+	public <T> T request(EffectFactory<E,T> ef) {
+		return this.request(ef.getRetriever());
+	}
+	
 }
