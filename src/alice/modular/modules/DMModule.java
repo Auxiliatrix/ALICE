@@ -11,36 +11,43 @@ import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.FileIO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
+import discord4j.discordjson.json.EmojiData;
 
-public class TierModule extends Module<MessageCreateEvent> {
+public class DMModule extends Module<MessageCreateEvent> {
 
-	public TierModule() {
+	public DMModule() {
 		super(MessageCreateEvent.class);
 	}
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand() {
-		DependencyFactory.Builder<MessageCreateEvent> dfb = DependencyFactory.builder();
-		EffectFactory<MessageCreateEvent, MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getChannel());
+		DependencyFactory.Builder<MessageCreateEvent> dfb = DependencyFactory.<MessageCreateEvent>builder();
+		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
 		
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
-
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		command.withCondition(mce -> mce.getMessage().getContent().startsWith("%tier"));
-		command.withDependentEffect(d -> {
-			MessageChannel mc = d.<MessageChannel>request(mcef);
-			MessageCreateEvent mce = d.getEvent();
-			String content = mce.getMessage().getContent();
-			TokenizedString ts = new TokenizedString(content);
-			if( ts.size() > 1 ) {
-				String email = ts.getString(1);
-				String tier = lookup(email);
-				return mc.createMessage(tier);
-			} else {
-				return mc.createMessage("This module can be used to find what tier you are. `%tier email@email.com`");
-			}
+		
+		command.withCondition(mce -> mce.getMessage().getAuthor().isPresent());
+		command.withCondition(mce -> {
+			TokenizedString ts = tokenizeMessage(mce);
+			return ts.getToken(0).toString().equalsIgnoreCase("%tier") && ts.size() > 1;
 		});
+		
+		command.withDependentEffect(d -> {
+			MessageChannel dm = d.<MessageChannel>request(mcef);
+			TokenizedString ts = tokenizeMessage(d.getEvent());
+			String email = ts.getString(1);
+			String tier = lookup(email);
+			return dm.createMessage(tier).and(d.getEvent().getMessage().addReaction(ReactionEmoji.unicode("\u2705")));
+		});
+		
+		
 		return command;
+	}
+	
+	public static TokenizedString tokenizeMessage(MessageCreateEvent mce) {
+		return new TokenizedString(mce.getMessage().getContent());
 	}
 	
 	protected String lookup(String email) {
@@ -60,5 +67,5 @@ public class TierModule extends Module<MessageCreateEvent> {
 			return "Sorry, I couldn't find your email in the database.";
 		}
 	}
-
+	
 }

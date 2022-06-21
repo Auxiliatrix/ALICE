@@ -21,6 +21,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	protected List<Supplier<Mono<?>>> suppliers;
 	protected List<Function<E, Boolean>> independentConditions;
 	protected List<Function<Dependency<E>, Boolean>> dependentConditions;
+	protected List<Boolean> conditions;
 	
 	protected List<Command<E>> subcommands;
 	
@@ -33,6 +34,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		this.suppliers = new ArrayList<Supplier<Mono<?>>>();
 		this.independentConditions = new ArrayList<Function<E, Boolean>>();
 		this.dependentConditions = new ArrayList<Function<Dependency<E>, Boolean>>();
+		this.conditions = new ArrayList<Boolean>();
 		
 		subcommands = new ArrayList<Command<E>>();
 	}
@@ -77,6 +79,11 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
+	public Command<E> withCondition(Boolean condition) {
+		conditions.add(condition);
+		return this;
+	}
+	
 	protected boolean checkConditions(E t) {
 		Mono<Dependency<E>> dependency = dependencies.getDependency(t);
 		
@@ -88,6 +95,10 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		
 		for( Function<E, Boolean> condition : independentConditions ) {
 			result &= condition.apply(t);
+		}
+		
+		for( Boolean condition : conditions ) {
+			result &= condition;
 		}
 		
 		return result;
