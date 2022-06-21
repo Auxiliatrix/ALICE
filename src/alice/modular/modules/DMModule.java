@@ -48,7 +48,7 @@ public class DMModule extends MessageModule {
 		Map<String,String> tierMap = new HashMap<String, String>();
 		for( int f=1; f<lines.length; f++ ) {
 			String[] line = lines[f].split(",");
-			if( line.length > 2 ) {
+			if( line.length > 1 ) {
 				tierMap.put(line[0].toLowerCase(), line[1]);
 				for( int g=2; g<line.length; g++ ) {
 					String token = line[g];
