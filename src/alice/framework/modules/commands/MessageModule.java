@@ -22,7 +22,10 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 	}
 	
 	public static Function<MessageCreateEvent, Boolean> getInvokedCondition(String invocation) {
-		return mce -> tokenizeMessage(mce).getString(0).equalsIgnoreCase(invocation);
+		return mce -> {
+			TokenizedString ts = tokenizeMessage(mce);
+			return ts.size() > 1 && ts.getString(0).equalsIgnoreCase(invocation);
+		};
 	}
 	
 	public static Function<MessageCreateEvent, Boolean> getArgumentCondition(int position, String argument) {

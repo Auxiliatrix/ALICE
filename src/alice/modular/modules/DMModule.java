@@ -38,7 +38,6 @@ public class DMModule extends MessageModule {
 			return dm.createMessage(tier).and(d.getEvent().getMessage().addReaction(ReactionEmoji.unicode("\u2705")));
 		});
 		
-		
 		return command;
 	}
 	
