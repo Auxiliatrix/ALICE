@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import alice.framework.modules.commands.Command;
-import alice.framework.modules.commands.Module;
+import alice.framework.modules.commands.MessageModule;
 import alice.framework.modules.tasks.DependencyFactory;
 import alice.framework.modules.tasks.EffectFactory;
 import alice.framework.structures.TokenizedString;
@@ -12,9 +12,8 @@ import alice.framework.utilities.FileIO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
-import discord4j.discordjson.json.EmojiData;
 
-public class DMModule extends Module<MessageCreateEvent> {
+public class DMModule extends MessageModule {
 
 	public DMModule() {
 		super(MessageCreateEvent.class);
@@ -24,15 +23,12 @@ public class DMModule extends Module<MessageCreateEvent> {
 	public Command<MessageCreateEvent> buildCommand() {
 		DependencyFactory.Builder<MessageCreateEvent> dfb = DependencyFactory.<MessageCreateEvent>builder();
 		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
-		
+
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		
 		command.withCondition(mce -> mce.getMessage().getAuthor().isPresent());
-		command.withCondition(mce -> {
-			TokenizedString ts = tokenizeMessage(mce);
-			return ts.getToken(0).toString().equalsIgnoreCase("%tier") && ts.size() > 1;
-		});
+		command.withCondition(getInvokedCondition("%tier"));
 		
 		command.withDependentEffect(d -> {
 			MessageChannel dm = d.<MessageChannel>request(mcef);
@@ -44,10 +40,6 @@ public class DMModule extends Module<MessageCreateEvent> {
 		
 		
 		return command;
-	}
-	
-	public static TokenizedString tokenizeMessage(MessageCreateEvent mce) {
-		return new TokenizedString(mce.getMessage().getContent());
 	}
 	
 	protected String lookup(String email) {

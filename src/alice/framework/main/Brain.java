@@ -137,13 +137,15 @@ public class Brain {
 	            );
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private static void loadModules(String includePrefix) {
 		Reflections include = new Reflections(includePrefix);	// Classes included within the specified directory
-		Set<Class<? extends Module<?>>> excluded = new HashSet<Class<? extends Module<?>>>();	// Classes to exclude
-		Reflections exclude = null;
+		Set<Class<? extends Module>> excluded = new HashSet<Class<? extends Module>>();	// Classes to exclude
+		Reflections exclude = new Reflections("alice.framework.modules");
+		excluded = exclude.getSubTypesOf(alice.framework.modules.commands.Module.class);
 		
 		for( Class<?> c : include.getSubTypesOf(alice.framework.modules.commands.Module.class) ) {
-			if( exclude != null && excluded.contains(c) ) {
+			if( excluded.contains(c) ) {
 				continue;
 			}
 			try {
