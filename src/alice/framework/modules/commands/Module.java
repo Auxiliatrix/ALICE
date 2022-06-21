@@ -3,6 +3,7 @@ package alice.framework.modules.commands;
 import java.time.Duration;
 
 import alice.framework.main.Brain;
+import alice.framework.modules.tasks.DependencyFactory;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -13,18 +14,10 @@ public abstract class Module<E extends Event> {
 		
 	protected Module(Class<E> type) {
 		load(type);
-		this.command = buildCommand();
+		this.command = buildCommand(DependencyFactory.<E>builder());
 	}
 	
 	protected void load(Class<E> type) {
-//		Brain.client.on(type)
-//			.flatMap(e -> handle(e))
-//			.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)))
-//			.doOnError(e -> {
-//				System.err.println("Propagated error detected.");
-//				Brain.client.logout().block();
-//			})
-//			.subscribe();
 		Brain.client.on(type).subscribe(e -> handle(e)
 				.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)))
 				.doOnError(f -> {
@@ -39,6 +32,6 @@ public abstract class Module<E extends Event> {
 		return command.apply(event);
 	}
 	
-	public abstract Command<E> buildCommand();	
+	public abstract Command<E> buildCommand(DependencyFactory.Builder<E> dfb);	
 	
 }

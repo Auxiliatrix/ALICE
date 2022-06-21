@@ -7,7 +7,7 @@ import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
 import alice.framework.main.Brain;
 import alice.framework.modules.commands.Command;
-import alice.framework.modules.commands.Module;
+import alice.framework.modules.commands.MessageModule;
 import alice.framework.modules.tasks.DependencyFactory;
 import alice.framework.modules.tasks.EffectFactory;
 import alice.framework.structures.TokenizedString;
@@ -15,24 +15,23 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
 
-public class InviteTrackerModule extends Module<MessageCreateEvent> {
+public class InviteTrackerModule extends MessageModule {
 
 	public InviteTrackerModule() {
 		super(MessageCreateEvent.class);
 	}
 
 	@Override
-	public Command<MessageCreateEvent> buildCommand() {
+	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
 		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
 
-		DependencyFactory.Builder<MessageCreateEvent> dfb = DependencyFactory.builder();
 		EffectFactory<MessageCreateEvent, Guild> gef = dfb.addDependency(mce -> mce.getGuild());
 		
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		
-		command.withCondition(mce -> mce.getMessage().getContent().startsWith("%invact"));
+		command.withCondition(getInvokedCondition("%invact"));
 		command.withDependentEffect(d -> {
 			String content = d.getEvent().getMessage().getContent();
 			Guild guild = d.<Guild>request(gef);

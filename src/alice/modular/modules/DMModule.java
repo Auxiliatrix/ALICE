@@ -20,8 +20,7 @@ public class DMModule extends MessageModule {
 	}
 
 	@Override
-	public Command<MessageCreateEvent> buildCommand() {
-		DependencyFactory.Builder<MessageCreateEvent> dfb = DependencyFactory.<MessageCreateEvent>builder();
+	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
 		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
 
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();

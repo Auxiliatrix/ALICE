@@ -24,10 +24,9 @@ public class InviteDeleteModule extends Module<InviteDeleteEvent> {
 	}
 
 	@Override
-	public Command<InviteDeleteEvent> buildCommand() {
+	public Command<InviteDeleteEvent> buildCommand(DependencyFactory.Builder<InviteDeleteEvent> dfb) {
 		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
 
-		DependencyFactory.Builder<InviteDeleteEvent> dfb = DependencyFactory.builder();
 		EffectFactory<InviteDeleteEvent, List<Member>> lmef = dfb.addDependency(ide -> Brain.getMembers(ide.getGuildId().get()).collectList());
 		
 		DependencyFactory<InviteDeleteEvent> df = dfb.buildDependencyFactory();

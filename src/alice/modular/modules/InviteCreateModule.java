@@ -18,10 +18,8 @@ public class InviteCreateModule extends Module<InviteCreateEvent> {
 	}
 
 	@Override
-	public Command<InviteCreateEvent> buildCommand() {
+	public Command<InviteCreateEvent> buildCommand(DependencyFactory.Builder<InviteCreateEvent> dfb) {
 		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
-
-		DependencyFactory.Builder<InviteCreateEvent> dfb = DependencyFactory.builder();
 		
 		DependencyFactory<InviteCreateEvent> df = dfb.buildDependencyFactory();
 		Command<InviteCreateEvent> command = new Command<InviteCreateEvent>(df);
