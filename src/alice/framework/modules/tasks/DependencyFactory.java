@@ -24,6 +24,12 @@ public class DependencyFactory<E extends Event> {
 			return new EffectFactory<E2,T>(dependency);
 		}
 		
+		public <T> EffectFactory<E2,T> addWrappedDependency(Function<E2, ?> dependency) {
+			Function<E2, Mono<?>> wrappedDependency = dependency.andThen(t -> Mono.just(t));
+			retrievers.add(wrappedDependency);
+			return new EffectFactory<E2,T>(wrappedDependency);
+		}
+		
 		public DependencyFactory<E2> buildDependencyFactory() {
 			return new DependencyFactory<E2>(retrievers);
 		}

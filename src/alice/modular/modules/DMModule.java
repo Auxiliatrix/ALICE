@@ -10,6 +10,7 @@ import alice.framework.modules.tasks.EffectFactory;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.FileIO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 
@@ -22,20 +23,16 @@ public class DMModule extends MessageModule {
 	@Override
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
 		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
-
+		EffectFactory<MessageCreateEvent,TokenizedString> tsef = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
+		EffectFactory<MessageCreateEvent,Message> mef = dfb.addWrappedDependency(mce -> mce.getMessage());
+		
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		
 		command.withCondition(mce -> mce.getMessage().getAuthor().isPresent());
 		command.withCondition(getInvokedCondition("%tier"));
-		
-		command.withDependentEffect(d -> {
-			MessageChannel dm = d.<MessageChannel>request(mcef);
-			TokenizedString ts = tokenizeMessage(d.getEvent());
-			String email = ts.getString(1);
-			String tier = lookup(email);
-			return dm.createMessage(tier).and(d.getEvent().getMessage().addReaction(ReactionEmoji.unicode("\u2705")));
-		});
+				
+		command.withDependentEffect(mcef.with(tsef).with(mef).getEffect((mc,ts,m) -> mc.createMessage(lookup(ts.getString(1))).and(m.addReaction(ReactionEmoji.unicode("\u2705")))));
 		
 		return command;
 	}
