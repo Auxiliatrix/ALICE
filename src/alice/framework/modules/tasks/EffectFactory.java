@@ -2,6 +2,7 @@ package alice.framework.modules.tasks;
 
 import java.util.function.Function;
 
+import alice.framework.modules.tasks.MultiEffectFactories.EffectFactory2;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
@@ -25,4 +26,9 @@ public class EffectFactory<E extends Event, T> {
 	protected Function<E,Mono<?>> getRetriever() {
 		return retriever;
 	}
+	
+	public <U> EffectFactory2<E,T,U> with(EffectFactory<E,U> effectFactory) {
+		return new EffectFactory2<E,T,U>(getRetriever(), effectFactory.getRetriever());
+	}
+	
 }
