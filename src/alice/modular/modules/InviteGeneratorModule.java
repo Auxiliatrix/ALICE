@@ -33,10 +33,9 @@ public class InviteGeneratorModule extends MessageModule {
 			});
 		}));
 		
-		command.withDependentEffect(d -> {
-			InviteData id = d.<InviteData>request(idef);
-			return d.<MessageChannel>request(mcef).createMessage("discord.gg/" + id.code());
-		});
+		command.withDependentEffect(idef.with(mcef).getEffect((id,mc) -> {
+			return mc.createMessage("discord.gg/" + id.code());
+		}));
 		
 		return command;
 	}

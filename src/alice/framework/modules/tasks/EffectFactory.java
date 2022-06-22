@@ -1,5 +1,6 @@
 package alice.framework.modules.tasks;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import alice.framework.modules.tasks.MultiEffectFactories.EffectFactory2;
@@ -18,6 +19,9 @@ public class EffectFactory<E extends Event, T> {
 		return d -> spec.apply(d.<T>request(retriever));
 	}
 	
+	public Consumer<Dependency<E>> getEffect(Consumer<T> spec) {
+		return d -> spec.accept(d.<T>request(retriever));
+	}
 	
 	public Function<Dependency<E>, Boolean> getCondition(Function<T,Boolean> spec) {
 		return d -> spec.apply(d.<T>request(retriever));

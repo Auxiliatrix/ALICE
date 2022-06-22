@@ -32,7 +32,14 @@ public class DMModule extends MessageModule {
 		command.withCondition(mce -> mce.getMessage().getAuthor().isPresent());
 		command.withCondition(getInvokedCondition("%tier"));
 				
-		command.withDependentEffect(mcef.with(tsef).with(mef).getEffect((mc,ts,m) -> mc.createMessage(lookup(ts.getString(1))).and(m.addReaction(ReactionEmoji.unicode("\u2705")))));
+		command.withDependentEffect(
+				mcef.with(tsef).with(mef)
+				.getEffect(
+						(mc,ts,m) -> {
+							return mc.createMessage(lookup(ts.getString(1)))
+									.and(m.addReaction(ReactionEmoji.unicode("\u2705")));
+						}
+					));
 		
 		return command;
 	}

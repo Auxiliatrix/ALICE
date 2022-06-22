@@ -26,22 +26,21 @@ public class InviteTrackerModule extends MessageModule {
 		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
 
 		EffectFactory<MessageCreateEvent, Guild> gef = dfb.addDependency(mce -> mce.getGuild());
+		EffectFactory<MessageCreateEvent, TokenizedString> tsef = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
 		
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		
 		command.withCondition(getInvokedCondition("%invact"));
-		command.withDependentEffect(d -> {
-			String content = d.getEvent().getMessage().getContent();
-			Guild guild = d.<Guild>request(gef);
-			TokenizedString ts = new TokenizedString(content);
+		
+		command.withDependentEffect(gef.with(tsef).getEffect((g,ts) -> {
 			if( ts.size() > 1 ) {
 				if( !sfi.has("invite_map") ) {
 					sfi.putJSONObject("invite_map");
 				}
 				if( !sfi.has("guildID") ) {
-					sfi.put("guildID", guild.getId().asLong());
+					sfi.put("guildID", g.getId().asLong());
 				}
 				if( !sfi.has("roleID") ) {
 					sfi.put("roleID", Long.parseLong(ts.getToken(1).getContent()));
@@ -51,7 +50,7 @@ public class InviteTrackerModule extends MessageModule {
 					sfi.putJSONArray("self_invites");
 				}
 				SyncedJSONArray sai = sfi.getJSONArray("self_invites");
-				List<String> invites = guild.getInvites().filter(ei -> 
+				List<String> invites = g.getInvites().filter(ei -> 
 					Snowflake.of("367437754034028545").equals(ei.getInviterId().get())
 					|| Brain.client.getSelfId().equals(ei.getInviterId().get())
 					).map(ei -> ei.getCode()).collectList().block();
@@ -62,7 +61,7 @@ public class InviteTrackerModule extends MessageModule {
 					}
 				}
 			}
-		});
+		}));
 		
 		return command;
 	}

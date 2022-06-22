@@ -1,13 +1,21 @@
 package alice.framework.modules.tasks;
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+import alina.utilities.multifunctions.HexConsumer;
 import alina.utilities.multifunctions.HexFunction;
+import alina.utilities.multifunctions.OctConsumer;
 import alina.utilities.multifunctions.OctFunction;
+import alina.utilities.multifunctions.PentConsumer;
 import alina.utilities.multifunctions.PentFunction;
+import alina.utilities.multifunctions.QuadConsumer;
 import alina.utilities.multifunctions.QuadFunction;
+import alina.utilities.multifunctions.SeptConsumer;
 import alina.utilities.multifunctions.SeptFunction;
+import alina.utilities.multifunctions.TriConsumer;
 import alina.utilities.multifunctions.TriFunction;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
@@ -28,6 +36,9 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2));
 		}
 		
+		public Consumer<Dependency<E>> getEffect(BiConsumer<T,U> spec) {
+			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2));
+		}
 		
 		public Function<Dependency<E>, Boolean> getCondition(BiFunction<T,U,Boolean> spec) {
 			return d -> spec.apply(d.<T>request(r1),d.<U>request(r2));
@@ -55,6 +66,9 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3));
 		}
 		
+		public Consumer<Dependency<E>> getEffect(TriConsumer<T,U,V> spec) {
+			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3));
+		}
 		
 		public Function<Dependency<E>, Boolean> getCondition(TriFunction<T,U,V,Boolean> spec) {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3));
@@ -84,6 +98,9 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4));
 		}
 		
+		public Consumer<Dependency<E>> getEffect(QuadConsumer<T,U,V,W> spec) {
+			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4));
+		}
 		
 		public Function<Dependency<E>, Boolean> getCondition(QuadFunction<T,U,V,W,Boolean> spec) {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4));
@@ -115,6 +132,9 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5));
 		}
 		
+		public Consumer<Dependency<E>> getEffect(PentConsumer<T,U,V,W,X> spec) {
+			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5));
+		}
 		
 		public Function<Dependency<E>, Boolean> getCondition(PentFunction<T,U,V,W,X,Boolean> spec) {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5));
@@ -147,6 +167,10 @@ public class MultiEffectFactories {
 		public Function<Dependency<E>, Mono<?>> getEffect(HexFunction<T,U,V,W,X,Y,Mono<?>> spec) {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5), d.<Y>request(r6));
 		}		
+		
+		public Consumer<Dependency<E>> getEffect(HexConsumer<T,U,V,W,X,Y> spec) {
+			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5),d.<Y>request(r6));
+		}
 		
 		public Function<Dependency<E>, Boolean> getCondition(HexFunction<T,U,V,W,X,Y,Boolean> spec) {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5), d.<Y>request(r6));
@@ -182,6 +206,10 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5), d.<Y>request(r6), d.<Z>request(r7));
 		}		
 		
+		public Consumer<Dependency<E>> getEffect(SeptConsumer<T,U,V,W,X,Y,Z> spec) {
+			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5),d.<Y>request(r6),d.<Z>request(r7));
+		}
+		
 		public Function<Dependency<E>, Boolean> getCondition(SeptFunction<T,U,V,W,X,Y,Z,Boolean> spec) {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5), d.<Y>request(r6), d.<Z>request(r7));
 		}
@@ -212,6 +240,10 @@ public class MultiEffectFactories {
 			this.r6 = r6;
 			this.r7 = r7;
 			this.r8 = r8;
+		}
+		
+		public Consumer<Dependency<E>> getEffect(OctConsumer<T,U,V,W,X,Y,Z,A> spec) {
+			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5),d.<Y>request(r6),d.<Z>request(r7),d.<A>request(r8));
 		}
 		
 		public Function<Dependency<E>, Mono<?>> getEffect(OctFunction<T,U,V,W,X,Y,Z,A,Mono<?>> spec) {

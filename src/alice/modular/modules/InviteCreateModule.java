@@ -7,6 +7,7 @@ import alice.framework.main.Brain;
 import alice.framework.modules.commands.Command;
 import alice.framework.modules.commands.Module;
 import alice.framework.modules.tasks.DependencyFactory;
+import alice.framework.modules.tasks.EffectFactory;
 import alice.framework.utilities.FileIO;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.InviteCreateEvent;
@@ -21,6 +22,8 @@ public class InviteCreateModule extends Module<InviteCreateEvent> {
 	public Command<InviteCreateEvent> buildCommand(DependencyFactory.Builder<InviteCreateEvent> dfb) {
 		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
 		
+		EffectFactory<InviteCreateEvent,String> cef = dfb.addWrappedDependency(ice -> ice.getCode());
+		
 		DependencyFactory<InviteCreateEvent> df = dfb.buildDependencyFactory();
 		Command<InviteCreateEvent> command = new Command<InviteCreateEvent>(df);
 		
@@ -34,13 +37,12 @@ public class InviteCreateModule extends Module<InviteCreateEvent> {
 			return result;
 		});
 		
-		command.withEffect(ice -> {
-			String code = ice.getCode();
+		command.withDependentEffect(cef.getEffect(code -> {
 			SyncedJSONArray inviteList = sfi.getJSONArray("self_invites");
 			inviteList.put(code);
 			FileIO.appendToFile("tmp/codes.csv", String.format("%s\n", code));
 			System.out.println(code);
-		});
+		}));
 		
 		return command;
 	}
