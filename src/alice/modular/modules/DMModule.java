@@ -17,7 +17,7 @@ import discord4j.core.object.reaction.ReactionEmoji;
 public class DMModule extends MessageModule {
 
 	public DMModule() {
-		super(MessageCreateEvent.class);
+		super();
 	}
 
 	@Override

@@ -18,7 +18,7 @@ import discord4j.core.object.entity.Guild;
 public class InviteTrackerModule extends MessageModule {
 
 	public InviteTrackerModule() {
-		super(MessageCreateEvent.class);
+		super();
 	}
 
 	@Override

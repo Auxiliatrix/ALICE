@@ -19,6 +19,8 @@ public class DependencyFactory<E extends Event> {
 			retrievers = new ArrayList<Function<E2, Mono<?>>>();
 		}
 		
+		// TODO: Add multiple dependencies to create multieffect factories
+		
 		public <T> EffectFactory<E2,T> addDependency(Function<E2, Mono<?>> dependency) {
 			retrievers.add(dependency);
 			return new EffectFactory<E2,T>(dependency);
@@ -49,12 +51,18 @@ public class DependencyFactory<E extends Event> {
 	public Mono<Dependency<E>> getDependency(E event) {
 		List<Mono<?>> dependencies = new ArrayList<Mono<?>>();
 		for( Function<E, Mono<?>> retriever : retrievers ) {
-			dependencies.add(retriever.apply(event));
+			try {
+				dependencies.add(retriever.apply(event));
+			} catch(Exception e) {
+				dependencies.add(Mono.empty());
+			}
 		}
-		return Mono.zip(dependencies, a -> {
+		
+		return Mono.fromSupplier(() -> {
 			Map<Function<E,Mono<?>>,Object> referenceMap = new HashMap<Function<E,Mono<?>>,Object>();
-			for( int f=0; f<a.length; f++ ) {
-				referenceMap.put(retrievers.get(f), a[f]);
+			for( int f=0; f<dependencies.size(); f++ ) {
+				referenceMap.put(retrievers.get(f), dependencies.get(f).block());
+				// If breaking, add check for mono exceptions and putting null in map instead
 			}
 			return new Dependency<E>(referenceMap, event);
 		}).share();

@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class InviteGeneratorModule extends MessageModule {
 
 	public InviteGeneratorModule() {
-		super(MessageCreateEvent.class);
+		super();
 	}
 
 	@Override

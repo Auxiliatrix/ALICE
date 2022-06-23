@@ -11,7 +11,7 @@ import discord4j.core.object.entity.channel.MessageChannel;
 public class HelloModule extends MessageModule {
 
 	public HelloModule() {
-		super(MessageCreateEvent.class);
+		super();
 	}
 	
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {

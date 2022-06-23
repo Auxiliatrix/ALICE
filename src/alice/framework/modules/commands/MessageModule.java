@@ -13,8 +13,8 @@ import discord4j.rest.util.PermissionSet;
 
 public abstract class MessageModule extends Module<MessageCreateEvent> {
 
-	public MessageModule(Class<MessageCreateEvent> type) {
-		super(type);
+	public MessageModule() {
+		super(MessageCreateEvent.class);
 	}
 	
 	public static TokenizedString tokenizeMessage(MessageCreateEvent mce) {
@@ -22,10 +22,7 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 	}
 	
 	public static Function<MessageCreateEvent, Boolean> getInvokedCondition(String invocation) {
-		return mce -> {
-			TokenizedString ts = tokenizeMessage(mce);
-			return ts.size() > 1 && ts.getString(0).equalsIgnoreCase(invocation);
-		};
+		return getArgumentCondition(0, invocation);
 	}
 	
 	public static Function<MessageCreateEvent, Boolean> getArgumentCondition(int position, String argument) {
@@ -37,6 +34,14 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 			TokenizedString ts = tokenizeMessage(mce);
 			return ts.size() > position && (ignoreCase ? ts.getString(position).equalsIgnoreCase(argument) : ts.getString(position).equals(argument));
 		};
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getDMCondition() {
+		return mce -> !mce.getGuildId().isPresent();
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getGuildCondition() {
+		return mce -> mce.getGuildId().isPresent();
 	}
 	
 	public static Function<Dependency<MessageCreateEvent>, Boolean> getRoleCondition(EffectFactory<MessageCreateEvent,List<Role>> retriever, Role condition) {
