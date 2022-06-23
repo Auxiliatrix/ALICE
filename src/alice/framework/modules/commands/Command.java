@@ -49,7 +49,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	}
 	
 	public Command<E> withSubcommand(Command<E> subcommand) {
-		executeOrder.add(subcommands);
+		subcommands.add(subcommand);
 		return this;
 	}
 	
@@ -90,14 +90,14 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	}
 	
 	public Command<E> withCondition(Function<E, Boolean> condition) {
-		checkOrder.add(independentConditions);
 		independentConditions.add(condition);
+		checkOrder.add(independentConditions);
 		return this;
 	}
 	
 	public Command<E> withCondition(Boolean condition) {
-		checkOrder.add(conditions);
 		conditions.add(condition);
+		checkOrder.add(conditions);
 		return this;
 	}
 	
@@ -158,26 +158,6 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 				result = result.and(suppliersIterator.next().get());
 			}
 		}
-		
-//		for( Function<Dependency<E>, Mono<?>> effect : dependentEffects ) {
-//			result = result.and(effect.apply(dependency.block()));
-//		}
-//		
-//		for( Function<E, Mono<?>> effect : independentEffects ) {
-//			result = result.and(effect.apply(t));
-//		}
-//		
-//		for( Consumer<Dependency<E>> effect : dependentSideEffects ) {
-//			result = result.and(Mono.fromRunnable(() -> {effect.accept(dependency.block());}));
-//		}
-//		
-//		for( Consumer<E> effect : independentSideEffects ) {
-//			result = result.and(Mono.fromRunnable(() -> {effect.accept(t);}));
-//		}
-//		
-//		for( Supplier<Mono<?>> effect : suppliers ) {
-//			result = result.and(effect.get());
-//		}
 		
 		return result;
 	}
