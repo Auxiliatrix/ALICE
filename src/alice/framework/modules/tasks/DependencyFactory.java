@@ -33,7 +33,7 @@ public class DependencyFactory<E extends Event> {
 		}
 		
 		public DependencyFactory<E2> buildDependencyFactory() {
-			return new DependencyFactory<E2>(retrievers);
+			return new DependencyFactory<E2>(new ArrayList<Function<E2,Mono<?>>>(retrievers));
 		}
 		
 	}
@@ -61,8 +61,12 @@ public class DependencyFactory<E extends Event> {
 		return Mono.fromSupplier(() -> {
 			Map<Function<E,Mono<?>>,Object> referenceMap = new HashMap<Function<E,Mono<?>>,Object>();
 			for( int f=0; f<dependencies.size(); f++ ) {
-				referenceMap.put(retrievers.get(f), dependencies.get(f).block());
-				// If breaking, add check for mono exceptions and putting null in map instead
+				try {
+					referenceMap.put(retrievers.get(f), dependencies.get(f).block());
+				} catch (Exception e) {
+					System.err.println("Error caught while creating dependency for " + event.getClass());
+					referenceMap.put(retrievers.get(f), null);
+				}
 			}
 			return new Dependency<E>(referenceMap, event);
 		}).share();

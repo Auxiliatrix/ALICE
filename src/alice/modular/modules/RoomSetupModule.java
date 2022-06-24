@@ -22,9 +22,10 @@ public class RoomSetupModule extends MessageModule {
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.<MessageChannel>addDependency(mce -> mce.getMessage().getChannel());
-		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory(); // TODO: figure out why this didn't break
 		EffectFactory<MessageCreateEvent,PermissionSet> psef = dfb.<PermissionSet>addDependency(mce -> mce.getMember().get().getBasePermissions());		
 		EffectFactory<MessageCreateEvent,VoiceChannel> vcef = dfb.<VoiceChannel>addDependency(mce -> mce.getMember().get().getVoiceState().flatMap(vs -> vs.getChannel()));
+		
+		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getInvokedCondition("%room"));

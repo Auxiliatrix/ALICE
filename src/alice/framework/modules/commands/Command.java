@@ -111,17 +111,29 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		
 		for( List<?> conditionList : checkOrder ) {
 			if( conditionList.equals(conditions) ) {
-				if( !conditionsIterator.next() ) {
+				try {
+					if( !conditionsIterator.next() ) {
+						return false;
+					}
+				} catch (Exception e) {
 					return false;
 				}
 			}
 			if( conditionList.equals(independentConditions) ) {
-				if( !independentConditionsIterator.next().apply(t) ) {
+				try {
+					if( !independentConditionsIterator.next().apply(t) ) {
+						return false;
+					}
+				} catch (Exception e) {
 					return false;
 				}
 			}
 			if( conditionList.equals(dependentConditions) ) {
-				if( !dependentConditionsIterator.next().apply(dependency.block()) ) {
+				try {
+					if( !dependentConditionsIterator.next().apply(dependency.block()) ) {
+						return false;
+					}
+				} catch (Exception e) {
 					return false;
 				}
 			}
@@ -142,17 +154,36 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		
 		for( List<?> effectList : executeOrder ) {
 			if( effectList.equals(dependentEffects) ) {
-				result = result.and(dependentEffectsIterator.next().apply(dependency.block()));
+				try {
+					result = result.and(dependentEffectsIterator.next().apply(dependency.block()));
+				} catch (Exception e) {
+					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					break;
+				}
 			}
 			if( effectList.equals(independentEffects) ) {
-				result = result.and(independentEffectsIterator.next().apply(t));
-
+				try {
+					result = result.and(independentEffectsIterator.next().apply(t));
+				} catch (Exception e) {
+					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					break;
+				}
 			}
 			if( effectList.equals(dependentSideEffects) ) {
-				result = result.and(Mono.fromRunnable(() -> {dependentSideEffectsIterator.next().accept(dependency.block());}));
+				try {
+					result = result.and(Mono.fromRunnable(() -> {dependentSideEffectsIterator.next().accept(dependency.block());}));
+				} catch (Exception e) {
+					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					break;
+				}
 			}
 			if( effectList.equals(independentSideEffects) ) {
-				result = result.and(Mono.fromRunnable(() -> {independentSideEffectsIterator.next().accept(t);}));
+				try {
+					result = result.and(Mono.fromRunnable(() -> {independentSideEffectsIterator.next().accept(t);}));
+				} catch (Exception e) {
+					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					break;
+				}
 			}
 			if( effectList.equals(suppliers) ) {
 				result = result.and(suppliersIterator.next().get());
