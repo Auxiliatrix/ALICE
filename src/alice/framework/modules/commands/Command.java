@@ -48,6 +48,8 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		subcommands = new ArrayList<Command<E>>();
 	}
 	
+	// TODO: conditions with things to execute on a failure
+	
 	public Command<E> withSubcommand(Command<E> subcommand) {
 		subcommands.add(subcommand);
 		return this;

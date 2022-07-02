@@ -31,6 +31,11 @@ public class EffectFactory<E extends Event, T> {
 		return retriever;
 	}
 	
+	// TODO: make this the default
+	public T requestFrom(Dependency<E> dependency) {
+		return dependency.<T>request(this);
+	}
+	
 	public <U> EffectFactory2<E,T,U> with(EffectFactory<E,U> effectFactory) {
 		return new EffectFactory2<E,T,U>(getRetriever(), effectFactory.getRetriever());
 	}

@@ -2,6 +2,8 @@ package alice.framework.modules.commands;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import alice.framework.modules.tasks.Dependency;
 import alice.framework.modules.tasks.EffectFactory;
@@ -33,6 +35,30 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 		return mce -> {
 			TokenizedString ts = tokenizeMessage(mce);
 			return ts.size() > position && (ignoreCase ? ts.getString(position).equalsIgnoreCase(argument) : ts.getString(position).equals(argument));
+		};
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getMatchCondition(String pattern, int position) {
+		return mce -> {
+			TokenizedString ts = tokenizeMessage(mce);
+			Pattern checker = Pattern.compile(pattern);
+			Matcher matcher = checker.matcher(ts.getString(position));
+			return matcher.matches();
+		};
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getMatchCondition(String pattern) {
+		return mce -> {
+			Pattern checker = Pattern.compile(pattern);
+			Matcher matcher = checker.matcher(mce.getMessage().getContent());
+			return matcher.matches();
+		};
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getArgumentsCondition(int count) {
+		return mce -> {
+			TokenizedString ts = tokenizeMessage(mce);
+			return ts.size() >= count;
 		};
 	}
 	
