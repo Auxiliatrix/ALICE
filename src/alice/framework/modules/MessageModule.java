@@ -72,7 +72,7 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 	
 	public static Function<Dependency<MessageCreateEvent>, Boolean> getRoleCondition(EffectFactory<MessageCreateEvent,List<Role>> retriever, Role condition) {
 		return d -> {
-			List<Role> roles = d.<List<Role>>request(retriever);
+			List<Role> roles = retriever.requestFrom(d);
 			for( Role role : roles ) {
 				if( role.equals(condition) ) {
 					return true;
@@ -84,7 +84,7 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 	
 	public static Function<Dependency<MessageCreateEvent>, Boolean> getPermissionCondition(EffectFactory<MessageCreateEvent,PermissionSet> retriever, Permission condition) {
 		return d -> {
-			PermissionSet permissions = d.<PermissionSet>request(retriever);
+			PermissionSet permissions = retriever.requestFrom(d);
 			for( Permission permission : permissions ) {
 				if( permission.equals(condition) ) {
 					return true;

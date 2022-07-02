@@ -55,9 +55,9 @@ public class RoleAssignModule extends MessageModule {
 		getCommand.withCondition(MessageModule.getArgumentCondition(1, "add"));
 		getCommand.withCondition(MessageModule.getArgumentsCondition(3));
 		getCommand.withDependentEffect(d -> {
-			MessageChannel mc = d.<MessageChannel>request(mcef);
-			Member m = d.<Member>request(mef);
-			List<Role> lr = d.<List<Role>>request(lref);
+			MessageChannel mc = mcef.requestFrom(d);
+			Member m = mef.requestFrom(d);
+			List<Role> lr = lref.requestFrom(d);
 			MessageCreateEvent mce = d.getEvent();
 			TokenizedString ts = MessageModule.tokenizeMessage(mce);
 			
@@ -88,10 +88,10 @@ public class RoleAssignModule extends MessageModule {
 		removeCommand.withCondition(MessageModule.getArgumentCondition(1, "remove"));
 		removeCommand.withCondition(MessageModule.getArgumentsCondition(3));
 		removeCommand.withDependentEffect(d -> {
-			MessageChannel mc = d.<MessageChannel>request(mcef);
-			Member m = d.<Member>request(mef);
-			List<Role> lr = d.<List<Role>>request(lref);
-			List<Role> lur = d.<List<Role>>request(luref);
+			MessageChannel mc = mcef.requestFrom(d);
+			Member m = mef.requestFrom(d);
+			List<Role> lr = lref.requestFrom(d);
+			List<Role> lur = luref.requestFrom(d);
 			MessageCreateEvent mce = d.getEvent();
 			TokenizedString ts = MessageModule.tokenizeMessage(mce);
 			
@@ -134,9 +134,9 @@ public class RoleAssignModule extends MessageModule {
 		Command<MessageCreateEvent> allowAddCommand = new Command<MessageCreateEvent>(dfa);
 		allowAddCommand.withCondition(MessageModule.getArgumentCondition(2, "add"));
 		allowAddCommand.withDependentEffect(d -> {
-			List<Role> lr = d.<List<Role>>request(lref);
-			Member m = d.<Member>request(mef);
-			MessageChannel mc = d.<MessageChannel>request(mcef);
+			MessageChannel mc = mcef.requestFrom(d);
+			Member m = mef.requestFrom(d);
+			List<Role> lr = lref.requestFrom(d);
 
 			MessageCreateEvent mce = d.getEvent();
 			TokenizedString ts = MessageModule.tokenizeMessage(mce);
@@ -168,9 +168,9 @@ public class RoleAssignModule extends MessageModule {
 		Command<MessageCreateEvent> allowRemoveCommand = new Command<MessageCreateEvent>(dfa);
 		allowRemoveCommand.withCondition(MessageModule.getArgumentCondition(2, "remove"));
 		allowRemoveCommand.withDependentEffect(d -> {
-			List<Role> lr = d.<List<Role>>request(lref);
-			Member m = d.<Member>request(mef);
-			MessageChannel mc = d.<MessageChannel>request(mcef);
+			MessageChannel mc = mcef.requestFrom(d);
+			Member m = mef.requestFrom(d);
+			List<Role> lr = lref.requestFrom(d);
 
 			MessageCreateEvent mce = d.getEvent();
 			TokenizedString ts = MessageModule.tokenizeMessage(mce);
@@ -210,9 +210,9 @@ public class RoleAssignModule extends MessageModule {
 		Command<MessageCreateEvent> disallowAddCommand = new Command<MessageCreateEvent>(dfa);
 		disallowAddCommand.withCondition(MessageModule.getArgumentCondition(2, "add"));
 		disallowAddCommand.withDependentEffect(d -> {
-			List<Role> lr = d.<List<Role>>request(lref);
-			Member m = d.<Member>request(mef);
-			MessageChannel mc = d.<MessageChannel>request(mcef);
+			MessageChannel mc = mcef.requestFrom(d);
+			Member m = mef.requestFrom(d);
+			List<Role> lr = lref.requestFrom(d);
 
 			MessageCreateEvent mce = d.getEvent();
 			TokenizedString ts = MessageModule.tokenizeMessage(mce);
@@ -244,9 +244,9 @@ public class RoleAssignModule extends MessageModule {
 		Command<MessageCreateEvent> disallowRemoveCommand = new Command<MessageCreateEvent>(dfa);
 		disallowRemoveCommand.withCondition(MessageModule.getArgumentCondition(2, "remove"));
 		disallowRemoveCommand.withDependentEffect(d -> {
-			List<Role> lr = d.<List<Role>>request(lref);
-			Member m = d.<Member>request(mef);
-			MessageChannel mc = d.<MessageChannel>request(mcef);
+			MessageChannel mc = mcef.requestFrom(d);
+			Member m = mef.requestFrom(d);
+			List<Role> lr = lref.requestFrom(d);
 
 			MessageCreateEvent mce = d.getEvent();
 			TokenizedString ts = MessageModule.tokenizeMessage(mce);

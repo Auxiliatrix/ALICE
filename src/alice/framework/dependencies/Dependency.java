@@ -16,7 +16,6 @@ public class Dependency<E extends Event> {
 		this.event = event;
 	}
 	
-	// TODO: Exception handling
 	@SuppressWarnings("unchecked")
 	public <T> T request(Function<E,Mono<?>> retriever) {
 		T response;
@@ -31,10 +30,6 @@ public class Dependency<E extends Event> {
 	
 	public E getEvent() {
 		return event;
-	}
-	
-	public <T> T request(EffectFactory<E,T> ef) {
-		return this.request(ef.getRetriever());
 	}
 	
 }

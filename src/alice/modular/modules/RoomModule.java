@@ -71,7 +71,7 @@ public class RoomModule extends Module<VoiceStateUpdateEvent> {
 		Command<VoiceStateUpdateEvent> leaveCommand = new Command<VoiceStateUpdateEvent>(df);
 		leaveCommand.withDependentCondition(ocef.getCondition(vc -> vc != null));
 		leaveCommand.withDependentCondition(d -> {
-			long count = d.<Long>request(cef);
+			long count = cef.requestFrom(d);
 			return count == 0 || count == 1 && d.getEvent().isMoveEvent();
 		});
 		leaveCommand.withDependentCondition(ocef.getCondition(oc -> {

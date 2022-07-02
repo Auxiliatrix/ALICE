@@ -28,10 +28,8 @@ public class DMModule extends MessageModule {
 		
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		
 		command.withCondition(mce -> mce.getMessage().getAuthor().isPresent());
-		command.withCondition(getInvokedCondition("%tier"));
-				
+		command.withCondition(MessageModule.getInvokedCondition("%tier"));
 		command.withDependentEffect(
 				mcef.with(tsef).with(mef)
 				.getEffect(

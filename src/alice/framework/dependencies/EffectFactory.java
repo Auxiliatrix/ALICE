@@ -27,17 +27,12 @@ public class EffectFactory<E extends Event, T> {
 		return d -> spec.apply(d.<T>request(retriever));
 	}
 	
-	protected Function<E,Mono<?>> getRetriever() {
-		return retriever;
-	}
-	
-	// TODO: make this the default
 	public T requestFrom(Dependency<E> dependency) {
-		return dependency.<T>request(this);
+		return dependency.<T>request(retriever);
 	}
 	
 	public <U> EffectFactory2<E,T,U> with(EffectFactory<E,U> effectFactory) {
-		return new EffectFactory2<E,T,U>(getRetriever(), effectFactory.getRetriever());
+		return new EffectFactory2<E,T,U>(retriever, effectFactory.retriever);
 	}
 	
 }
