@@ -32,30 +32,26 @@ public class InviteDeleteModule extends Module<InviteDeleteEvent> {
 		
 		DependencyFactory<InviteDeleteEvent> df = dfb.buildDependencyFactory();
 		Command<InviteDeleteEvent> command = new Command<InviteDeleteEvent>(df);
-		
-		command.withCondition(ice -> {
-			String code = ice.getCode();
-			boolean result = true;
-			
-			result &= sfi.getJSONArray("self_invites").toList().contains(code);
-			
-			return result;
-		});
-		
-		command.withDependentEffect(lmef.with(cef).getEffect((lm,c) -> {
-			lm.sort(new Comparator<Member>() {
-				@Override
-				public int compare(Member o1, Member o2) {
-					return -o1.getJoinTime().get().compareTo(o2.getJoinTime().get());
-			}});
-			Member target = lm.get(0);
-			return target.addRole(Snowflake.of(sfi.getLong("roleID"))).and(Mono.fromRunnable(() -> {
-				SyncedJSONObject inviteMap = sfi.getJSONObject("invite_map");
-				inviteMap.put(target.getId().asString(), c);
-				FileIO.appendToFile("tmp/user_associations.csv", String.format("%s,%s#%s,%s\n", c, target.getUsername(), target.getDiscriminator(), target.getId().asString()));
-				System.out.println(target.getUsername() + "#" + target.getDiscriminator());
-			}));
-		}));
+		command.withCondition(ice -> sfi.getJSONArray("self_invites").toList().contains(ice.getCode()));
+		command.withDependentEffect(lmef.with(cef).getEffect(
+			(lm,c) -> {
+				lm.sort(new Comparator<Member>() {
+					@Override
+					public int compare(Member o1, Member o2) {
+						return -o1.getJoinTime().get().compareTo(o2.getJoinTime().get());
+					}
+				});
+				Member target = lm.get(0);
+				return target.addRole(Snowflake.of(sfi.getLong("roleID"))).and(Mono.fromRunnable(
+					() -> {
+						SyncedJSONObject inviteMap = sfi.getJSONObject("invite_map");
+						inviteMap.put(target.getId().asString(), c);
+						FileIO.appendToFile("tmp/user_associations.csv", String.format("%s,%s#%s,%s\n", c, target.getUsername(), target.getDiscriminator(), target.getId().asString()));
+						System.out.println(target.getUsername() + "#" + target.getDiscriminator());
+					}
+				));
+			}
+		));
 		
 		return command;
 	}

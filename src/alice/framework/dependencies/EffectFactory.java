@@ -19,7 +19,7 @@ public class EffectFactory<E extends Event, T> {
 		return d -> spec.apply(d.<T>request(retriever));
 	}
 	
-	public Consumer<Dependency<E>> getEffect(Consumer<T> spec) {
+	public Consumer<Dependency<E>> getSideEffect(Consumer<T> spec) {
 		return d -> spec.accept(d.<T>request(retriever));
 	}
 	

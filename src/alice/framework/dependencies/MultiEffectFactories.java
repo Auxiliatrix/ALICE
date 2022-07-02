@@ -36,7 +36,7 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2));
 		}
 		
-		public Consumer<Dependency<E>> getEffect(BiConsumer<T,U> spec) {
+		public Consumer<Dependency<E>> getSideEffect(BiConsumer<T,U> spec) {
 			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2));
 		}
 		
@@ -66,7 +66,7 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3));
 		}
 		
-		public Consumer<Dependency<E>> getEffect(TriConsumer<T,U,V> spec) {
+		public Consumer<Dependency<E>> getSideEffect(TriConsumer<T,U,V> spec) {
 			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3));
 		}
 		
@@ -98,7 +98,7 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4));
 		}
 		
-		public Consumer<Dependency<E>> getEffect(QuadConsumer<T,U,V,W> spec) {
+		public Consumer<Dependency<E>> getSideEffect(QuadConsumer<T,U,V,W> spec) {
 			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4));
 		}
 		
@@ -132,7 +132,7 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5));
 		}
 		
-		public Consumer<Dependency<E>> getEffect(PentConsumer<T,U,V,W,X> spec) {
+		public Consumer<Dependency<E>> getSideEffect(PentConsumer<T,U,V,W,X> spec) {
 			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5));
 		}
 		
@@ -168,7 +168,7 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5), d.<Y>request(r6));
 		}		
 		
-		public Consumer<Dependency<E>> getEffect(HexConsumer<T,U,V,W,X,Y> spec) {
+		public Consumer<Dependency<E>> getSideEffect(HexConsumer<T,U,V,W,X,Y> spec) {
 			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5),d.<Y>request(r6));
 		}
 		
@@ -206,7 +206,7 @@ public class MultiEffectFactories {
 			return d -> spec.apply(d.<T>request(r1), d.<U>request(r2), d.<V>request(r3), d.<W>request(r4), d.<X>request(r5), d.<Y>request(r6), d.<Z>request(r7));
 		}		
 		
-		public Consumer<Dependency<E>> getEffect(SeptConsumer<T,U,V,W,X,Y,Z> spec) {
+		public Consumer<Dependency<E>> getSideEffect(SeptConsumer<T,U,V,W,X,Y,Z> spec) {
 			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5),d.<Y>request(r6),d.<Z>request(r7));
 		}
 		
@@ -242,7 +242,7 @@ public class MultiEffectFactories {
 			this.r8 = r8;
 		}
 		
-		public Consumer<Dependency<E>> getEffect(OctConsumer<T,U,V,W,X,Y,Z,A> spec) {
+		public Consumer<Dependency<E>> getSideEffect(OctConsumer<T,U,V,W,X,Y,Z,A> spec) {
 			return d -> spec.accept(d.<T>request(r1),d.<U>request(r2),d.<V>request(r3),d.<W>request(r4),d.<X>request(r5),d.<Y>request(r6),d.<Z>request(r7),d.<A>request(r8));
 		}
 		

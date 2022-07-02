@@ -70,6 +70,14 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 		return mce -> mce.getGuildId().isPresent();
 	}
 	
+	public static Function<MessageCreateEvent, Boolean> getHumanCondition() {
+		return mce -> mce.getMessage().getAuthor().isPresent();
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getBotCondition() {
+		return mce -> !mce.getMessage().getAuthor().isPresent();
+	}
+	
 	public static Function<Dependency<MessageCreateEvent>, Boolean> getRoleCondition(EffectFactory<MessageCreateEvent,List<Role>> retriever, Role condition) {
 		return d -> {
 			List<Role> roles = retriever.requestFrom(d);

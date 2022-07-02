@@ -33,72 +33,81 @@ public class RoomModule extends Module<VoiceStateUpdateEvent> {
 		
 		Command<VoiceStateUpdateEvent> command = new Command<VoiceStateUpdateEvent>(df);
 		command.withDependentCondition(ccef.with(ocef).getCondition((vc,oc) -> vc != oc));
-		command.withCondition(vsue -> {
-			SyncedJSONObject sf = SyncedSaveFile.ofGuild(vsue.getCurrent().getGuildId().asLong());
-			return sf.has("%room_nexus") && sf.has("%room_temps");
-		});
+		command.withCondition(
+			vsue -> {
+				SyncedJSONObject sf = SyncedSaveFile.ofGuild(vsue.getCurrent().getGuildId().asLong());
+				return sf.has("%room_nexus") && sf.has("%room_temps");
+			}
+		);
 		
 		Command<VoiceStateUpdateEvent> joinCommand = new Command<VoiceStateUpdateEvent>(df);
 		joinCommand.withDependentCondition(ccef.getCondition(vc -> vc != null));
-		joinCommand.withDependentCondition(ccef.getCondition(vc -> {
-			SyncedJSONObject sf = SyncedSaveFile.ofGuild(vc.getGuildId().asLong());
-			return vc.getId().asString().equals(sf.getString("%room_nexus"));
-		}));
-		joinCommand.withDependentEffect(ccef.with(cmef).getEffect((cc,cm) -> {
-			return cc.getGuild()
-				.flatMap(g -> g.createVoiceChannel(
-					VoiceChannelCreateSpec.builder()
-						.name(cm.getUsername()+"#"+cm.getDiscriminator()+"'s Room")
-						.parentId(cc.getCategoryId().isPresent() ? Possible.of(cc.getCategoryId().get()) : Possible.absent())
-						.build()
+		joinCommand.withDependentCondition(ccef.getCondition(
+			vc -> {
+				SyncedJSONObject sf = SyncedSaveFile.ofGuild(vc.getGuildId().asLong());
+				return vc.getId().asString().equals(sf.getString("%room_nexus"));
+			}
+		));
+		joinCommand.withDependentEffect(ccef.with(cmef).getEffect(
+			(cc,cm) ->
+				cc.getGuild()
+					.flatMap(g -> g.createVoiceChannel(
+						VoiceChannelCreateSpec.builder()
+							.name(cm.getUsername()+"#"+cm.getDiscriminator()+"'s Room")
+							.parentId(cc.getCategoryId().isPresent() ? Possible.of(cc.getCategoryId().get()) : Possible.absent())
+							.build()
+						)
 					)
-				)
-				.flatMap(vc -> cm.edit(
-					GuildMemberEditSpec.builder()
-						.newVoiceChannelOrNull(vc.getId())
-						.build()
+					.flatMap(vc -> cm.edit(
+						GuildMemberEditSpec.builder()
+							.newVoiceChannelOrNull(vc.getId())
+							.build()
+						)
+						.and(Mono.fromRunnable(() -> {
+							SyncedJSONObject sf = SyncedSaveFile.ofGuild(cc.getGuildId().asLong());
+							SyncedJSONArray temps = sf.getJSONArray("%room_temps");
+							temps.put(vc.getId().asString());
+						}))
 					)
-					.and(Mono.fromRunnable(() -> {
-						SyncedJSONObject sf = SyncedSaveFile.ofGuild(cc.getGuildId().asLong());
-						SyncedJSONArray temps = sf.getJSONArray("%room_temps");
-						temps.put(vc.getId().asString());
-					}))
-				)
-				;
-		}
 		));
 		
 		Command<VoiceStateUpdateEvent> leaveCommand = new Command<VoiceStateUpdateEvent>(df);
 		leaveCommand.withDependentCondition(ocef.getCondition(vc -> vc != null));
-		leaveCommand.withDependentCondition(d -> {
-			long count = cef.requestFrom(d);
-			return count == 0 || count == 1 && d.getEvent().isMoveEvent();
-		});
-		leaveCommand.withDependentCondition(ocef.getCondition(oc -> {
-			SyncedJSONObject sf = SyncedSaveFile.ofGuild(oc.getGuildId().asLong());
-			SyncedJSONArray temps = sf.getJSONArray("%room_temps");
-			for( int f=0; f<temps.length(); f++ ) {
-				if( temps.get(f).toString().equals(oc.getId().asString()) ) {
-					return true;
+		leaveCommand.withDependentCondition(
+			d -> {
+				long count = cef.requestFrom(d);
+				return count == 0 || count == 1 && d.getEvent().isMoveEvent();
+			}
+		);
+		leaveCommand.withDependentCondition(ocef.getCondition(
+			oc -> {
+				SyncedJSONObject sf = SyncedSaveFile.ofGuild(oc.getGuildId().asLong());
+				SyncedJSONArray temps = sf.getJSONArray("%room_temps");
+				for( int f=0; f<temps.length(); f++ ) {
+					if( temps.get(f).toString().equals(oc.getId().asString()) ) {
+						return true;
+					}
+				}
+				return false;
+			}
+		));
+		leaveCommand.withDependentEffect(ocef.getSideEffect(
+			oc -> {
+				SyncedJSONObject sf = SyncedSaveFile.ofGuild(oc.getGuildId().asLong());
+				SyncedJSONArray temps = sf.getJSONArray("%room_temps");
+				int index = -1;
+				for( int f=0; f<temps.length(); f++ ) {
+					if( temps.get(f).toString().equals(oc.getId().asString()) ) {
+						index = f;
+						break;
+					}
+				}
+				if( index != -1 ) {
+					temps.remove(index);
 				}
 			}
-			return false;
-		}));
-		leaveCommand.withDependentEffect(ocef.getEffect(oc -> {
-			SyncedJSONObject sf = SyncedSaveFile.ofGuild(oc.getGuildId().asLong());
-			SyncedJSONArray temps = sf.getJSONArray("%room_temps");
-			int index = -1;
-			for( int f=0; f<temps.length(); f++ ) {
-				if( temps.get(f).toString().equals(oc.getId().asString()) ) {
-					index = f;
-					break;
-				}
-			}
-			if( index != -1 ) {
-				temps.remove(index);
-			}
-		}));
-		leaveCommand.withDependentEffect(ocef.getEffect(oc -> {return oc.delete();}));
+		));
+		leaveCommand.withDependentEffect(ocef.getEffect(oc -> oc.delete()));
 
 		command.withSubcommand(leaveCommand);
 		command.withSubcommand(joinCommand);

@@ -3,7 +3,7 @@ package alice.modular.modules;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.EffectFactory;
-import alice.framework.dependencies.MessageSendEffectSpec;
+import alice.framework.effects.MessageSendEffectSpec;
 import alice.framework.modules.MessageModule;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
@@ -19,8 +19,7 @@ public class HelloModule extends MessageModule {
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		
-		command.withCondition(mce -> mce.getMessage().getContent().startsWith("%hello"));
+		command.withCondition(MessageModule.getInvokedCondition("%hello"));
 		command.withDependentEffect(ef.getEffect(new MessageSendEffectSpec("Hello world!")));
 		command.withEffect(mce -> {System.out.println("Hello world!");});
 		

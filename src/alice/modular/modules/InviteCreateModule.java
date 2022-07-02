@@ -26,23 +26,21 @@ public class InviteCreateModule extends Module<InviteCreateEvent> {
 		
 		DependencyFactory<InviteCreateEvent> df = dfb.buildDependencyFactory();
 		Command<InviteCreateEvent> command = new Command<InviteCreateEvent>(df);
-		
-		command.withCondition(ice -> {
-			boolean result = true;
-			result &= sfi.has("guildID");
-			result &= sfi.has("roleID");
-			result &= sfi.has("invite_map");
-			result &= sfi.has("self_invites");
-			result &= Snowflake.of("367437754034028545").equals(ice.getInviter().get().getId()) || Brain.client.getSelfId().equals(ice.getInviter().get().getId());
-			return result;
-		});
-		
-		command.withDependentEffect(cef.getEffect(code -> {
-			SyncedJSONArray inviteList = sfi.getJSONArray("self_invites");
-			inviteList.put(code);
-			FileIO.appendToFile("tmp/codes.csv", String.format("%s\n", code));
-			System.out.println(code);
-		}));
+		command.withCondition(
+			ice -> sfi.has("guildID")
+				&& sfi.has("roleID")
+				&& sfi.has("invite_map")
+				&& sfi.has("self_invites")
+				&& (Snowflake.of("367437754034028545").equals(ice.getInviter().get().getId()) || Brain.client.getSelfId().equals(ice.getInviter().get().getId()))
+		);
+		command.withDependentEffect(cef.getSideEffect(
+			code -> {
+				SyncedJSONArray inviteList = sfi.getJSONArray("self_invites");
+				inviteList.put(code);
+				FileIO.appendToFile("tmp/codes.csv", String.format("%s\n", code));
+				System.out.println(code);
+			}
+		));
 		
 		return command;
 	}

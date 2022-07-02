@@ -24,18 +24,13 @@ public class InviteGeneratorModule extends MessageModule {
 		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		
 		command.withCondition(getInvokedCondition("%gen"));
-		
-		command.withDependentEffect(idef.getEffect(id -> {
-			return Mono.fromRunnable(() -> {
-				System.out.println(id.code());
-			});
-		}));
-		
-		command.withDependentEffect(idef.with(mcef).getEffect((id,mc) -> {
-			return mc.createMessage("discord.gg/" + id.code());
-		}));
+		command.withDependentEffect(idef.getEffect(
+			id -> Mono.fromRunnable(() -> {System.out.println(id.code());}
+		)));
+		command.withDependentEffect(idef.with(mcef).getEffect(
+			(id,mc) -> mc.createMessage("discord.gg/" + id.code())
+		));
 		
 		return command;
 	}

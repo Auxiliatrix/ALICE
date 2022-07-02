@@ -1,4 +1,4 @@
-package alice.framework.dependencies;
+package alice.framework.effects;
 
 import java.util.function.Function;
 

@@ -35,25 +35,29 @@ public class RoomSetupModule extends MessageModule {
 		Command<MessageCreateEvent> assignCommand = new Command<MessageCreateEvent>(df);
 		assignCommand.withCondition(MessageModule.getArgumentCondition(1, "assign"));
 		assignCommand.withDependentCondition(vcef.getCondition(vc -> vc != null));
-		assignCommand.withDependentEffect(vcef.getEffect(vc -> {
-			SyncedJSONObject sf = SyncedSaveFile.ofGuild(vc.getGuildId().asLong());
-			sf.put("%room_nexus", vc.getId().asString());
-			sf.putJSONArray("%room_temps");
-		}));
+		assignCommand.withDependentEffect(vcef.getSideEffect(
+			vc -> {
+				SyncedJSONObject sf = SyncedSaveFile.ofGuild(vc.getGuildId().asLong());
+				sf.put("%room_nexus", vc.getId().asString());
+				sf.putJSONArray("%room_temps");
+			}
+		));
 		assignCommand.withDependentEffect(mcef.getEffect(mc -> {return mc.createMessage("Nexus assigned successfully!");}));
 		
 		Command<MessageCreateEvent> unassignCommand = new Command<MessageCreateEvent>(df);
 		unassignCommand.withCondition(MessageModule.getArgumentCondition(1, "unassign"));
-		unassignCommand.withEffect(mce -> {
-			SyncedJSONObject sf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
-			if( sf.has("%room_nexus") ) {
-				sf.remove("%room_nexus");
+		unassignCommand.withEffect(
+			mce -> {
+				SyncedJSONObject sf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
+				if( sf.has("%room_nexus") ) {
+					sf.remove("%room_nexus");
+				}
+				if( sf.has("%room_temps") ) {
+					sf.remove("%room_temps");
+				}
 			}
-			if( sf.has("%room_temps") ) {
-				sf.remove("%room_temps");
-			}
-		});
-		unassignCommand.withDependentEffect(mcef.getEffect(mc -> {return mc.createMessage("Nexus unassigned successfully!");}));
+		);
+		unassignCommand.withDependentEffect(mcef.getEffect(mc -> mc.createMessage("Nexus unassigned successfully!")));
 
 		command.withSubcommand(assignCommand);
 		command.withSubcommand(unassignCommand);
