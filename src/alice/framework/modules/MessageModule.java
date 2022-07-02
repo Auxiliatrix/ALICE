@@ -1,12 +1,12 @@
-package alice.framework.modules.commands;
+package alice.framework.modules;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import alice.framework.modules.tasks.Dependency;
-import alice.framework.modules.tasks.EffectFactory;
+import alice.framework.dependencies.Dependency;
+import alice.framework.dependencies.EffectFactory;
 import alice.framework.structures.TokenizedString;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Role;

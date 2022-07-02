@@ -1,9 +1,10 @@
-package alice.framework.modules.commands;
+package alice.framework.modules;
 
 import java.time.Duration;
 
+import alice.framework.dependencies.Command;
+import alice.framework.dependencies.DependencyFactory;
 import alice.framework.main.Brain;
-import alice.framework.modules.tasks.DependencyFactory;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;

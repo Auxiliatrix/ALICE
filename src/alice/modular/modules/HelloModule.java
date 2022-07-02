@@ -1,10 +1,10 @@
 package alice.modular.modules;
 
-import alice.framework.modules.commands.Command;
-import alice.framework.modules.commands.MessageModule;
-import alice.framework.modules.tasks.DependencyFactory;
-import alice.framework.modules.tasks.EffectFactory;
-import alice.framework.modules.tasks.MessageSendEffectSpec;
+import alice.framework.dependencies.Command;
+import alice.framework.dependencies.DependencyFactory;
+import alice.framework.dependencies.EffectFactory;
+import alice.framework.dependencies.MessageSendEffectSpec;
+import alice.framework.modules.MessageModule;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 

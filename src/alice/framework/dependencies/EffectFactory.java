@@ -1,9 +1,9 @@
-package alice.framework.modules.tasks;
+package alice.framework.dependencies;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import alice.framework.modules.tasks.MultiEffectFactories.EffectFactory2;
+import alice.framework.dependencies.MultiEffectFactories.EffectFactory2;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 

@@ -10,11 +10,11 @@ import java.util.List;
 
 import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
+import alice.framework.dependencies.Command;
+import alice.framework.dependencies.DependencyFactory;
+import alice.framework.dependencies.EffectFactory;
 import alice.framework.main.Brain;
-import alice.framework.modules.commands.Command;
-import alice.framework.modules.commands.Module;
-import alice.framework.modules.tasks.DependencyFactory;
-import alice.framework.modules.tasks.EffectFactory;
+import alice.framework.modules.Module;
 import alice.framework.utilities.FileIO;
 
 public class InviteDeleteModule extends Module<InviteDeleteEvent> {

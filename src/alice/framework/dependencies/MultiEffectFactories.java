@@ -1,4 +1,4 @@
-package alice.framework.modules.tasks;
+package alice.framework.dependencies;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;

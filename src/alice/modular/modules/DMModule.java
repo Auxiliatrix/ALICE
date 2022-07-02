@@ -3,10 +3,10 @@ package alice.modular.modules;
 import java.util.HashMap;
 import java.util.Map;
 
-import alice.framework.modules.commands.Command;
-import alice.framework.modules.commands.MessageModule;
-import alice.framework.modules.tasks.DependencyFactory;
-import alice.framework.modules.tasks.EffectFactory;
+import alice.framework.dependencies.Command;
+import alice.framework.dependencies.DependencyFactory;
+import alice.framework.dependencies.EffectFactory;
+import alice.framework.modules.MessageModule;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.FileIO;
 import discord4j.core.event.domain.message.MessageCreateEvent;

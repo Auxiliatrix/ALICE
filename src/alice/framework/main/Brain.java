@@ -11,7 +11,7 @@ import org.reflections.Reflections;
 
 import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
-import alice.framework.modules.commands.Module;
+import alice.framework.modules.Module;
 import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
@@ -142,9 +142,9 @@ public class Brain {
 		Reflections include = new Reflections(includePrefix);	// Classes included within the specified directory
 		Set<Class<? extends Module>> excluded = new HashSet<Class<? extends Module>>();	// Classes to exclude
 		Reflections exclude = new Reflections("alice.framework.modules");
-		excluded = exclude.getSubTypesOf(alice.framework.modules.commands.Module.class);
+		excluded = exclude.getSubTypesOf(alice.framework.modules.Module.class);
 		
-		for( Class<?> c : include.getSubTypesOf(alice.framework.modules.commands.Module.class) ) {
+		for( Class<?> c : include.getSubTypesOf(alice.framework.modules.Module.class) ) {
 			if( excluded.contains(c) ) {
 				continue;
 			}

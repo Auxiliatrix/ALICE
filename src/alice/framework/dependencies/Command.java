@@ -1,4 +1,4 @@
-package alice.framework.modules.commands;
+package alice.framework.dependencies;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,8 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import alice.framework.modules.tasks.Dependency;
-import alice.framework.modules.tasks.DependencyFactory;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
