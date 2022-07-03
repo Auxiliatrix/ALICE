@@ -6,12 +6,12 @@ import java.util.function.Function;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
-public class Dependency<E extends Event> {
+public class DependencyMap<E extends Event> {
 
 	private final Map<Function<E,Mono<?>>, Object> referenceMap;
 	protected E event;
 	
-	protected Dependency(Map<Function<E,Mono<?>>, Object> referenceMap, E event) {
+	protected DependencyMap(Map<Function<E,Mono<?>>, Object> referenceMap, E event) {
 		this.referenceMap = referenceMap;
 		this.event = event;
 	}

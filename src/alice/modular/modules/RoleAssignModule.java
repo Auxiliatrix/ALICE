@@ -7,7 +7,7 @@ import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
-import alice.framework.dependencies.EffectFactory;
+import alice.framework.dependencies.DependencyManager;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.modules.MessageModule;
 import alice.framework.structures.TokenizedString;
@@ -28,16 +28,16 @@ public class RoleAssignModule extends MessageModule {
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
-		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getChannel());
-		EffectFactory<MessageCreateEvent,Member> mef = dfb.addWrappedDependency(mce -> mce.getMember().get());
-		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
+		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getChannel());
+		DependencyManager<MessageCreateEvent,Member> mef = dfb.addWrappedDependency(mce -> mce.getMember().get());
+		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getInvokedCondition("%role"));
 		
 		Command<MessageCreateEvent> sideCommand = new Command<MessageCreateEvent>(df);
-		sideCommand.withEffect(
+		sideCommand.withSideEffect(
 			mce -> {
 				SyncedJSONObject sf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
 				if( !sf.has("%role_allowed") ) {
@@ -49,9 +49,9 @@ public class RoleAssignModule extends MessageModule {
 			}
 		);
 		
-		EffectFactory<MessageCreateEvent,List<Role>> lref = dfb.addDependency(mce -> mce.getGuild().flatMap(g -> g.getRoles().collectList()));
-		EffectFactory<MessageCreateEvent,List<Role>> luref = dfb.addDependency(mce -> mce.getMember().get().getRoles().collectList());
-		DependencyFactory<MessageCreateEvent> dfs = dfb.buildDependencyFactory();
+		DependencyManager<MessageCreateEvent,List<Role>> lref = dfb.addDependency(mce -> mce.getGuild().flatMap(g -> g.getRoles().collectList()));
+		DependencyManager<MessageCreateEvent,List<Role>> luref = dfb.addDependency(mce -> mce.getMember().get().getRoles().collectList());
+		DependencyFactory<MessageCreateEvent> dfs = dfb.build();
 		
 		Command<MessageCreateEvent> getCommand = new Command<MessageCreateEvent>(dfs);
 		getCommand.withCondition(MessageModule.getArgumentCondition(1, "add"));
@@ -129,8 +129,8 @@ public class RoleAssignModule extends MessageModule {
 			}
 		);
 		
-		EffectFactory<MessageCreateEvent,PermissionSet> psef = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
-		DependencyFactory<MessageCreateEvent> dfa = dfb.buildDependencyFactory();
+		DependencyManager<MessageCreateEvent,PermissionSet> psef = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
+		DependencyFactory<MessageCreateEvent> dfa = dfb.build();
 		
 		Command<MessageCreateEvent> allowCommand = new Command<MessageCreateEvent>(dfa);
 		allowCommand.withCondition(MessageModule.getArgumentCondition(1, "allow"));

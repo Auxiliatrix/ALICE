@@ -5,7 +5,7 @@ import java.util.Map;
 
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
-import alice.framework.dependencies.EffectFactory;
+import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.MessageModule;
 import alice.framework.structures.TokenizedString;
 import alice.framework.utilities.FileIO;
@@ -22,15 +22,15 @@ public class DMModule extends MessageModule {
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
-		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
-		EffectFactory<MessageCreateEvent,TokenizedString> tsef = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
-		EffectFactory<MessageCreateEvent,Message> mef = dfb.addWrappedDependency(mce -> mce.getMessage());
+		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
+		DependencyManager<MessageCreateEvent,TokenizedString> tsef = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
+		DependencyManager<MessageCreateEvent,Message> mef = dfb.addWrappedDependency(mce -> mce.getMessage());
 		
-		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
+		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withCondition(MessageModule.getInvokedCondition("%tier"));
-		command.withDependentEffect(mcef.with(tsef).with(mef).getEffect(
+		command.withDependentEffect(mcef.with(tsef).with(mef).buildEffect(
 			(mc,ts,m) -> {
 				return mc.createMessage(lookup(ts.getString(1)))
 						.and(m.addReaction(ReactionEmoji.unicode("\u2705")));

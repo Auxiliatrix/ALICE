@@ -4,7 +4,7 @@ import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
-import alice.framework.dependencies.EffectFactory;
+import alice.framework.dependencies.DependencyManager;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.modules.MessageModule;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -21,11 +21,11 @@ public class RoomSetupModule extends MessageModule {
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
-		EffectFactory<MessageCreateEvent,MessageChannel> mcef = dfb.<MessageChannel>addDependency(mce -> mce.getMessage().getChannel());
-		EffectFactory<MessageCreateEvent,PermissionSet> psef = dfb.<PermissionSet>addDependency(mce -> mce.getMember().get().getBasePermissions());		
-		EffectFactory<MessageCreateEvent,VoiceChannel> vcef = dfb.<VoiceChannel>addDependency(mce -> mce.getMember().get().getVoiceState().flatMap(vs -> vs.getChannel()));
+		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.<MessageChannel>addDependency(mce -> mce.getMessage().getChannel());
+		DependencyManager<MessageCreateEvent,PermissionSet> psef = dfb.<PermissionSet>addDependency(mce -> mce.getMember().get().getBasePermissions());		
+		DependencyManager<MessageCreateEvent,VoiceChannel> vcef = dfb.<VoiceChannel>addDependency(mce -> mce.getMember().get().getVoiceState().flatMap(vs -> vs.getChannel()));
 		
-		DependencyFactory<MessageCreateEvent> df = dfb.buildDependencyFactory();
+		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getInvokedCondition("%room"));
@@ -34,19 +34,19 @@ public class RoomSetupModule extends MessageModule {
 		
 		Command<MessageCreateEvent> assignCommand = new Command<MessageCreateEvent>(df);
 		assignCommand.withCondition(MessageModule.getArgumentCondition(1, "assign"));
-		assignCommand.withDependentCondition(vcef.getCondition(vc -> vc != null));
-		assignCommand.withDependentEffect(vcef.getSideEffect(
+		assignCommand.withDependentCondition(vcef.buildCondition(vc -> vc != null));
+		assignCommand.withDependentSideEffect(vcef.buildSideEffect(
 			vc -> {
 				SyncedJSONObject sf = SyncedSaveFile.ofGuild(vc.getGuildId().asLong());
 				sf.put("%room_nexus", vc.getId().asString());
 				sf.putJSONArray("%room_temps");
 			}
 		));
-		assignCommand.withDependentEffect(mcef.getEffect(mc -> {return mc.createMessage("Nexus assigned successfully!");}));
+		assignCommand.withDependentEffect(mcef.buildEffect(mc -> {return mc.createMessage("Nexus assigned successfully!");}));
 		
 		Command<MessageCreateEvent> unassignCommand = new Command<MessageCreateEvent>(df);
 		unassignCommand.withCondition(MessageModule.getArgumentCondition(1, "unassign"));
-		unassignCommand.withEffect(
+		unassignCommand.withSideEffect(
 			mce -> {
 				SyncedJSONObject sf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
 				if( sf.has("%room_nexus") ) {
@@ -57,7 +57,7 @@ public class RoomSetupModule extends MessageModule {
 				}
 			}
 		);
-		unassignCommand.withDependentEffect(mcef.getEffect(mc -> mc.createMessage("Nexus unassigned successfully!")));
+		unassignCommand.withDependentEffect(mcef.buildEffect(mc -> mc.createMessage("Nexus unassigned successfully!")));
 
 		command.withSubcommand(assignCommand);
 		command.withSubcommand(unassignCommand);

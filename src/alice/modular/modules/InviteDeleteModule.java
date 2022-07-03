@@ -12,7 +12,7 @@ import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
-import alice.framework.dependencies.EffectFactory;
+import alice.framework.dependencies.DependencyManager;
 import alice.framework.main.Brain;
 import alice.framework.modules.Module;
 import alice.framework.utilities.FileIO;
@@ -27,13 +27,13 @@ public class InviteDeleteModule extends Module<InviteDeleteEvent> {
 	public Command<InviteDeleteEvent> buildCommand(DependencyFactory.Builder<InviteDeleteEvent> dfb) {
 		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
 
-		EffectFactory<InviteDeleteEvent, List<Member>> lmef = dfb.addDependency(ide -> Brain.getMembers(ide.getGuildId().get()).collectList());
-		EffectFactory<InviteDeleteEvent, String> cef = dfb.addWrappedDependency(ide -> ide.getCode());
+		DependencyManager<InviteDeleteEvent, List<Member>> lmef = dfb.addDependency(ide -> Brain.getMembers(ide.getGuildId().get()).collectList());
+		DependencyManager<InviteDeleteEvent, String> cef = dfb.addWrappedDependency(ide -> ide.getCode());
 		
-		DependencyFactory<InviteDeleteEvent> df = dfb.buildDependencyFactory();
+		DependencyFactory<InviteDeleteEvent> df = dfb.build();
 		Command<InviteDeleteEvent> command = new Command<InviteDeleteEvent>(df);
 		command.withCondition(ice -> sfi.getJSONArray("self_invites").toList().contains(ice.getCode()));
-		command.withDependentEffect(lmef.with(cef).getEffect(
+		command.withDependentEffect(lmef.with(cef).buildEffect(
 			(lm,c) -> {
 				lm.sort(new Comparator<Member>() {
 					@Override

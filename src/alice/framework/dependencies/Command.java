@@ -15,13 +15,13 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	protected DependencyFactory<E> dependencies;
 	
 	protected List<Function<E, Mono<?>>> independentEffects;
-	protected List<Function<Dependency<E>, Mono<?>>> dependentEffects;
+	protected List<Function<DependencyMap<E>, Mono<?>>> dependentEffects;
 	protected List<Consumer<E>> independentSideEffects;
-	protected List<Consumer<Dependency<E>>> dependentSideEffects;
+	protected List<Consumer<DependencyMap<E>>> dependentSideEffects;
 	protected List<Supplier<Mono<?>>> suppliers;
 	
 	protected List<Function<E, Boolean>> independentConditions;
-	protected List<Function<Dependency<E>, Boolean>> dependentConditions;
+	protected List<Function<DependencyMap<E>, Boolean>> dependentConditions;
 	protected List<Boolean> conditions;
 	
 	protected List<Command<E>> subcommands;
@@ -32,12 +32,12 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	public Command(DependencyFactory<E> dependencies) {
 		this.dependencies = dependencies;
 		this.independentEffects = new ArrayList<Function<E, Mono<?>>>();
-		this.dependentEffects = new ArrayList<Function<Dependency<E>, Mono<?>>>();
+		this.dependentEffects = new ArrayList<Function<DependencyMap<E>, Mono<?>>>();
 		this.independentSideEffects = new ArrayList<Consumer<E>>();
-		this.dependentSideEffects = new ArrayList<Consumer<Dependency<E>>>();
+		this.dependentSideEffects = new ArrayList<Consumer<DependencyMap<E>>>();
 		this.suppliers = new ArrayList<Supplier<Mono<?>>>();
 		this.independentConditions = new ArrayList<Function<E, Boolean>>();
-		this.dependentConditions = new ArrayList<Function<Dependency<E>, Boolean>>();
+		this.dependentConditions = new ArrayList<Function<DependencyMap<E>, Boolean>>();
 		this.conditions = new ArrayList<Boolean>();
 		
 		checkOrder = new ArrayList<List<?>>();
@@ -53,13 +53,13 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
-	public Command<E> withDependentEffect(Function<Dependency<E>, Mono<?>> dependentEffect) {
+	public Command<E> withDependentEffect(Function<DependencyMap<E>, Mono<?>> dependentEffect) {
 		dependentEffects.add(dependentEffect);
 		executeOrder.add(dependentEffects);
 		return this;
 	}
 	
-	public Command<E> withDependentEffect(Consumer<Dependency<E>> effect) {
+	public Command<E> withDependentSideEffect(Consumer<DependencyMap<E>> effect) {
 		dependentSideEffects.add(effect);
 		executeOrder.add(dependentSideEffects);
 		return this;
@@ -71,7 +71,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
-	public Command<E> withEffect(Consumer<E> effect) {
+	public Command<E> withSideEffect(Consumer<E> effect) {
 		independentSideEffects.add(effect);
 		executeOrder.add(independentSideEffects);
 		return this;
@@ -83,7 +83,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
-	public Command<E> withDependentCondition(Function<Dependency<E>, Boolean> dependentCondition) {
+	public Command<E> withDependentCondition(Function<DependencyMap<E>, Boolean> dependentCondition) {
 		dependentConditions.add(dependentCondition);
 		checkOrder.add(dependentConditions);
 		return this;
@@ -102,11 +102,11 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	}
 	
 	protected boolean checkConditions(E t) {
-		Mono<Dependency<E>> dependency = dependencies.getDependency(t);
+		Mono<DependencyMap<E>> dependency = dependencies.buildDependencyMap(t);
 
 		Iterator<Boolean> conditionsIterator = conditions.iterator();
 		Iterator<Function<E, Boolean>> independentConditionsIterator = independentConditions.iterator();
-		Iterator<Function<Dependency<E>, Boolean>> dependentConditionsIterator = dependentConditions.iterator();
+		Iterator<Function<DependencyMap<E>, Boolean>> dependentConditionsIterator = dependentConditions.iterator();
 		
 		
 		for( List<?> conditionList : checkOrder ) {
@@ -144,11 +144,11 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	
 	protected Mono<?> executeEffects(E t) {	
 		Mono<?> result = Mono.fromRunnable(() -> {});
-		Mono<Dependency<E>> dependency = dependencies.getDependency(t);
+		Mono<DependencyMap<E>> dependency = dependencies.buildDependencyMap(t);
 		
-		Iterator<Function<Dependency<E>, Mono<?>>> dependentEffectsIterator = dependentEffects.iterator();
+		Iterator<Function<DependencyMap<E>, Mono<?>>> dependentEffectsIterator = dependentEffects.iterator();
 		Iterator<Function<E, Mono<?>>> independentEffectsIterator = independentEffects.iterator();
-		Iterator<Consumer<Dependency<E>>> dependentSideEffectsIterator = dependentSideEffects.iterator();
+		Iterator<Consumer<DependencyMap<E>>> dependentSideEffectsIterator = dependentSideEffects.iterator();
 		Iterator<Consumer<E>> independentSideEffectsIterator = independentSideEffects.iterator();
 		Iterator<Supplier<Mono<?>>> suppliersIterator = suppliers.iterator();
 		

@@ -5,8 +5,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import alice.framework.dependencies.Dependency;
-import alice.framework.dependencies.EffectFactory;
+import alice.framework.dependencies.DependencyMap;
+import alice.framework.dependencies.DependencyManager;
 import alice.framework.structures.TokenizedString;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Role;
@@ -78,7 +78,7 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 		return mce -> !mce.getMessage().getAuthor().isPresent();
 	}
 	
-	public static Function<Dependency<MessageCreateEvent>, Boolean> getRoleCondition(EffectFactory<MessageCreateEvent,List<Role>> retriever, Role condition) {
+	public static Function<DependencyMap<MessageCreateEvent>, Boolean> getRoleCondition(DependencyManager<MessageCreateEvent,List<Role>> retriever, Role condition) {
 		return d -> {
 			List<Role> roles = retriever.requestFrom(d);
 			for( Role role : roles ) {
@@ -90,7 +90,7 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 		};
 	}
 	
-	public static Function<Dependency<MessageCreateEvent>, Boolean> getPermissionCondition(EffectFactory<MessageCreateEvent,PermissionSet> retriever, Permission condition) {
+	public static Function<DependencyMap<MessageCreateEvent>, Boolean> getPermissionCondition(DependencyManager<MessageCreateEvent,PermissionSet> retriever, Permission condition) {
 		return d -> {
 			PermissionSet permissions = retriever.requestFrom(d);
 			for( Permission permission : permissions ) {
