@@ -1,0 +1,1 @@
+worker: java -jar target/rehaul.jar $BOT_TOKEN

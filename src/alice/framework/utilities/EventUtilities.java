@@ -1,6 +1,5 @@
 package alice.framework.utilities;
 
-import alice.framework.main.Brain;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.Channel.Type;
@@ -8,14 +7,6 @@ import discord4j.core.object.entity.channel.GuildChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 
 public class EventUtilities {
-	
-	public static synchronized String getGuildId(MessageCreateEvent event) {
-		return event.getGuild().block().getId().asString();
-	}
-	
-	public static synchronized boolean fromSelf(MessageCreateEvent event) {
-		return event.getMessage().getAuthor().isEmpty() ? false : event.getMessage().getAuthor().get().equals(Brain.client.getSelf().block());
-	}
 	
 	public static synchronized VoiceChannel getConnectedVC(MessageCreateEvent event) {
 		VoiceChannel location = null;
@@ -33,7 +24,7 @@ public class EventUtilities {
 	}
 	
 	public static synchronized boolean getDisconnected(VoiceStateUpdateEvent event) {
-		return !event.getOld().isEmpty();
+		return event.getOld().isPresent();
 	}
 	
 	public static synchronized String escapeMarkdown(String message) {

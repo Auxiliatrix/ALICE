@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-	implementation "com.github.austinv11:Discord4J:3.1.0"
+	implementation "com.discord4j:discord4j-core:3.2.2"
 	implementation 'org.reflections:reflections:0.9.11'
 	implementation group: 'org.json', name: 'json', version: '20200518'
 }

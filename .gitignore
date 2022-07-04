@@ -12,8 +12,10 @@
 bin/
 
 # Local Data Files
-tmp/
-test/
+tmp/*
+tmp/guilds/*
+lab/*
+test/*
 *Exp.java
 
 # Eclipse Files

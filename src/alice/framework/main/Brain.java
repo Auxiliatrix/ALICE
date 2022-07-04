@@ -1,219 +1,205 @@
 package alice.framework.main;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.reflections.Reflections;
 
-import alice.configuration.calibration.Constants;
-import alice.framework.handlers.Documentable;
-import alice.framework.handlers.Handler;
-import alice.framework.handlers.MessageHandler;
-import alice.framework.structures.AtomicSaveFile;
-import alice.framework.structures.AtomicSaveFolder;
+import alice.framework.database.SyncedJSONObject;
+import alice.framework.database.SyncedSaveFile;
+import alice.framework.modules.Module;
 import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
+import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.core.object.presence.Activity;
-import discord4j.core.object.presence.Presence;
+import discord4j.core.object.presence.ClientActivity;
+import discord4j.core.object.presence.ClientPresence;
+import discord4j.core.spec.UserEditSpec;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
+import discord4j.rest.request.RouteMatcher;
+import discord4j.rest.response.ResponseFunction;
 import discord4j.rest.util.Image;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class Brain {
 	
-	public static GatewayDiscordClient client = null;
-	
-	@SuppressWarnings("rawtypes")
-	public static AtomicReference<List<Handler>> handlers = new AtomicReference<List<Handler>>(new ArrayList<Handler>()); // This is disgusting
-	
-	public static AtomicSaveFolder guildIndex = new AtomicSaveFolder();
-	
-	public static AtomicBoolean RESTART = new AtomicBoolean(true);
-	public static MessageChannel upkeepChannel;
-	public static MessageChannel reportChannel;
-	
-	public static AtomicReference<PriorityQueue<Scheduled>> schedule = new AtomicReference<PriorityQueue<Scheduled>>(new PriorityQueue<Scheduled>());
-	
-	public static class Scheduled implements Comparable<Scheduled> {
-		public long date;
-		public Mono<?> response;
-		
-		public Scheduled(long date, Mono<?> response) {
-			this.date = date;
-			this.response = response;
-		}
+	public static GatewayDiscordClient client = null;						// Discord client object
+	public static AtomicBoolean ALIVE = new AtomicBoolean(true);			// Global variable to determine if shutdown is a restart command
 
-		@Override
-		public int compareTo(Scheduled o) {
-			return Long.valueOf(this.date).compareTo(o.date);
-		}
-	}
+	public static MessageChannel reportChannel;								// Hard-coded text channel to send error messages to
+	public static MessageChannel upkeepChannel;								// Hard-coded text channel to send upkeep messages to
+		// TODO: check for null
+		// TODO: move to constants file
+			
+	public static AtomicReference<String> token_ref = new AtomicReference<String>();
 	
 	public static void main(String[] args) {
-		if ( args.length < 1 ) {
-			AliceLogger.error("Please pass the TOKEN as the first argument.");
-			System.exit(0);
+		String token = System.getenv("BOT_TOKEN");
+		if( token == null ) {
+			if ( args.length < 1 ) {	// Checks if a token was passed
+				AliceLogger.error("Please pass the TOKEN as the first argument.");
+				System.exit(0);
+			} else {
+				token = args[0];
+			}
 		}
-		while( RESTART.get() ) {
-			handlers.get().clear();
-			AliceLogger.info("Reloading save data...");
-			reload();
-			
-			AliceLogger.info("Logging in...");
-			login(args[0]);
-			
-			upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
-			reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();
 
-			client.on(ReadyEvent.class)
-			.flatMap(
-					event -> Flux.defer( 
-							() -> Mono.fromRunnable(() -> {
-								schedule.get().add(new Scheduled(System.currentTimeMillis(), upkeepChannel.createMessage("Running upkeep")));
-							})
-									.and(Mono.delay(Duration.ofMinutes(5)))
-									.repeat()
-						)
-				)
-			.subscribe();
-			
-			client.on(ReadyEvent.class)
-			.flatMap(
-					event -> Flux.defer( () ->
-							Mono.defer(() -> {
-								Mono<?> baseMono = Mono.fromRunnable(() -> {});
-								while( !schedule.get().isEmpty() ) {
-									if( schedule.get().element().date < System.currentTimeMillis() ) {
-										baseMono = baseMono.and(schedule.get().remove().response);
-									} else {
-										break;
-									}
-								}
-								return baseMono;
-							})
-									.and(Mono.delay(Duration.ofSeconds(1)))
-									.repeat()
-						)
-				)
-			.subscribe();
-			
-//			client.on(MessageCreateEvent.class)
-//			.filter(event -> event.getMessage().getContent().startsWith("%break"))
-//			.flatMap(event -> event.getMessage().getChannel())
-//			.flatMap(channel -> {
-//				Thread thread = new Thread(() -> {
-//					System.out.println("Processing");
-//					try {
-//						Thread.sleep(11000);
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					}
-//					channel.createMessage("Broken!").block();
-//				});
-//				return Mono.fromRunnable(() -> {thread.start();});
-//			})
-//			.subscribe();
-			
-			client.onDisconnect().block();
-			client = null;
-			
-			AliceLogger.info("Shutting down...");
+		token_ref.set(token);
+				
+		while( ALIVE.get() ) {		// Primary system loop
+			try {
+				AliceLogger.info("Starting up...");
+				
+				login(args[0]);			// Log in to server
+				reload();				// Reload guild data
+				
+				upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
+				reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
+				
+				setup();
+								
+				client.onDisconnect().block();	// Wait until disconnected
+				client = null;
+				
+				AliceLogger.info("Shutting down...");
+			} catch (Exception e) {
+				e.printStackTrace();
+				AliceLogger.info("Recovering...");
+			}
 		}
 	}
 	
-	public static Handler<?> getModuleByName(String name) {
-		for( Handler<?> h : handlers.get() ) {
-			if( h.getName().equalsIgnoreCase(name) || h.getAliases().contains(name.toLowerCase()) ) {
-				return h;
-			}
-		}
-		return null;
-	}
-	
-	public static MessageHandler getDocumentableByName(String name) {
-		for( Handler<?> h : handlers.get() ) {
-			if( !(h instanceof MessageHandler) || !(h instanceof Documentable) ) {
-				continue;
-			}
-			if( h.getName().equalsIgnoreCase(name) || h.getAliases().contains(name.toLowerCase()) ) {
-				return (MessageHandler) h;
-			}
-		}
-		return null;
-	}
-	
+	/**
+	 * Reloads guild save data files for each registered Guild
+	 */
 	private static void reload() {
-		File folder = new File("tmp/guilds");
-		if( folder.isDirectory() ) {
-			for( File file : folder.listFiles() ) {
-				String guildId = file.getName();
-				int extension = guildId.indexOf(".");
-				if( extension > 0 ) {
-					guildId = guildId.substring(0, extension);
-					String guildFile = String.format("%s%s%s%s%s.json", "tmp", File.separator, "guilds", File.separator, guildId);
-					Brain.guildIndex.put(guildId, new AtomicSaveFile(guildFile));
-					AliceLogger.info(String.format("Loaded guild data for %s.", guildId), 1);
-				}
-			}
+		AliceLogger.info("Reloading save data...");
+		for( Guild guild : client.getGuilds().collectList().block() ) {
+			@SuppressWarnings("unused")
+			SyncedJSONObject guildData = SyncedSaveFile.ofGuild(guild.getId().asLong());
 		}
 	}
 	
-	private static void login(String token) {
-		AliceLogger.info("Establishing connection...", 1);
-		client = DiscordClientBuilder.create(token).build().login().block();
-		client.updatePresence(Presence.online(Activity.listening("%help"))).block();
+	/**
+	 * Sets up hard-coded Discord channels for maintenance purposes
+	 */
+	private static void setup() {
 		client.on(ReadyEvent.class)
+		.flatMap(
+				event -> Flux.defer( 
+						() -> upkeepChannel.createMessage("Running upkeep").and(Mono.delay(Duration.ofMinutes(5))).onErrorContinue((e, o) -> { e.printStackTrace(); }).repeat()
+					)
+			)
+		.subscribe();
+	}
+	
+	/**
+	 * Logs in to the Discord API server and subscribes to the client with features.
+	 * @param token String used to identify client program
+	 */
+	private static void login(String token) {
+		AliceLogger.info("Logging in...");
+		client = DiscordClientBuilder.create(token)
+				.onClientResponse(ResponseFunction.emptyOnErrorStatus(RouteMatcher.any(), 1006))
+				.build().login().block();
+		client.updatePresence(ClientPresence.online(ClientActivity.listening("%help"))).block();
+			// TODO: turn into a variable
+		client.on(ReadyEvent.class)	// Once the Ready event is received from the server
 			.subscribe( event -> {
-				AliceLogger.info("Initializing modules...", 1);
-				loadModules(Constants.INCLUDED_MODULES, Constants.EXCLUDED_MODULES);
-				for( String modules : Constants.ADDITIONAL_MODULES ) {
-					loadModules(modules);
-				}
+				AliceLogger.info("Initializing Modules...", 1);
+				loadModules("alice.modular.modules");
+//				for( String whitelisted : Constants.FEATURE_WHITELIST ) {	// Iterate through each directory containing feature classes
+//					loadFeatures(whitelisted);	// Load the features contained within those feature classes
+//				}
 			});
-		//updateAvatar("https://i.imgur.com/grVaLEQ.png");
 		
 		AliceLogger.info("Log in successful.");
 	}
 	
-	private static void loadModules(String includePrefix) {
-		loadModules(includePrefix, "");
+	public static Flux<Member> getMembers(Snowflake guildId) {
+		return DiscordClient.create(token_ref.get())
+	            .gateway()
+	            .setEnabledIntents(IntentSet.of(Intent.GUILD_MEMBERS))
+	            .login()
+	            .flatMapMany(gateway ->
+	                gateway.requestMembers(guildId)
+	            );
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private static void loadModules(String includePrefix, String excludePrefix) {
-		Reflections include = new Reflections(includePrefix);
-		Reflections exclude = excludePrefix.isEmpty() ? null : new Reflections(excludePrefix);
-		for( Class<?> c : include.getSubTypesOf(alice.framework.handlers.Handler.class) ) {
-			if( exclude != null && exclude.getSubTypesOf(alice.framework.handlers.Handler.class).contains(c) ) {
+	private static void loadModules(String includePrefix) {
+		Reflections include = new Reflections(includePrefix);	// Classes included within the specified directory
+		Set<Class<? extends Module>> excluded = new HashSet<Class<? extends Module>>();	// Classes to exclude
+		Reflections exclude = new Reflections("alice.framework.modules");
+		excluded = exclude.getSubTypesOf(alice.framework.modules.Module.class);
+		
+		for( Class<?> c : include.getSubTypesOf(alice.framework.modules.Module.class) ) {
+			if( excluded.contains(c) ) {
 				continue;
 			}
-			handlers.updateAndGet( h -> { 
-				try {
-					h.add( (Handler) c.getConstructor().newInstance() );
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-					e.printStackTrace();
-					AliceLogger.error(String.format("An error occured while instantiating %s.", c.getName() ), 2);
-				}
-				return h;
-			} );
+			try {
+				c.getConstructor().newInstance();
+				AliceLogger.info(String.format("Loaded Module: %s", c.getName()), 2);
+			} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				AliceLogger.error(String.format("An error occured while instantiating %s.", c.getName() ), 2);
+				e.printStackTrace();
+			}
 		}
+		AliceLogger.info("Modules initialized.", 1);
 	}
 	
-	@SuppressWarnings("unused")
-	private static void updateAvatar(String url) {
-		client.edit(spec -> {
-			spec.setAvatar(Image.ofUrl(url).block());
-			AliceLogger.info("Avatar updated.");
-		}).subscribe();
+	/**
+	 * A function to update the bot's avatar
+	 * @param url to retrieve image from
+	 */
+	public static void updateAvatar(String url) {
+		client.edit(UserEditSpec.builder().avatar(Image.ofUrl(url).block()).build())
+			.onErrorResume(error -> { error.printStackTrace(); return Mono.empty(); }).subscribe();
 	}
+	
+	/**
+	 * Find a Feature by its name variable
+	 * @param name String to check against Feature name
+	 * @return Feature associated with the given name
+	 */
+//	@SuppressWarnings("rawtypes")
+//	public static Feature getFeatureByName(String name) {
+//		for( PriorityQueue<Feature> ff : features.get().values() ) {
+//			for( Feature f : ff ) {
+//				if( f.getName().equalsIgnoreCase(name) || f.getAliases().contains(name.toLowerCase()) ) {
+//					return f;
+//				}
+//			}
+//		}
+//		return null;
+//	}
+	
+	/**
+	 * Find a Documentable Feature by its name variable.
+	 * @param name String to check against Feature name
+	 * @return Documentable Feature associated with the given name
+	 */
+//	@SuppressWarnings("rawtypes")
+//	public static Feature getDocumentableByName(String name) { // TODO: replace this function with a is-documentable check wherever applicable
+//		for( PriorityQueue<Feature> ff : features.get().values() ) {
+//			for( Feature f : ff ) {
+//				if( f instanceof Documentable && (f.getName().equalsIgnoreCase(name) || f.getAliases().contains(name.toLowerCase())) ) {
+//					return f;
+//				}
+//			}
+//		}
+//		return null;
+//	}
+	
 }

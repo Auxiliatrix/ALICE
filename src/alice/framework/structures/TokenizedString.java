@@ -1,68 +1,262 @@
 package alice.framework.structures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import alice.framework.utilities.StringUtilities;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 
+/**
+ * A String wrapper that automatically parses the given String in a variety of ways for easy access.
+ * @author Auxiliatrix
+ *
+ */
 public class TokenizedString {
 	
+	public static final String DELIMIT_WHITESPACE = "\\s+";
+	public static final String DELIMIT_WHITESPACE_PUNCTUATED = "[\\.\\?\\!\\,\\-\\;]*\\s+";
+	
+	/**
+	 * A String and the way it was formatted
+	 *
+	 */
+	public static class Token {
+		
+		protected String content;
+		protected int index;
+		
+		protected boolean quoted;
+		protected boolean coded;
+		protected boolean mentioned;
+		
+		public Token(String content, int index) {
+			this.content = content;
+			this.index = index;
+			this.quoted = false;
+			this.coded = false;
+			this.mentioned = false;
+		}
+		
+		public Token withQuoted() {
+			quoted = true;
+			return this;
+		}
+		
+		public Token withCoded() {
+			coded = true;
+			return this;
+		}
+		
+		public Token withMentioned() {
+			mentioned = true;
+			return this;
+		}
+		
+		public boolean isQuoted() {
+			return this.quoted;
+		}
+		
+		public boolean isCoded() {
+			return this.coded;
+		}
+		
+		public boolean isMentioned() {
+			return this.mentioned;
+		}
+		
+		public boolean isPlain() {
+			return !this.quoted && !this.isCoded() && !this.isMentioned();
+		}
+		
+		public boolean isInteger() {
+			try {
+				@SuppressWarnings("unused")
+				int number = Integer.parseInt(content);
+				return true;
+			} catch( NumberFormatException e ) {}
+			return false;
+		}
+		
+		/**
+		 * 
+		 * @return the token as an integer
+		 * @throws NumberFormatException - if the string does not contain a parsable integer.
+		 */
+		public int asInteger() {
+			return Integer.parseInt(content);
+		}
+		
+		public String getContent() {
+			return this.content;
+		}
+		
+		public int getIndex() {
+			return index;
+		}
+		
+		@Override
+		public String toString() {
+			return content;
+		}
+	}
+	
+	/**
+	 * The original unalterted content of the message this object was constructed from.
+	 */
 	private String originalString;
 	
-	private List<String> activeTokens;
-	private List<String> allTokens;
-	private List<String> unquotedTokens;
-	private List<String> quotedTokens;
+	private Token[] tokens;
 	
 	public TokenizedString(String string) {
-		originalString = string;
-		
-		allTokens = StringUtilities.getAllTokens(string);
-		unquotedTokens = StringUtilities.getUnquotedTokens(string);
-		quotedTokens = StringUtilities.getQuotedTokens(string);
-		
-		activeTokens = new ArrayList<String>(allTokens);
+		this.originalString = string;
+		tokens = parse(string);
 	}
 	
-	public TokenizedString quotedOnly() {
-		TokenizedString copy = new TokenizedString(originalString);
-		copy.activeTokens = new ArrayList<String>(copy.quotedTokens);
-		return copy;
+	public Token getToken(int index) {
+		return tokens[index];
 	}
 	
-	public TokenizedString unquotedOnly() {
-		TokenizedString copy = new TokenizedString(originalString);
-		copy.activeTokens = new ArrayList<String>(copy.unquotedTokens);
-		return copy;
+	public String getString(int index) {
+		return tokens[index].getContent();
 	}
 	
-	public TokenizedString inclusive() {
-		TokenizedString copy = new TokenizedString(originalString);
-		copy.activeTokens = new ArrayList<String>(copy.allTokens);
-		return copy;
-	}
-	
-	public List<String> getTokens() {
-		return new ArrayList<String>(activeTokens);
-	}
-	
-	public List<Integer> getNumbers() {
-		List<Integer> numbers = new ArrayList<Integer>();
-		for( String token : activeTokens ) {
-			try {
-				int number = Integer.parseInt(token);
-				numbers.add(number);
-			} catch( NumberFormatException e ) {}
+	public List<String> getStrings() {
+		List<String> strings = new ArrayList<String>();
+		for( Token token : tokens ) {
+			strings.add(token.getContent());
 		}
-		return numbers;
+		return strings;
 	}
 	
-	public String get(int index) {
-		return activeTokens.get(index);
+	public List<Token> getTokens() {
+		return Arrays.asList(tokens);
+	}
+	
+	public TokenizedString getSubTokens(int index) {
+		return new TokenizedString(originalString.substring(tokens[index].getIndex()));
+	}
+	
+	public static Token[] parse(String string) {
+		return parse(string, DELIMIT_WHITESPACE_PUNCTUATED);
+	}
+	
+	public static Token[] parse(String string, String delim) {
+		/*
+		 * Parsing rules:
+		 * - A token is a quantity of text meant to be interpreted separately from the rest of the text.
+		 * - A token is typically delimited by spaces, but exceptions can be made.
+		 * - A token will ignore delimiters if it is contained within quotation marks of any type.
+		 * - Quotation marks will be ignored while within code blocks, and vice versa.
+		 * - For the sake of mobile support, “, ”, '', and " will be considered to be the same symbol. 
+		 */
+		string = string.replace("“", "\"");
+		string = string.replace("”", "\"");
+		string = string.replace("''", "\"");
+		string = string.replaceAll(delim, " ");
+		List<Token> tokens = new ArrayList<Token>();
+		int globalIndex = 0; // how to track when skipping over delimiter
+		
+		String[] segments = string.split(DELIMIT_WHITESPACE);
+
+		StringBuilder word = new StringBuilder();
+		int wordStartIndex = 0;
+		
+		boolean inQuote = false;
+		boolean inCode = false;
+		
+		for( int f=0; f<segments.length; f++ ) {
+			String segment = segments[f];
+			int localIndex = 0;
+			while( localIndex < segment.length() ) {
+				char c = segment.charAt(localIndex);
+				switch(c) {
+					case '\"':
+						if( inQuote ) {
+							inQuote = false;
+							Token token = new Token(word.toString(), wordStartIndex);
+							if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+								token = token.withMentioned();
+							}
+							token = token.withQuoted();
+							tokens.add(token);
+							word = new StringBuilder();
+							wordStartIndex = globalIndex+1;
+						} else if( !inCode && globalIndex != string.length()-1 && verifyClosed(string.substring(globalIndex+1), '\"')) {
+							if( word.length() > 0 ) {
+								Token token = new Token(word.toString(), wordStartIndex);
+								if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+									token = token.withMentioned();
+								}
+								tokens.add(token);
+							}
+							word = new StringBuilder();
+							wordStartIndex = globalIndex;
+							inQuote = true;
+						} else {
+							word.append(c);
+						}
+						break;
+					case '`':
+						if( inCode ) {
+							inCode = false;
+							Token token = new Token(word.toString(), wordStartIndex);
+							if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+								token = token.withMentioned();
+							}
+							token = token.withCoded();
+							tokens.add(token);
+							word = new StringBuilder();
+							wordStartIndex = globalIndex+1;
+						} else if( !inQuote && globalIndex != string.length()-1 && verifyClosed(string.substring(globalIndex+1), '`')) {
+							if( word.length() > 0 ) {
+								Token token = new Token(word.toString(), wordStartIndex);
+								if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+									token = token.withMentioned();
+								}
+								tokens.add(token);
+							}
+							word = new StringBuilder();
+							wordStartIndex = globalIndex;
+							inCode = true;
+						} else {
+							word.append(c);
+						}
+						break;
+					default:
+						word.append(c);
+						break;
+				}
+				globalIndex++;
+				localIndex++;
+			}
+			if( (!inQuote && !inCode || f == segments.length-1) && word.length() > 0 ) {
+				Token token = new Token(word.toString(), wordStartIndex);
+				if( word.toString().startsWith("<@!") && word.toString().endsWith(">") ) {
+					token = token.withMentioned();
+				}
+				tokens.add(token);
+				word = new StringBuilder();
+				wordStartIndex = globalIndex+1;
+			} else if( inQuote || inCode ) {
+				word.append(' ');
+			}
+			globalIndex++;
+		}
+		
+		return tokens.toArray(new Token[tokens.size()]);
+	}
+	
+	private static boolean verifyClosed(String string, char symbol) {
+		return string.indexOf(symbol) != -1;
+	}
+
+	@Override
+	public String toString() {
+		return originalString;
 	}
 	
 	public int size() {
-		return activeTokens.size();
+		return tokens.length;
 	}
 	
 	public boolean equals(String string) {
@@ -187,58 +381,57 @@ public class TokenizedString {
 		return false;
 	}
 	
-	public boolean containsToken(String token) {
-		return activeTokens.contains(token);
-	}
-	
-	public boolean containsTokenIgnoreCase(String token) {
-		for( String genericToken : activeTokens ) {
-			if( genericToken.equalsIgnoreCase(token) ) {
+	public boolean containsToken(String t) {
+		for( Token token : tokens ) {
+			if( token.getContent().equals(t) ) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public boolean containsAnyTokens(String...tokens) {
-		for( String token : tokens ) {
-			if( containsToken(token) ) {
+	public boolean containsTokenIgnoreCase(String t) {
+		for( Token token : tokens ) {
+			if( token.getContent().equalsIgnoreCase(t) ) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public boolean containsAnyTokensIgnoreCase(String...tokens) {
-		for( String token : tokens ) {
-			if( containsTokenIgnoreCase(token) ) {
+	public boolean containsAnyTokens(String...ts) {
+		for( String t : ts ) {
+			if( containsToken(t) ) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public boolean containsAllTokens(String...tokens) {
-		for( String token : tokens ) {
-			if( !containsToken(token) ) {
+	public boolean containsAnyTokensIgnoreCase(String...ts) {
+		for( String t : ts ) {
+			if( containsTokenIgnoreCase(t) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsAllTokens(String...ts) {
+		for( String t : ts ) {
+			if( !containsToken(t) ) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	public boolean containsAllTokensIgnoreCase(String...tokens) {
-		for( String token : tokens ) {
-			if( !containsTokenIgnoreCase(token) ) {
+	public boolean containsAllTokensIgnoreCase(String...ts) {
+		for( String t : ts ) {
+			if( !containsTokenIgnoreCase(t) ) {
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	@Override
-	public String toString() {
-		return originalString;
-	}
-	
 }
