@@ -29,6 +29,13 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	protected List<List<?>> checkOrder;
 	protected List<List<?>> executeOrder;
 	
+	public Command(DependencyFactory<E> dependencies, Command<E>...subcommands) {
+		this(dependencies);
+		for( Command<E> subcommand : subcommands ) {
+			withSubcommand(subcommand);
+		}
+	}
+	
 	public Command(DependencyFactory<E> dependencies) {
 		this.dependencies = dependencies;
 		this.independentEffects = new ArrayList<Function<E, Mono<?>>>();
