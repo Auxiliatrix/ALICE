@@ -1,5 +1,10 @@
 package alice.modular.modules;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
 import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
 import alice.framework.dependencies.Command;
@@ -8,11 +13,14 @@ import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.MessageModule;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.rest.util.Permission;
+import discord4j.rest.util.PermissionSet;
 import reactor.core.publisher.Mono;
 
 public class EngagementModule extends MessageModule {
-
+	
 	public EngagementModule() {
 		super();
 	}
@@ -20,14 +28,17 @@ public class EngagementModule extends MessageModule {
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent, MessageChannel> mcdf = dfb.addDependency(mce -> mce.getMessage().getChannel());
+		DependencyManager<MessageCreateEvent, PermissionSet> psdf = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
+		command.withCondition(MessageModule.getHumanCondition());
 		
 		Command<MessageCreateEvent> invokedCommand = new Command<MessageCreateEvent>(df);
 		invokedCommand.withCondition(MessageModule.getInvokedCondition("%engagement"));
-
+		invokedCommand.withDependentCondition(MessageModule.getPermissionCondition(psdf, Permission.ADMINISTRATOR));
+		
 		Command<MessageCreateEvent> setupCommand = new Command<MessageCreateEvent>(df);
 		setupCommand.withCondition(MessageModule.getArgumentCondition(1, "setup"));
 		setupCommand.withDependentEffect(d -> {
@@ -39,23 +50,55 @@ public class EngagementModule extends MessageModule {
 					ssf.putJSONObject("%engagement_daily_messages");
 				}
 				if( !ssf.has("%engagement_daily_firsts") ) {
-					ssf.putJSONObject("engagement_daily_firsts");
+					ssf.putJSONObject("%engagement_daily_firsts");
 				}
 				if( !ssf.has("%engagement_daily_uniques") ) {
-					ssf.putJSONObject("engagement_daily_uniques");
+					ssf.putJSONObject("%engagement_daily_uniques");
+				}
+				if( !ssf.has("%engagement_lasts") ) {
+					ssf.putJSONObject("%engagement_lasts");
 				}
 			}).and(mc.createMessage("Setup completed successfully! Now tracking engagement metrics for this server."));
 		});
 		
-		Command<MessageCreateEvent> usageCommand = new Command<MessageCreateEvent>(df);
+		@SuppressWarnings("unchecked")
+		Command<MessageCreateEvent> usageCommand = new Command<MessageCreateEvent>(df,
+			new Command<MessageCreateEvent>(df)
+				.withCondition(MessageModule.getArgumentCondition(1, "messages"))
+				.withDependentEffect(d -> {
+					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
+					MessageChannel mc = mcdf.requestFrom(d);
+					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
+					return mc.createMessage(daily_messages.has(key) ? daily_messages.get(key)+" messages sent!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+				}),
+			new Command<MessageCreateEvent>(df)
+				.withCondition(MessageModule.getArgumentCondition(1, "firsts"))
+				.withDependentEffect(d -> {
+					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+					SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
+					MessageChannel mc = mcdf.requestFrom(d);
+					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
+					return mc.createMessage(daily_firsts.has(key) ? daily_firsts.get(key)+" first messages!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+				}),
+			new Command<MessageCreateEvent>(df)
+				.withCondition(MessageModule.getArgumentCondition(1, "uniques"))
+				.withDependentEffect(d -> {
+					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_uniques");
+					MessageChannel mc = mcdf.requestFrom(d);
+					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
+					return mc.createMessage(daily_messages.has(key) ? daily_messages.get(key)+" unique users engaged!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+				})
+		);
+		usageCommand.withCondition(MessageModule.getArgumentsCondition(3));
 		usageCommand.withCondition(mce -> {
 			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
 			return ssf.has("%engagement_daily_messages") // KEY: YYYY-MM-DD, VALUE: # OF MESSAGES
 					&& ssf.has("%engagement_daily_firsts") // KEY: YYYY-MM-DD, VALUE: # OF FIRST SENDS
-					&& ssf.has("%engagement_daily_firsts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
+					&& ssf.has("%engagement_daily_uniques")
+					&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
 		});
-		
-		
 		
 		invokedCommand.withSubcommand(setupCommand);
 		invokedCommand.withSubcommand(usageCommand);
@@ -65,7 +108,13 @@ public class EngagementModule extends MessageModule {
 			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
 			return ssf.has("%engagement_daily_messages") // KEY: YYYY-MM-DD, VALUE: # OF MESSAGES
 					&& ssf.has("%engagement_daily_firsts") // KEY: YYYY-MM-DD, VALUE: # OF FIRST SENDS
-					&& ssf.has("%engagement_daily_firsts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
+					&& ssf.has("%engagement_daily_uniques")
+					&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
+		});
+		passiveCommand.withDependentSideEffect(d -> {
+			Member m = d.getEvent().getMember().get();
+			LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
+			String dateString = sdf.format(ldt);
 		});
 		
 		command.withSubcommand(invokedCommand);
