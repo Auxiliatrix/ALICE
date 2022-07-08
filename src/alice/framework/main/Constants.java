@@ -1,7 +1,12 @@
 package alice.framework.main;
 
+import java.text.SimpleDateFormat;
+
 public class Constants {
 	/* Properties */
+	public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+
+	
 	public static final String COMMAND_PREFIX = "%";
 	public static final String NAME = "AL | CE";
 	public static final String FULL_NAME = "Assistive Logistics | Communicative Entity";
