@@ -1,5 +1,6 @@
 package alice.modular.modules;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -116,7 +117,7 @@ public class EngagementModule extends MessageModule {
 			Member m = d.getEvent().getMember().get();
 			String ID = m.getId().asString();
 			LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
-			String dateString = Constants.SDF.format(ldt);
+			String dateString = Constants.SDF.format(Date.valueOf(ldt.toLocalDate()));
 			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
 			SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
 			SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
@@ -137,14 +138,16 @@ public class EngagementModule extends MessageModule {
 
 			if( !lasts.has(ID) ) {
 				daily_firsts.put(dateString, daily_firsts.getInt(dateString)+1);
-				daily_uniques.put(dateString, daily_firsts.getInt(dateString)+1);
+				daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
 			} else {
 				if( !lasts.getString(ID).equals(dateString) ) {
-					daily_uniques.put(dateString, daily_firsts.getInt(dateString)+1);
+					daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
 				}
 			}
 			
 			lasts.put(ID, dateString);
+
+			System.out.println("Ran!");
 		});
 		
 		command.withSubcommand(invokedCommand);
