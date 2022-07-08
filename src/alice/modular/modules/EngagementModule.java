@@ -1,6 +1,5 @@
 package alice.modular.modules;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -11,6 +10,7 @@ import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
+import alice.framework.main.Constants;
 import alice.framework.modules.MessageModule;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
@@ -85,10 +85,10 @@ public class EngagementModule extends MessageModule {
 				.withCondition(MessageModule.getArgumentCondition(1, "uniques"))
 				.withDependentEffect(d -> {
 					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_uniques");
+					SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
 					MessageChannel mc = mcdf.requestFrom(d);
 					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					return mc.createMessage(daily_messages.has(key) ? daily_messages.get(key)+" unique users engaged!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+					return mc.createMessage(daily_uniques.has(key) ? daily_uniques.get(key)+" unique users engaged!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
 				})
 		);
 		usageCommand.withCondition(MessageModule.getArgumentsCondition(3));
@@ -111,10 +111,40 @@ public class EngagementModule extends MessageModule {
 					&& ssf.has("%engagement_daily_uniques")
 					&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
 		});
+		passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdf, Permission.ADMINISTRATOR).andThen(b -> !b));
 		passiveCommand.withDependentSideEffect(d -> {
 			Member m = d.getEvent().getMember().get();
+			String ID = m.getId().asString();
 			LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
-			String dateString = sdf.format(ldt);
+			String dateString = Constants.SDF.format(ldt);
+			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+			SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
+			SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
+			SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
+			SyncedJSONObject lasts = ssf.getJSONObject("%engagement_lasts");
+			
+			if( !daily_messages.has(dateString) ) {
+				daily_messages.put(dateString, 0);
+			}
+			if( !daily_firsts.has(dateString) ) {
+				daily_firsts.put(dateString, 0);
+			}
+			if( !daily_uniques.has(dateString) ) {
+				daily_uniques.put(dateString, 0);
+			}
+			
+			daily_messages.put(dateString, daily_messages.getInt(dateString)+1);
+
+			if( !lasts.has(ID) ) {
+				daily_firsts.put(dateString, daily_firsts.getInt(dateString)+1);
+				daily_uniques.put(dateString, daily_firsts.getInt(dateString)+1);
+			} else {
+				if( !lasts.getString(ID).equals(dateString) ) {
+					daily_uniques.put(dateString, daily_firsts.getInt(dateString)+1);
+				}
+			}
+			
+			lasts.put(ID, dateString);
 		});
 		
 		command.withSubcommand(invokedCommand);
