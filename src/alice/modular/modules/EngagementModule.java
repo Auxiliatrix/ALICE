@@ -90,6 +90,28 @@ public class EngagementModule extends MessageModule {
 					MessageChannel mc = mcdf.requestFrom(d);
 					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
 					return mc.createMessage(daily_uniques.has(key) ? daily_uniques.get(key)+" unique users engaged!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+				}),
+			new Command<MessageCreateEvent>(df)
+				.withCondition(MessageModule.getArgumentCondition(1, "report"))
+				.withDependentEffect(d -> {
+					MessageChannel mc = mcdf.requestFrom(d);
+
+					LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
+					String dateString = Constants.SDF.format(Date.valueOf(ldt.toLocalDate()));
+					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
+					SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
+					SyncedJSONObject daily_uniques = ssf.getJSONObject("%engagement_daily_uniques");
+					if( daily_messages.has(dateString) && daily_firsts.has(dateString) && daily_uniques.has(dateString) ) {
+						int dms = daily_messages.getInt(dateString);
+						int dfs = daily_firsts.getInt(dateString);
+						int dus = daily_uniques.getInt(dateString);
+						
+						String message = String.format("Messages Sent: %d\nFirst-Time Messages: %d\nActive users: %d\nMessages/User: %.2f", dms, dfs, dus, (double) dms/dus);
+						return mc.createMessage(message);
+					} else {
+						return mc.createMessage("No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+					}
 				})
 		);
 		usageCommand.withCondition(MessageModule.getArgumentsCondition(3));
@@ -146,8 +168,6 @@ public class EngagementModule extends MessageModule {
 			}
 			
 			lasts.put(ID, dateString);
-
-			System.out.println("Ran!");
 		});
 		
 		command.withSubcommand(invokedCommand);
