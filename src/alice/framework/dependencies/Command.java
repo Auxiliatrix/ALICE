@@ -29,7 +29,8 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	protected List<List<?>> checkOrder;
 	protected List<List<?>> executeOrder;
 	
-	public Command(DependencyFactory<E> dependencies, Command<E>...subcommands) {
+	
+	public Command(DependencyFactory<E> dependencies, @SuppressWarnings("unchecked") Command<E>...subcommands) {
 		this(dependencies);
 		for( Command<E> subcommand : subcommands ) {
 			withSubcommand(subcommand);
@@ -60,9 +61,23 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
+	public Command<E> withSubcommands(@SuppressWarnings("unchecked") Command<E>... subcommands) {
+		for( Command<E> subcommand : subcommands ) {
+			withSubcommand(subcommand);
+		}
+		return this;
+	}
+	
 	public Command<E> withDependentEffect(Function<DependencyMap<E>, Mono<?>> dependentEffect) {
 		dependentEffects.add(dependentEffect);
 		executeOrder.add(dependentEffects);
+		return this;
+	}
+	
+	public Command<E> withDependentEffects(@SuppressWarnings("unchecked") Function<DependencyMap<E>, Mono<?>>... dependentEffects) {
+		for( Function<DependencyMap<E>, Mono<?>> dependentEffect : dependentEffects ) {
+			withDependentEffect(dependentEffect);
+		}
 		return this;
 	}
 	
@@ -72,9 +87,23 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
+	public Command<E> withDependentSideEffects(@SuppressWarnings("unchecked") Consumer<DependencyMap<E>>... effects) {
+		for( Consumer<DependencyMap<E>> effect : effects ) {
+			withDependentSideEffect(effect);
+		}
+		return this;
+	}
+	
 	public Command<E> withEffect(Function<E, Mono<?>> effect) {
 		independentEffects.add(effect);
 		executeOrder.add(independentEffects);
+		return this;
+	}
+	
+	public Command<E> withEffects(@SuppressWarnings("unchecked") Function<E, Mono<?>>... effects) {
+		for( Function<E, Mono<?>> effect : effects ) {
+			withEffect(effect);
+		}
 		return this;
 	}
 	
@@ -84,9 +113,23 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
+	public Command<E> withSideEffect(@SuppressWarnings("unchecked") Consumer<E>... effects) {
+		for( Consumer<E> effect : effects ) {
+			withSideEffect(effect);
+		}
+		return this;
+	}
+	
 	public Command<E> withEffect(Supplier<Mono<?>> effect) {
 		suppliers.add(effect);
 		executeOrder.add(suppliers);
+		return this;
+	}
+	
+	public Command<E> withEffects(@SuppressWarnings("unchecked") Supplier<Mono<?>>... effects) {
+		for( Supplier<Mono<?>> effect : effects ) {
+			withEffect(effect);
+		}
 		return this;
 	}
 	
@@ -96,15 +139,36 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return this;
 	}
 	
+	public Command<E> withDependentConditions(@SuppressWarnings("unchecked") Function<DependencyMap<E>, Boolean>... dependentConditions) {
+		for( Function<DependencyMap<E>, Boolean> dependentCondition : dependentConditions ) {
+			withDependentCondition(dependentCondition);
+		}
+		return this;
+	}
+	
 	public Command<E> withCondition(Function<E, Boolean> condition) {
 		independentConditions.add(condition);
 		checkOrder.add(independentConditions);
 		return this;
 	}
 	
+	public Command<E> withConditions(@SuppressWarnings("unchecked") Function<E, Boolean>... conditions) {
+		for( Function<E, Boolean> condition : conditions ) {
+			withCondition(condition);
+		}
+		return this;
+	}
+	
 	public Command<E> withCondition(Boolean condition) {
 		conditions.add(condition);
 		checkOrder.add(conditions);
+		return this;
+	}
+	
+	public Command<E> withConditions(Boolean... conditions) {
+		for( Boolean condition : conditions ) {
+			withCondition(condition);
+		}
 		return this;
 	}
 	
