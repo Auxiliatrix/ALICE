@@ -18,14 +18,13 @@ public class ReputationModule extends MessageModule {
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent, MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getChannel());
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
-		
-		// TODO: subcommands should be passed by reference and be same format as addDependency (return manager)
-		
+				
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withCondition(MessageModule.getInvokedCondition("%rep"));
 		
+		Command<MessageCreateEvent> leadCommand = command.addSubcommand();
 		
 		return command;
 	}
