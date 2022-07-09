@@ -56,6 +56,12 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	
 	// TODO: conditions with things to execute on a failure
 	
+	public Command<E> addSubcommand() {
+		Command<E> subcommand = new Command<E>(dependencies);
+		withSubcommand(subcommand);
+		return subcommand;
+	}
+	
 	public Command<E> withSubcommand(Command<E> subcommand) {
 		subcommands.add(subcommand);
 		return this;
