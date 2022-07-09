@@ -11,6 +11,7 @@ import alice.framework.dependencies.DependencyManager;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.modules.MessageModule;
 import alice.framework.structures.TokenizedString;
+import alice.framework.utilities.EmbedBuilders;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Role;
@@ -70,7 +71,7 @@ public class RoleAssignModule extends MessageModule {
 							
 				for( Object da : disallowed.toList() ) {
 					if( da.toString().equalsIgnoreCase(ts.getString(2)) ) {
-						return mc.createMessage("Sorry, you're not allowed to have that role!");
+						return mc.createMessage(EmbedBuilders.applyErrorFormat("You're not allowed to have that role!"));
 					}
 				}
 				for( Object a : allowed.toList() ) {
@@ -80,11 +81,11 @@ public class RoleAssignModule extends MessageModule {
 							return m.addRole(role.getId())
 									.and(mce.getMessage().addReaction(ReactionEmoji.unicode("\u2705")));
 						} else {
-							return mc.createMessage("Sorry, it looks like that role doesn't exist!");
+							return mc.createMessage(EmbedBuilders.applyErrorFormat("It looks like that role doesn't exist!"));
 						}
 					}
 				}
-				return mc.createMessage("Sorry, I don't recognize that as an assignable role!");
+				return mc.createMessage(EmbedBuilders.applyErrorFormat("I don't recognize that as an assignable role!"));
 			}
 		);
 		
@@ -106,7 +107,7 @@ public class RoleAssignModule extends MessageModule {
 				
 				for( Object da : disallowed.toList() ) {
 					if( da.toString().equalsIgnoreCase(ts.getString(2)) ) {
-						return mc.createMessage("Sorry, you're not allowed to remove that role!");
+						return mc.createMessage(EmbedBuilders.applyErrorFormat("You're not allowed to remove that role!"));
 					}
 				}
 				for( Object a : allowed.toList() ) {
@@ -118,14 +119,14 @@ public class RoleAssignModule extends MessageModule {
 								return m.removeRole(role.getId())
 										.and(mce.getMessage().addReaction(ReactionEmoji.unicode("\u2705")));
 							} else {
-								return mc.createMessage("Sorry, that doesn't seem to be a role that you have!");
+								return mc.createMessage(EmbedBuilders.applyErrorFormat("That doesn't seem to be a role that you have!"));
 							}
 						} else {
-							return mc.createMessage("Sorry, it looks like that role doesn't exist!");
+							return mc.createMessage(EmbedBuilders.applyErrorFormat("Tt looks like that role doesn't exist!"));
 						}
 					}
 				}
-				return mc.createMessage("Sorry, I don't recognize that as an unassignable role!");
+				return mc.createMessage(EmbedBuilders.applyErrorFormat("I don't recognize that as an unassignable role!"));
 			}
 		);
 		
@@ -154,22 +155,22 @@ public class RoleAssignModule extends MessageModule {
 				
 				Role role = findRoleByName(lr, ts.getString(3));
 				if( role == null ) {
-					return mc.createMessage("Sorry, it looks like that role doesn't exist!");
+					return mc.createMessage(EmbedBuilders.applyErrorFormat("It looks like that role doesn't exist!"));
 				}
 				
 				for( Object a : allowed.toList() ) {
 					if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage("A role by that name is already allowed.");
+						return mc.createMessage(EmbedBuilders.applyErrorFormat("A role by that name is already allowed."));
 					}
 				}
 				
 				for( Object da : disallowed.toList() ) {
 					if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage("That role is already on the disallowed list.");
+						return mc.createMessage(EmbedBuilders.applyErrorFormat("That role is already on the disallowed list."));
 					}
 				}
 				
-				return mc.createMessage("Role added to allowed list successfully.").and(Mono.fromRunnable(() -> {allowed.put(ts.getString(3).toLowerCase());}));
+				return mc.createMessage(EmbedBuilders.applySuccessFormat("Role added to allowed list successfully.")).and(Mono.fromRunnable(() -> {allowed.put(ts.getString(3).toLowerCase());}));
 			}
 		);
 		
@@ -189,7 +190,7 @@ public class RoleAssignModule extends MessageModule {
 				
 				Role role = findRoleByName(lr, ts.getString(3));
 				if( role == null ) {
-					return mc.createMessage("Sorry, it looks like that role doesn't exist!");
+					return mc.createMessage(EmbedBuilders.applyErrorFormat("Sorry, it looks like that role doesn't exist!"));
 				}
 				
 				int index = -1;
@@ -202,9 +203,9 @@ public class RoleAssignModule extends MessageModule {
 	
 				final int finalIndex = index;
 				if( index != -1 ) {
-					return mc.createMessage("Role removed from allowed list successfully.").and(Mono.fromRunnable(() -> {allowed.remove(finalIndex);}));
+					return mc.createMessage(EmbedBuilders.applySuccessFormat("Role removed from allowed list successfully.")).and(Mono.fromRunnable(() -> {allowed.remove(finalIndex);}));
 				} else {
-					return mc.createMessage("That role is not on the allowed list.");
+					return mc.createMessage(EmbedBuilders.applyErrorFormat("That role is not on the allowed list."));
 				}
 			}
 		);
@@ -234,22 +235,22 @@ public class RoleAssignModule extends MessageModule {
 				
 				Role role = findRoleByName(lr, ts.getString(3));
 				if( role == null ) {
-					return mc.createMessage("Sorry, it looks like that role doesn't exist!");
+					return mc.createMessage(EmbedBuilders.applyErrorFormat("Sorry, it looks like that role doesn't exist!"));
 				}
 				
 				for( Object a : allowed.toList() ) {
 					if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage("That role is already on the allowed list.");
+						return mc.createMessage(EmbedBuilders.applyErrorFormat("That role is already on the allowed list."));
 					}
 				}
 				
 				for( Object da : disallowed.toList() ) {
 					if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage("A role by that name is already disallowed.");
+						return mc.createMessage(EmbedBuilders.applyErrorFormat("A role by that name is already disallowed."));
 					}
 				}
 				
-				return mc.createMessage("Role added to disallowed list successfully.").and(Mono.fromRunnable(() -> {disallowed.put(ts.getString(3).toLowerCase());}));
+				return mc.createMessage(EmbedBuilders.applySuccessFormat("Role added to disallowed list successfully.")).and(Mono.fromRunnable(() -> {disallowed.put(ts.getString(3).toLowerCase());}));
 			}
 		);
 		
@@ -269,7 +270,7 @@ public class RoleAssignModule extends MessageModule {
 				
 				Role role = findRoleByName(lr, ts.getString(3));
 				if( role == null ) {
-					return mc.createMessage("Sorry, it looks like that role doesn't exist!");
+					return mc.createMessage(EmbedBuilders.applyErrorFormat("Sorry, it looks like that role doesn't exist!"));
 				}
 				
 				int index = -1;
@@ -282,9 +283,9 @@ public class RoleAssignModule extends MessageModule {
 	
 				final int finalIndex = index;
 				if( index != -1 ) {
-					return mc.createMessage("Role removed from disallowed list successfully.").and(Mono.fromRunnable(() -> {disallowed.remove(finalIndex);}));
+					return mc.createMessage(EmbedBuilders.applySuccessFormat("Role removed from disallowed list successfully.")).and(Mono.fromRunnable(() -> {disallowed.remove(finalIndex);}));
 				} else {
-					return mc.createMessage("That role is not on the disallowed list.");
+					return mc.createMessage(EmbedBuilders.applyErrorFormat("That role is not on the disallowed list."));
 				}
 			}
 		);

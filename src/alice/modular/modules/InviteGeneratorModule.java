@@ -4,6 +4,7 @@ import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.MessageModule;
+import alice.framework.utilities.EmbedBuilders;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.spec.InviteCreateSpec;
@@ -29,7 +30,7 @@ public class InviteGeneratorModule extends MessageModule {
 			id -> Mono.fromRunnable(() -> {System.out.println(id.code());}
 		)));
 		command.withDependentEffect(idef.with(mcef).buildEffect(
-			(id,mc) -> mc.createMessage("discord.gg/" + id.code())
+			(id,mc) -> mc.createMessage(EmbedBuilders.applySuccessFormat("discord.gg/" + id.code()))
 		));
 		
 		return command;

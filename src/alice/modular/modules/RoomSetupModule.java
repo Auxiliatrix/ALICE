@@ -7,6 +7,7 @@ import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.modules.MessageModule;
+import alice.framework.utilities.EmbedBuilders;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
@@ -42,7 +43,7 @@ public class RoomSetupModule extends MessageModule {
 				sf.putJSONArray("%room_temps");
 			}
 		));
-		assignCommand.withDependentEffect(mcef.buildEffect(mc -> {return mc.createMessage("Nexus assigned successfully!");}));
+		assignCommand.withDependentEffect(mcef.buildEffect(mc -> {return mc.createMessage(EmbedBuilders.applySuccessFormat("Nexus assigned successfully!"));}));
 		
 		Command<MessageCreateEvent> unassignCommand = new Command<MessageCreateEvent>(df);
 		unassignCommand.withCondition(MessageModule.getArgumentCondition(1, "unassign"));
@@ -57,7 +58,7 @@ public class RoomSetupModule extends MessageModule {
 				}
 			}
 		);
-		unassignCommand.withDependentEffect(mcef.buildEffect(mc -> mc.createMessage("Nexus unassigned successfully!")));
+		unassignCommand.withDependentEffect(mcef.buildEffect(mc -> mc.createMessage(EmbedBuilders.applyErrorFormat("Nexus unassigned successfully!"))));
 
 		command.withSubcommand(assignCommand);
 		command.withSubcommand(unassignCommand);

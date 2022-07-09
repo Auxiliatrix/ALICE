@@ -4,6 +4,9 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
 
 import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
@@ -13,11 +16,13 @@ import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.main.Constants;
 import alice.framework.modules.MessageModule;
+import alice.framework.utilities.EmbedBuilders;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.PermissionSet;
+import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
 public class EngagementModule extends MessageModule {
@@ -59,7 +64,7 @@ public class EngagementModule extends MessageModule {
 				if( !ssf.has("%engagement_lasts") ) {
 					ssf.putJSONObject("%engagement_lasts");
 				}
-			}).and(mc.createMessage("Setup completed successfully! Now tracking engagement metrics for this server."));
+			}).and(mc.createMessage(EmbedBuilders.applySuccessFormat("Setup completed successfully! Now tracking engagement metrics for this server.")));
 		});
 		
 		@SuppressWarnings("unchecked")
@@ -71,7 +76,7 @@ public class EngagementModule extends MessageModule {
 					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
 					MessageChannel mc = mcdf.requestFrom(d);
 					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					return mc.createMessage(daily_messages.has(key) ? daily_messages.get(key)+" messages sent!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+					return mc.createMessage(daily_messages.has(key) ? EmbedBuilders.applySuccessFormat(daily_messages.get(key)+" messages sent!") : EmbedBuilders.applyErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*"));
 				}),
 			new Command<MessageCreateEvent>(df)
 				.withCondition(MessageModule.getArgumentCondition(1, "firsts"))
@@ -80,7 +85,7 @@ public class EngagementModule extends MessageModule {
 					SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
 					MessageChannel mc = mcdf.requestFrom(d);
 					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					return mc.createMessage(daily_firsts.has(key) ? daily_firsts.get(key)+" first messages!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+					return mc.createMessage(daily_firsts.has(key) ? EmbedBuilders.applySuccessFormat(daily_firsts.get(key)+" first messages!") : EmbedBuilders.applyErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*"));
 				}),
 			new Command<MessageCreateEvent>(df)
 				.withCondition(MessageModule.getArgumentCondition(1, "uniques"))
@@ -89,7 +94,7 @@ public class EngagementModule extends MessageModule {
 					SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
 					MessageChannel mc = mcdf.requestFrom(d);
 					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					return mc.createMessage(daily_uniques.has(key) ? daily_uniques.get(key)+" unique users engaged!" : "No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+					return mc.createMessage(daily_uniques.has(key) ? EmbedBuilders.applySuccessFormat(daily_uniques.get(key)+" unique users engaged!") : EmbedBuilders.applyErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*"));
 				}),
 			new Command<MessageCreateEvent>(df)
 				.withCondition(MessageModule.getArgumentCondition(1, "report"))
@@ -107,10 +112,14 @@ public class EngagementModule extends MessageModule {
 						int dfs = daily_firsts.getInt(dateString);
 						int dus = daily_uniques.getInt(dateString);
 						
-						String message = String.format("Messages Sent: %d\nFirst-Time Messages: %d\nActive users: %d\nMessages/User: %.2f", dms, dfs, dus, (double) dms/dus);
-						return mc.createMessage(message);
+						List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();	
+						entries.add(new SimpleEntry<String,String>("Messages Sent",dms+""));
+						entries.add(new SimpleEntry<String,String>("Active Users",dfs+""));
+						entries.add(new SimpleEntry<String,String>("Unique Users",dus+""));
+						entries.add(new SimpleEntry<String,String>("Messages/User",(double)dms/dus+""));
+						return mc.createMessage(EmbedBuilders.applyListFormat(String.format("Engagement Report for %s", dateString), Color.GREEN, entries, false, false));
 					} else {
-						return mc.createMessage("No data collected for the given date!\n*Date Format: YYYY-MM-DD*");
+						return mc.createMessage(EmbedBuilders.applyErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*"));
 					}
 				})
 		);
