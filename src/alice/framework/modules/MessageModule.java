@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import alice.framework.dependencies.DependencyMap;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.structures.TokenizedString;
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Role;
 import discord4j.rest.util.Permission;
@@ -76,6 +77,36 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 	
 	public static Function<MessageCreateEvent, Boolean> getBotCondition() {
 		return mce -> !mce.getMessage().getAuthor().isPresent();
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getMentionsCondition(int count) {
+		return mce -> mce.getMessage().getUserMentionIds().size() >= count; 
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getMentionsCondition(Snowflake user) {
+		return mce -> mce.getMessage().getUserMentionIds().contains(user); 
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getMentionsAllCondition(Snowflake... users) {
+		return mce -> {
+			for( Snowflake user : users ) {
+				if( !mce.getMessage().getUserMentionIds().contains(user) ) {
+					return false;
+				}
+			}
+			return true;
+		};
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getMentionsAnyCondition(Snowflake... users) {
+		return mce -> {
+			for( Snowflake user : users ) {
+				if( mce.getMessage().getUserMentionIds().contains(user) ) {
+					return true;
+				}
+			}
+			return false;
+		};
 	}
 	
 	public static Function<DependencyMap<MessageCreateEvent>, Boolean> getRoleCondition(DependencyManager<MessageCreateEvent,List<Role>> retriever, Role condition) {
