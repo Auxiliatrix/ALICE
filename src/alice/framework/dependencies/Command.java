@@ -62,6 +62,12 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return subcommand;
 	}
 	
+	public Command<E> addSubcommand(DependencyFactory<E> dependencies) {
+		Command<E> subcommand = new Command<E>(dependencies);
+		withSubcommand(subcommand);
+		return subcommand;
+	}
+	
 	public Command<E> withSubcommand(Command<E> subcommand) {
 		subcommands.add(subcommand);
 		return this;
