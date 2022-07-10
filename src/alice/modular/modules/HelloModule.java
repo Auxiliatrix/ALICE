@@ -1,5 +1,7 @@
 package alice.modular.modules;
 
+import alice.framework.database.SyncedJSONObject;
+import alice.framework.database.SyncedSaveFile;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
@@ -22,6 +24,26 @@ public class HelloModule extends MessageModule {
 		command.withCondition(MessageModule.getInvokedCondition("%hello"));
 		command.withDependentEffect(ef.buildEffect(new MessageSendEffectSpec("Hello world!")));
 		command.withSideEffect(mce -> {System.out.println("Hello world!");});
+		
+		Command<MessageCreateEvent> c1 = command.addSubcommand();
+		c1.withCondition(mce -> {
+			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getMessage().getGuildId().get().asLong());
+			return !ssf.has("test"); // This must check for a variable referenced in the other method as well.
+		});
+		c1.withSideEffect(mce -> {}); // The presence of this line causes an error in the next execution.
+		
+		Command<MessageCreateEvent> c2 = command.addSubcommand();
+		c2.withDependentEffect(d -> {
+			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getMessage().getGuildId().get().asLong());
+			if( !ssf.has("test") ) {
+				ssf.putJSONObject("test");
+			}
+			SyncedJSONObject test = ssf.getJSONObject("test");
+			if( !test.has("tester") ) {
+				test.put("tester", 0);
+			}
+			return ef.requestFrom(d).createMessage(test.getInt("tester")+"");
+		});
 		
 		return command;
 	}	

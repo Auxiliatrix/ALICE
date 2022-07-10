@@ -101,23 +101,22 @@ public class EngagementModule extends MessageModule {
 				.withDependentEffect(d -> {
 					MessageChannel mc = mcdf.requestFrom(d);
 
-					LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
-					String dateString = Constants.SDF.format(Date.valueOf(ldt.toLocalDate()));
+					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
 					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
 					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
 					SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
 					SyncedJSONObject daily_uniques = ssf.getJSONObject("%engagement_daily_uniques");
-					if( daily_messages.has(dateString) && daily_firsts.has(dateString) && daily_uniques.has(dateString) ) {
-						int dms = daily_messages.getInt(dateString);
-						int dfs = daily_firsts.getInt(dateString);
-						int dus = daily_uniques.getInt(dateString);
+					if( daily_messages.has(key) && daily_firsts.has(key) && daily_uniques.has(key) ) {
+						int dms = daily_messages.getInt(key);
+						int dfs = daily_firsts.getInt(key);
+						int dus = daily_uniques.getInt(key);
 						
 						List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();	
 						entries.add(new SimpleEntry<String,String>("Messages Sent",dms+""));
 						entries.add(new SimpleEntry<String,String>("Active Users",dfs+""));
 						entries.add(new SimpleEntry<String,String>("Unique Users",dus+""));
 						entries.add(new SimpleEntry<String,String>("Messages/User",(double)dms/dus+""));
-						return mc.createMessage(EmbedBuilders.applyListFormat(String.format("Engagement Report for %s", dateString), Color.GREEN, entries, false, false));
+						return mc.createMessage(EmbedBuilders.applyListFormat(String.format("Engagement Report for %s", key), Color.GREEN, entries, false, true));
 					} else {
 						return mc.createMessage(EmbedBuilders.applyErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*"));
 					}

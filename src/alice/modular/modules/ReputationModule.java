@@ -52,7 +52,8 @@ public class ReputationModule extends MessageModule {
 						.description(String.format("This user has :scroll:%s reputation!", rep_map.get(s.asString())))
 						.color(Color.YELLOW)
 						.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
-						.build());
+						.build())
+					.and(Mono.fromRunnable(() -> {System.out.println("Rep");}));
 		});
 		
 		Command<MessageCreateEvent> arg = command.addSubcommand();
@@ -74,11 +75,20 @@ public class ReputationModule extends MessageModule {
 		});
 		
 //		Command<MessageCreateEvent> leadCommand = arg.addSubcommand();
-		
+				
 		Command<MessageCreateEvent> repCommand = arg.addSubcommand();
 		repCommand.withCondition(MessageModule.getMentionsCondition(1));
 		repCommand.withDependentEffect(d -> {
 			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+//			if( ssf == null ) {
+//				System.out.println("null save file");
+//			}
+//			if( !ssf.has("%rep_map") ) {
+//				ssf.putJSONObject("%rep_map");
+//			}
+//			if( !ssf.has("%rep_last") ) {
+//				ssf.putJSONObject("%rep_last");
+//			}
 			SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
 			SyncedJSONObject rep_last = ssf.getJSONObject("%rep_last");
 			MessageChannel mc = mcdm.requestFrom(d);
@@ -92,7 +102,6 @@ public class ReputationModule extends MessageModule {
 			if( !rep_map.has(s.asString()) ) {
 				rep_map.put(s.asString(), 0);
 			}
-			
 			if( s.equals(target) ) {
 				return mc.createMessage(EmbedBuilders.applyErrorFormat("You cannot give reputation to yourself!", EmbedBuilders.ERR_PERMISSION));
 			} else {
