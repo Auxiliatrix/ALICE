@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import alice.framework.utilities.AliceLogger;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 
@@ -248,7 +249,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 				try {
 					result = result.and(dependentEffectsIterator.next().apply(dependency.block()));
 				} catch (Exception e) {
-					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building dependent effect:"); e.printStackTrace();});
 					break;
 				}
 			}
@@ -256,7 +257,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 				try {
 					result = result.and(independentEffectsIterator.next().apply(t));
 				} catch (Exception e) {
-					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building independent effect:"); e.printStackTrace();});
 					break;
 				}
 			}
@@ -264,7 +265,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 				try {
 					result = result.and(Mono.fromRunnable(() -> {dependentSideEffectsIterator.next().accept(dependency.block());}));
 				} catch (Exception e) {
-					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building dependent side-effect:"); e.printStackTrace();});
 					break;
 				}
 			}
@@ -272,7 +273,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 				try {
 					result = result.and(Mono.fromRunnable(() -> {independentSideEffectsIterator.next().accept(t);}));
 				} catch (Exception e) {
-					result = Mono.fromRunnable(() -> {System.err.println("Fatal error while executing for " + t.getClass());});
+					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building independent side-effect:"); e.printStackTrace();});
 					break;
 				}
 			}
