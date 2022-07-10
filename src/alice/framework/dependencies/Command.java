@@ -234,20 +234,31 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		return true;
 	}
 	
-	protected Mono<?> executeEffects(E t) {	
+	protected Mono<?> executeEffects(E t) {
 		Mono<?> result = Mono.fromRunnable(() -> {});
 		Mono<DependencyMap<E>> dependency = dependencies.buildDependencyMap(t);
 		
-		Iterator<Function<DependencyMap<E>, Mono<?>>> dependentEffectsIterator = dependentEffects.iterator();
-		Iterator<Function<E, Mono<?>>> independentEffectsIterator = independentEffects.iterator();
-		Iterator<Consumer<DependencyMap<E>>> dependentSideEffectsIterator = dependentSideEffects.iterator();
-		Iterator<Consumer<E>> independentSideEffectsIterator = independentSideEffects.iterator();
-		Iterator<Supplier<Mono<?>>> suppliersIterator = suppliers.iterator();
+//		Iterator<Function<DependencyMap<E>, Mono<?>>> dependentEffectsIterator = dependentEffects.iterator();
+//		Iterator<Function<E, Mono<?>>> independentEffectsIterator = independentEffects.iterator();
+//		Iterator<Consumer<DependencyMap<E>>> dependentSideEffectsIterator = dependentSideEffects.iterator();
+//		Iterator<Consumer<E>> independentSideEffectsIterator = independentSideEffects.iterator();
+//		Iterator<Supplier<Mono<?>>> suppliersIterator = suppliers.iterator();
+		
+		int dependentEffectsCounter = 0;
+		int independentEffectsCounter = 0;
+		int dependentSideEffectsCounter = 0;
+		int independentSideEffectsCounter = 0;
+		int suppliersCounter = 0;
+		
+		// TODO: Do something about the apply logic executing before any of the Mono'd results; its unintuitive
 		
 		for( List<?> effectList : executeOrder ) {
 			if( effectList.equals(dependentEffects) ) {
 				try {
-					result = result.and(dependentEffectsIterator.next().apply(dependency.block()));
+					int dependentEffectIndex = dependentEffectsCounter++;
+					Mono<?> wrapped = Mono.just(0).flatMap((c) -> dependentEffects.get(dependentEffectIndex).apply(dependency.block()));
+					//result = result.then(dependentEffects.get(dependentEffectsCounter++).apply(dependency.block()));
+					result = result.then(wrapped);
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building dependent effect:"); e.printStackTrace();});
 					break;
@@ -255,7 +266,10 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 			}
 			if( effectList.equals(independentEffects) ) {
 				try {
-					result = result.and(independentEffectsIterator.next().apply(t));
+					int independentEffectIndex = independentEffectsCounter++;
+					Mono<?> wrapped = Mono.just(0).flatMap((c) -> independentEffects.get(independentEffectIndex).apply(t));
+					//result = result.then(independentEffects.get(independentEffectsCounter++).apply(t));
+					result = result.then(wrapped);
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building independent effect:"); e.printStackTrace();});
 					break;
@@ -263,7 +277,8 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 			}
 			if( effectList.equals(dependentSideEffects) ) {
 				try {
-					result = result.and(Mono.fromRunnable(() -> {dependentSideEffectsIterator.next().accept(dependency.block());}));
+					Consumer<DependencyMap<E>> dependentSideEffect = dependentSideEffects.get(dependentSideEffectsCounter++);
+					result = result.then(Mono.fromRunnable(() -> {dependentSideEffect.accept(dependency.block());}));
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building dependent side-effect:"); e.printStackTrace();});
 					break;
@@ -271,14 +286,15 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 			}
 			if( effectList.equals(independentSideEffects) ) {
 				try {
-					result = result.and(Mono.fromRunnable(() -> {independentSideEffectsIterator.next().accept(t);}));
+					Consumer<E> independentSideEffect = independentSideEffects.get(independentSideEffectsCounter++);
+					result = result.then(Mono.fromRunnable(() -> {independentSideEffect.accept(t);}));
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building independent side-effect:"); e.printStackTrace();});
 					break;
 				}
 			}
 			if( effectList.equals(suppliers) ) {
-				result = result.and(suppliersIterator.next().get());
+				result = result.then(suppliers.get(suppliersCounter++).get());
 			}
 		}
 		
@@ -293,12 +309,12 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 			for( Command<E> subcommand : subcommands ) {
 				if( subcommand.checkConditions(t) ) {
 					overidden = true;
-					result = result.and(subcommand.apply(t));
+					result = result.then(subcommand.apply(t));
 				}
 			}
 			
 			if( !overidden ) {
-				result = result.and(executeEffects(t));
+				result = result.then(executeEffects(t));
 			}
 		}
 		

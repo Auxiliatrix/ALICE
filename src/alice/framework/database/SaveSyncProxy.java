@@ -78,7 +78,7 @@ public class SaveSyncProxy extends WrappingProxy {
 	
 	@Override
 	public InvocationPair preprocess(Object proxy, Method method, Object[] args) {
-		if( recursions == 1 ) {
+//		if( recursions == 1 ) {
 			if( method.isAnnotationPresent(WriteLock.class) ) {
 				lockWriter(key);
 			} else {
@@ -143,14 +143,14 @@ public class SaveSyncProxy extends WrappingProxy {
 				
 				}
 			}
-		}
+//		}
 		return new InvocationPair(method, args);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object postprocess(Object proxy, Method method, Object[] args, Object result) {
-		if( recursions == 1 ) {
+//		if( recursions == 1 ) {
 			if( method.isAnnotationPresent(WriteLock.class) ) {
 				unlockWriter(key);
 			} else {
@@ -169,6 +169,9 @@ public class SaveSyncProxy extends WrappingProxy {
 			if( method.isAnnotationPresent(RecursiveLock.class) ) {
 				if( method.getReturnType().equals(SyncedJSONObject.class) ) {
 					JSONObject intermediary = (JSONObject) result;
+					if( intermediary == null ) {
+						return null;
+					}
 					if( recursiveCache.containsKey(intermediary) ) {
 						return recursiveCache.get(intermediary);
 					} else {
@@ -179,6 +182,9 @@ public class SaveSyncProxy extends WrappingProxy {
 					}
 				} else if( method.getReturnType().equals(SyncedJSONArray.class) ) {
 					JSONArray intermediary = (JSONArray) result;
+					if( intermediary == null ) {
+						return null;
+					}
 					if( recursiveArrayCache.containsKey(intermediary) ) {
 						return recursiveArrayCache.get(intermediary);
 					} else {
@@ -209,7 +215,7 @@ public class SaveSyncProxy extends WrappingProxy {
 						break;
 				}
 			}
-		}
+//		}
 		return result;
 	}
 	
