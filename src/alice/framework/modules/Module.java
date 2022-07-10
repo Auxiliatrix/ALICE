@@ -5,6 +5,7 @@ import java.time.Duration;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.main.Brain;
+import alice.framework.utilities.AliceLogger;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -20,9 +21,12 @@ public abstract class Module<E extends Event> {
 	
 	protected void load(Class<E> type) {
 		Brain.client.on(type).subscribe(e -> handle(e)
-				.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)))
+				.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)).doBeforeRetry(rs -> {
+					AliceLogger.error(String.format("Error propagated. Retrying %d of %d...",rs.totalRetriesInARow(),5));
+				}))
 				.doOnError(f -> {
-					System.err.println("Propagated error detected.");
+					AliceLogger.error("Fatal error propagated during task execution:");
+					f.printStackTrace();
 					Brain.client.logout().block();
 				})
 				.block()
