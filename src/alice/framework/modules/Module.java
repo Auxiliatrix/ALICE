@@ -22,7 +22,7 @@ public abstract class Module<E extends Event> {
 	protected void load(Class<E> type) {
 		Brain.client.on(type).subscribe(e -> handle(e)
 				.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)).doBeforeRetry(rs -> {
-					AliceLogger.error(String.format("Error propagated. Retrying %d of %d...",rs.totalRetriesInARow(),5));
+					AliceLogger.error(String.format("Error propagated. Retrying %d of %d...",rs.totalRetriesInARow()+1,5));
 				}))
 				.doOnError(f -> {
 					AliceLogger.error("Fatal error propagated during task execution:");

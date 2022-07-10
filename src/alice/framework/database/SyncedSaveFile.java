@@ -15,7 +15,7 @@ public interface SyncedSaveFile extends SyncedJSONObject {
 	public static SyncedJSONObject of(String key) {
 		if( !SaveSyncProxy.lockMap.containsKey(key) ) {
 			AliceLogger.info(String.format("Loaded guild data from %s.", key), 1);
-			SaveSyncProxy.lockMap.put(key, new ReadWriteReentrantLock(true));
+			SaveSyncProxy.lockMap.put(key, new ReadWriteReentrantLock());
 		}
 		
 		if( SaveSyncProxy.cache.containsKey(key) ) {
