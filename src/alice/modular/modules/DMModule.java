@@ -8,7 +8,7 @@ import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.MessageModule;
 import alice.framework.structures.TokenizedString;
-import alice.framework.utilities.EmbedBuilders;
+import alice.framework.utilities.EmbedFactory;
 import alice.framework.utilities.FileIO;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
@@ -33,7 +33,7 @@ public class DMModule extends MessageModule {
 		command.withCondition(MessageModule.getInvokedCondition("%tier"));
 		command.withDependentEffect(mcef.with(tsef).with(mef).buildEffect(
 			(mc,ts,m) -> {
-				return mc.createMessage(EmbedBuilders.applyErrorFormat(lookup(ts.getString(1))))
+				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat(lookup(ts.getString(1)))))
 						.and(m.addReaction(ReactionEmoji.unicode("\u2705")));
 			}
 		));

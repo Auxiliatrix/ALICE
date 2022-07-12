@@ -14,7 +14,7 @@ import alice.framework.dependencies.DependencyManager;
 import alice.framework.main.Brain;
 import alice.framework.main.Constants;
 import alice.framework.modules.MessageModule;
-import alice.framework.utilities.EmbedBuilders;
+import alice.framework.utilities.EmbedFactory;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -130,7 +130,7 @@ public class ReputationModule extends MessageModule {
 					entries.add(new SimpleEntry<String,String>(polled.getKey(),String.format("Reputation: :scroll:%d", polled.getValue())));
 					counter++;
 				}
-				return mc.createMessage(EmbedBuilders.applyListFormat("Reputation Leaderboard", Color.MOON_YELLOW, entries, true, true)
+				return mc.createMessage(EmbedFactory.build(EmbedFactory.modListFormat("Reputation Leaderboard", Color.MOON_YELLOW, entries, true, true))
 						.withFooter(Footer.of(String.format("Cumulative Score: %d | Total Entries: %d", repTotal, entryTotal),null))
 						.withAuthor(Author.of(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl())));
 			});
@@ -156,7 +156,7 @@ public class ReputationModule extends MessageModule {
 				rep_map.put(s.asString(), 0);
 			}
 			if( s.equals(target) && !admin ) {
-				return mc.createMessage(EmbedBuilders.applyErrorFormat("You cannot give reputation to yourself!", EmbedBuilders.ERR_PERMISSION));
+				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("You cannot give reputation to yourself!", EmbedFactory.ERR_PERMISSION)));
 			} else {
 				if( rep_last.has(s.asString()) ) {
 					long last = rep_last.getLong(s.asString());

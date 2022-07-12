@@ -6,7 +6,7 @@ import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.MessageModule;
 import alice.framework.structures.TokenizedString;
-import alice.framework.utilities.EmbedBuilders;
+import alice.framework.utilities.EmbedFactory;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -38,7 +38,7 @@ public class MassBanModule extends MessageModule {
 		command.withDependentEffect(d -> {
 			MessageChannel mc = mcdf.requestFrom(d);
 			Guild g = gdf.requestFrom(d);
-			Mono<?> ret = mc.createMessage(EmbedBuilders.applySuccessFormat("Initiating automatic bans."));
+			Mono<?> ret = mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Initiating automatic bans.")));
 			TokenizedString ts = MessageModule.tokenizeMessage(d.getEvent());
 			TokenizedString ids = ts.getSubTokens(1);
 			for( int f=0; f<ids.size(); f++ ) {

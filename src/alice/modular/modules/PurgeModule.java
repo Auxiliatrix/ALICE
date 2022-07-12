@@ -8,7 +8,7 @@ import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.MessageModule;
 import alice.framework.structures.TokenizedString;
-import alice.framework.utilities.EmbedBuilders;
+import alice.framework.utilities.EmbedFactory;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
@@ -104,7 +104,7 @@ public class PurgeModule extends MessageModule {
 					break;
 			}
 			
-			return queue.flatMap(message -> message.delete()).count().flatMap(l -> mc.createMessage(EmbedBuilders.applySuccessFormat("Purged messages!")));
+			return queue.flatMap(message -> message.delete()).count().flatMap(l -> mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Purged messages!"))));
 		});
 		
 		return command;
