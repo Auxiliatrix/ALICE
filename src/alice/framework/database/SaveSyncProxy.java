@@ -40,6 +40,10 @@ public class SaveSyncProxy extends WrappingProxy {
 		RedirectType type();
 	}
 	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.METHOD)
+	public @interface Desynchronized {}
+	
 	protected enum RedirectType {
 		SFIputJSONObject,
 		SFIputJSONArray,
@@ -78,11 +82,19 @@ public class SaveSyncProxy extends WrappingProxy {
 	
 	@Override
 	public InvocationPair preprocess(Object proxy, Method method, Object[] args) {
-//		if( recursions == 1 ) {
-			if( method.isAnnotationPresent(WriteLock.class) ) {
-				lockWriter(key);
+		if( recursions == 0 ) {
+			if( !method.isAnnotationPresent(Desynchronized.class) ) {
+				if( method.isAnnotationPresent(WriteLock.class) ) {
+					lockWriter(key);
+				} else {
+					lockReader(key);
+				}
 			} else {
-				lockReader(key);
+				if( args.length > 0 ) {
+					method = methods.get("toString(int)");
+				} else {
+					method = methods.get("toString()");
+				}
 			}
 			
 			if( method.isAnnotationPresent(Redirects.class) ) {
@@ -143,18 +155,20 @@ public class SaveSyncProxy extends WrappingProxy {
 				
 				}
 			}
-//		}
+		}
 		return new InvocationPair(method, args);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object postprocess(Object proxy, Method method, Object[] args, Object result) {
-//		if( recursions == 1 ) {
-			if( method.isAnnotationPresent(WriteLock.class) ) {
-				unlockWriter(key);
-			} else {
-				unlockReader(key);
+		if( recursions == 0 ) {
+			if( !method.isAnnotationPresent(Desynchronized.class) ) {
+				if( method.isAnnotationPresent(WriteLock.class) ) {
+					unlockWriter(key);
+				} else {
+					unlockReader(key);
+				}
 			}
 			
 			if( method.isAnnotationPresent(ReturnsSelf.class) ) {
@@ -215,7 +229,7 @@ public class SaveSyncProxy extends WrappingProxy {
 						break;
 				}
 			}
-//		}
+		}
 		return result;
 	}
 	
@@ -232,7 +246,7 @@ public class SaveSyncProxy extends WrappingProxy {
 	}
 	
 	protected static void unlockWriter(String key) {
-		FileIO.writeToFile(key, cache.get(key).toString(1));
+		FileIO.writeToFile(key, cache.get(key).desyncedToString(1)); // FUCKING GOTCHA
 		lockMap.get(key).unlockWriter();
 	}
 }

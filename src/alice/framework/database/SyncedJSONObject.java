@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import alice.framework.database.SaveSyncProxy.Desynchronized;
 import alice.framework.database.SaveSyncProxy.RecursiveLock;
 import alice.framework.database.SaveSyncProxy.RedirectType;
 import alice.framework.database.SaveSyncProxy.Redirects;
@@ -104,7 +105,7 @@ public interface SyncedJSONObject {
 //	@RestrictLock
 //	public Object optQuery(JSONPointer jsonPointer);
 	@WriteLock
-	// TODO: decouple
+	// TODO: decouple when JSONObject or JSONArray is removed
     public Object remove(String key);
     public boolean similar(Object other);
     public String toString();
@@ -112,6 +113,16 @@ public interface SyncedJSONObject {
     public Writer write(Writer writer) throws JSONException;
     public Writer write(Writer writer, int indentFactor, int indent);
     public Map<String, Object> toMap();
+    
+    @Desynchronized
+    public default String desyncedToString() {
+    	return null;
+    }
+    
+    @Desynchronized
+    public default String desyncedToString(int indentFactor) throws JSONException {
+    	return null;
+    }
     
     @WriteLock
     @ReturnsSelf
