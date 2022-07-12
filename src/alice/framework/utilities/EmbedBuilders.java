@@ -2,16 +2,18 @@ package alice.framework.utilities;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.function.Consumer;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import alice.framework.main.Brain;
 import alice.framework.main.Constants;
-import discord4j.core.spec.EmbedCreateFields.Author;
 import discord4j.core.spec.EmbedCreateFields.Field;
 import discord4j.core.spec.EmbedCreateFields.Footer;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 
-public class EmbedBuilders {
+public class EmbedFactory {
 	
 	public static final String GENERIC_SUCCESS_MESSAGE = "Operation completed!";
 	
@@ -31,98 +33,148 @@ public class EmbedBuilders {
 	public static final int MAX_FOOTER_LENGTH = 2048;
 	public static final int MAX_AUTHOR_LENGTH = 256;
 	
-	public static void safeAddTitle(EmbedCreateSpec.Builder spec, String title) {
-		if( !title.isEmpty() ) {
-			spec.title(StringUtilities.limitedString(title, MAX_TITLE_LENGTH));
-		}
-	}
-	
-	public static void safeAddDescription(EmbedCreateSpec.Builder spec, String description) {
-		if( !description.isEmpty() ) {
-			spec.description(StringUtilities.limitedString(description, MAX_DESCRIPTION_LENGTH));
-		}
-	}
-	
-	public static void safeAddField(EmbedCreateSpec.Builder spec, String fieldName, String fieldValue, boolean inline) {
-		if( !fieldName.isEmpty() && !fieldValue.isEmpty() ) {
-			spec.addField(Field.of(StringUtilities.limitedString(fieldName, MAX_FIELD_NAME_LENGTH), StringUtilities.limitedString(fieldValue, MAX_FIELD_VALUE_LENGTH), inline));
-		}
-	}
-
-	public static void safeAddFooter(EmbedCreateSpec.Builder spec, String footer, String icon) {
-		if( !footer.isEmpty() ) {
-			spec.footer(Footer.of(StringUtilities.limitedString(footer, MAX_FOOTER_LENGTH), icon));
-		}
-	}
-	
-	public static void safeAddAuthor(EmbedCreateSpec.Builder spec, String author, String url, String icon) {
-		if( !author.isEmpty() ) {
-			spec.author(Author.of(StringUtilities.limitedString(author, MAX_AUTHOR_LENGTH), url, icon));
-		}
-	}
-	
-	public static EmbedCreateSpec applyBotHeader() {
-		EmbedCreateSpec.Builder spec = EmbedCreateSpec.builder();
-		safeAddAuthor(spec, String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
-		return spec.build();
-	}
-	
-	public static EmbedCreateSpec applyCreditsFormat() {
-		EmbedCreateSpec.Builder spec = EmbedCreateSpec.builder();
-		spec.color(Color.of(255, 192, 203));
+	public static class FunctionalEmbedBuilder {
+		public EmbedCreateSpec.Builder ecsb;
 		
-		safeAddAuthor(spec, String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl());
-		safeAddTitle(spec, "Developed by Alina Kim");
-		safeAddDescription(spec, "Built using the [Java Discord4j Framework](https://github.com/Discord4J/Discord4J)");
-		safeAddField(spec, ":desktop: Developer", "[Alina Kim](https://www.github.com/Auxiliatrix)", false);
-		safeAddField(spec, ":computer: Contributor", "[Anthony Zanella](https://www.github.com/InfinityPhase)", false);
-		safeAddField(spec, ":paintbrush: Artist", "[Emily Lee](https://emlee.carrd.co/)", false);
-		
-		return spec.build();
-	}
-	
-	public static EmbedCreateSpec applySuccessFormat() {
-		return applySuccessFormat(GENERIC_SUCCESS_MESSAGE);
-	}
-	
-	public static EmbedCreateSpec applySuccessFormat(String message) {
-		EmbedCreateSpec.Builder spec = EmbedCreateSpec.builder();
-
-		spec.color(Color.of(95, 160, 82));
-		
-		safeAddTitle(spec, ":white_check_mark: Success!");
-		safeAddDescription(spec, message.isEmpty() ? GENERIC_SUCCESS_MESSAGE : message);
-		return spec.build();
-	}
-	
-	public static EmbedCreateSpec applyErrorFormat() {
-		return applyErrorFormat(GENERIC_ERROR_MESSAGE, ERR_GENERAL);
-	}
-	
-	public static EmbedCreateSpec applyErrorFormat(String message) {
-		return applyErrorFormat(message, ERR_GENERAL);
-	}
-	
-	public static EmbedCreateSpec applyErrorFormat(String message, String type) {
-		EmbedCreateSpec.Builder spec = EmbedCreateSpec.builder();
-
-		spec.color(Color.of(166, 39, 0));
-		
-		safeAddTitle(spec, String.format(":warning: %s!", type.isEmpty() ? ERR_GENERAL : type));
-		safeAddDescription(spec, message.isEmpty() ? GENERIC_ERROR_MESSAGE : message);
-		return spec.build();
-	}
-	
-	public static EmbedCreateSpec applyListFormat(String title, Color color, List<SimpleEntry<String, String>> items, boolean numbered, boolean inline ) {
-		EmbedCreateSpec.Builder spec = EmbedCreateSpec.builder();
-		spec.color(color);
-		
-		safeAddTitle(spec, title);
-		for( int f=0; f<Integer.min(MAX_FIELD_COUNT, items.size()); f++ ) {
-			SimpleEntry<String, String> item = items.get(f);
-			safeAddField(spec, numbered ? String.format("%d. %s", f+1, item.getKey()) : item.getKey(), item.getValue(), inline);
+		public FunctionalEmbedBuilder() {
+			this(EmbedCreateSpec.builder());
 		}
-		return spec.build();
+		
+		public FunctionalEmbedBuilder(EmbedCreateSpec.Builder ecsb) {
+			this.ecsb = ecsb;
+		}
+		
+		public FunctionalEmbedBuilder apply(Consumer<EmbedCreateSpec.Builder> modifier) {
+			modifier.accept(ecsb);
+			return this;
+		}
+		
+		public EmbedCreateSpec build() {
+			return ecsb.build();
+		}
+		
+		public static FunctionalEmbedBuilder from(Consumer<EmbedCreateSpec.Builder> modifier) {
+			EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder();
+			modifier.accept(builder);
+			return new FunctionalEmbedBuilder(builder);
+		}
+		
+	}
+	
+	public static FunctionalEmbedBuilder builder() {
+		return new FunctionalEmbedBuilder();
+	}
+	
+	public static EmbedCreateSpec.Builder from(Consumer<EmbedCreateSpec.Builder> modifier) {
+		EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder();
+		modifier.accept(builder);
+		return builder;
+	}
+	
+	public static EmbedCreateSpec build(Consumer<EmbedCreateSpec.Builder> modifier) {
+		EmbedCreateSpec.Builder builder = EmbedCreateSpec.builder();
+		modifier.accept(builder);
+		return builder.build();
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modSafeTitle(String title) {
+		return ecsb -> {
+					if( !title.isEmpty() ) {
+						ecsb.title(StringUtilities.limitedString(title, MAX_TITLE_LENGTH));
+					}
+				};
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modSafeDescription(String description) {
+		return ecsb -> {
+			if( !description.isEmpty() ) {
+				ecsb.description(StringUtilities.limitedString(description, MAX_DESCRIPTION_LENGTH));
+			}
+		};
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modSafeAddField(String name, String value, boolean inline) {
+		return ecsb -> {
+			if( !name.isEmpty() && !value.isEmpty() ) {
+				ecsb.addField(Field.of(StringUtilities.limitedString(name, MAX_FIELD_NAME_LENGTH), StringUtilities.limitedString(value, MAX_FIELD_VALUE_LENGTH), inline));
+			}
+		};
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modSafeFooter(String footer, @Nullable String icon) {
+		return ecsb -> {
+			if( !footer.isEmpty() ) {
+				ecsb.footer(Footer.of(StringUtilities.limitedString(footer, MAX_FOOTER_LENGTH), icon));
+			}
+		};
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modSafeAuthor(String author, @Nullable String url, @Nullable String icon) {
+		return ecsb -> {
+			if( !author.isEmpty() ) {
+				ecsb.author(author, url, icon);
+			}
+		};
+	}
+	
+	public static void applyBotHeader(EmbedCreateSpec.Builder builder) {
+		modSafeAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl()).accept(builder);;
+	}
+	
+	public static void applyCreditsFormat(EmbedCreateSpec.Builder builder) {
+		builder.color(Color.of(255, 192, 203));
+		modSafeAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl())
+			.andThen(modSafeTitle("Developed by Alina Kim"))
+			.andThen(modSafeDescription("Built using the [Java Discord4j Framework](https://github.com/Discord4J/Discord4J)"))
+			.andThen(modSafeAddField(":desktop: Developer", "[Alina Kim](https://www.github.com/Auxiliatrix)", false))
+			.andThen(modSafeAddField(":computer: Contributor", "[Anthony Zanella](https://www.github.com/InfinityPhase)", false))
+			.andThen(modSafeAddField(":paintbrush: Artist", "[Emily Lee](https://emlee.carrd.co/)", false))
+			.accept(builder);;
+	}
+	
+	public static void applySuccessFormat(EmbedCreateSpec.Builder builder) {
+		modSuccessFormat().accept(builder);
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modSuccessFormat() {
+		return modSuccessFormat(GENERIC_SUCCESS_MESSAGE);
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modSuccessFormat(String message) {
+		return ecsb -> {
+			ecsb.color(Color.of(95, 100, 82));
+			modSafeTitle(":white_check_mark: Success!")
+			.andThen(modSafeDescription(message.isEmpty() ? GENERIC_SUCCESS_MESSAGE : message))
+			.accept(ecsb);
+		};
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modErrorFormat() {
+		return modErrorFormat(GENERIC_ERROR_MESSAGE, ERR_GENERAL);
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modErrorFormat(String message) {
+		return modErrorFormat(message, ERR_GENERAL);
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modErrorFormat(String message, String type) {
+		return ecsb -> {
+			ecsb.color(Color.of(166, 39, 0));
+			modSafeTitle(String.format(":warning: %s", type.isEmpty() ? ERR_GENERAL : type))
+			.andThen(modSafeDescription(message.isEmpty() ? GENERIC_ERROR_MESSAGE : message))
+			.accept(ecsb);
+		};
+	}
+	
+	public static Consumer<EmbedCreateSpec.Builder> modListFormat(String title, Color color, List<SimpleEntry<String, String>> items, boolean numbered, boolean inline) {
+		return ecsb -> {
+			ecsb.color(color);
+			modSafeTitle(title).accept(ecsb);
+			for( int f=0; f<Integer.min(MAX_FIELD_COUNT, items.size()); f++ ) {
+				SimpleEntry<String, String> item = items.get(f);
+				modSafeAddField(numbered ? String.format("%d. %s", f+1, item.getKey()) : item.getKey(), item.getValue(), inline).accept(ecsb);;
+			}
+		};
 	}
 		
 //	public static synchronized Consumer<EmbedCreateSpec> getHelpConstructor(User user) {
