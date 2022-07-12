@@ -4,9 +4,6 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.AbstractMap.SimpleEntry;
 
 import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
@@ -20,9 +17,10 @@ import alice.framework.utilities.EmbedBuilders;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.spec.EmbedCreateSpec;
+import discord4j.rest.util.Color;
 import discord4j.rest.util.Permission;
 import discord4j.rest.util.PermissionSet;
-import discord4j.rest.util.Color;
 import reactor.core.publisher.Mono;
 
 public class EngagementModule extends MessageModule {
@@ -111,12 +109,14 @@ public class EngagementModule extends MessageModule {
 						int dfs = daily_firsts.getInt(key);
 						int dus = daily_uniques.getInt(key);
 						
-						List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();	
-						entries.add(new SimpleEntry<String,String>("Messages Sent",dms+""));
-						entries.add(new SimpleEntry<String,String>("Active Users",dfs+""));
-						entries.add(new SimpleEntry<String,String>("Unique Users",dus+""));
-						entries.add(new SimpleEntry<String,String>("Messages/User",(double)dms/dus+""));
-						return mc.createMessage(EmbedBuilders.applyListFormat(String.format("Engagement Report for %s", key), Color.GREEN, entries, false, true));
+//						List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();
+//						entries.add(new SimpleEntry<String,String>(String.format("Messages Sent: %d",dms),""));
+//						entries.add(new SimpleEntry<String,String>(String.format("Active Users: %d",dfs),""));
+//						entries.add(new SimpleEntry<String,String>(String.format("Unique Users: %d",dus),""));
+//						entries.add(new SimpleEntry<String,String>(String.format("Messages/User: %.2f",(double)dms/dus),""));
+//						return mc.createMessage(EmbedBuilders.applyListFormat(String.format("Engagement Report for %s", key), Color.GREEN, entries, false, false));
+						String report = String.format("**Messages Sent**: %d\n**Active Users**: %d\n**Unique Users**: %d\n**Messages/User**: %.2f", dms,dfs,dus,(double)dms/dus);
+						return mc.createMessage(EmbedCreateSpec.builder().description(report).color(Color.GREEN).title(String.format("Engagement Report [%s]", key)).build());
 					} else {
 						return mc.createMessage(EmbedBuilders.applyErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*"));
 					}

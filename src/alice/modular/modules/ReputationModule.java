@@ -1,17 +1,28 @@
 package alice.modular.modules;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+
 import alice.framework.database.SyncedJSONObject;
 import alice.framework.database.SyncedSaveFile;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
+import alice.framework.main.Brain;
+import alice.framework.main.Constants;
 import alice.framework.modules.MessageModule;
 import alice.framework.utilities.EmbedBuilders;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.User;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.spec.EmbedCreateFields.Author;
+import discord4j.core.spec.EmbedCreateFields.Footer;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import discord4j.rest.util.Permission;
@@ -28,6 +39,7 @@ public class ReputationModule extends MessageModule {
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent, MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getChannel());
 		DependencyManager<MessageCreateEvent, PermissionSet> psdm = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
+		DependencyManager<MessageCreateEvent, Guild> gdm = dfb.addDependency(mce -> mce.getGuild());
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 				
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
@@ -61,18 +73,74 @@ public class ReputationModule extends MessageModule {
 		Command<MessageCreateEvent> arg = command.addSubcommand();
 		arg.withCondition(MessageModule.getArgumentsCondition(2));
 		
-//		Command<MessageCreateEvent> leadCommand = arg.addSubcommand();
-				
-		Command<MessageCreateEvent> repCommand = arg.addSubcommand();
-		repCommand.withCondition(MessageModule.getMentionsCondition(1));
-		repCommand.withDependentEffect(d -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+		Command<MessageCreateEvent> setup = arg.addSubcommand();
+		setup.withCondition(mce -> {
+			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
+			return !ssf.has("%rep_map") && !ssf.has("%rep_last");
+		});
+		setup.withSideEffect(mce -> {
+			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
 			if( !ssf.has("%rep_map") ) {
 				ssf.putJSONObject("%rep_map");
 			}
 			if( !ssf.has("%rep_last") ) {
 				ssf.putJSONObject("%rep_last");
 			}
+		});
+		
+		Command<MessageCreateEvent> leadCommand = arg.addSubcommand();
+		leadCommand.withCondition(MessageModule.getArgumentCondition(1, "lead"));
+		leadCommand.withDependentEffect(d -> {
+			MessageChannel mc = mcdm.requestFrom(d);
+			Guild g = gdm.requestFrom(d);
+			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
+			SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
+			List<Mono<Member>> orderedMembers = new ArrayList<Mono<Member>>();
+			for( String key : rep_map.keySet() ) {
+				orderedMembers.add(g.getMemberById(Snowflake.of(key)));
+			}
+			
+			return Mono.zip(orderedMembers, ms -> {
+				List<Member> om = new ArrayList<Member>();
+				for( Object m : ms ) {
+					om.add((Member) m);
+				}
+				return om;
+			}).flatMap(oms -> {
+				PriorityQueue<SimpleEntry<String,Integer>> pq = new PriorityQueue<SimpleEntry<String,Integer>>((se1,se2) -> {return se2.getValue()-se1.getValue();});
+				int entryTotal = 0;
+				int repTotal = 0;
+				boolean first = true;
+				for( Member member : oms ) {
+					String key = member.getId().asString();
+					int score = rep_map.getInt(key);
+					pq.add(new SimpleEntry<String,Integer>(member.getUsername() + (first ? " :star:" : ""), score));
+					first = false;
+					entryTotal++;
+					repTotal += score;
+				}
+				
+				List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();
+				int counter = 0;
+				while( !pq.isEmpty() ) {
+					if( counter == 12 ) {
+						break;
+					}
+					SimpleEntry<String,Integer> polled = pq.poll();
+					entries.add(new SimpleEntry<String,String>(polled.getKey(),String.format("Reputation: :scroll:%d", polled.getValue())));
+					counter++;
+				}
+				return mc.createMessage(EmbedBuilders.applyListFormat("Reputation Leaderboard", Color.MOON_YELLOW, entries, true, true)
+						.withFooter(Footer.of(String.format("Cumulative Score: %d | Total Entries: %d", repTotal, entryTotal),null))
+						.withAuthor(Author.of(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl())));
+			});
+			
+		});
+		
+		Command<MessageCreateEvent> repCommand = arg.addSubcommand();
+		repCommand.withCondition(MessageModule.getMentionsCondition(1));
+		repCommand.withDependentEffect(d -> {
+			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
 			SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
 			SyncedJSONObject rep_last = ssf.getJSONObject("%rep_last");
 			boolean admin = psdm.requestFrom(d).contains(Permission.ADMINISTRATOR);

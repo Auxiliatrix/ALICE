@@ -58,7 +58,7 @@ public class RoomSetupModule extends MessageModule {
 				}
 			}
 		);
-		unassignCommand.withDependentEffect(mcef.buildEffect(mc -> mc.createMessage(EmbedBuilders.applyErrorFormat("Nexus unassigned successfully!"))));
+		unassignCommand.withDependentEffect(mcef.buildEffect(mc -> mc.createMessage(EmbedBuilders.applySuccessFormat("Nexus unassigned successfully!"))));
 
 		command.withSubcommand(assignCommand);
 		command.withSubcommand(unassignCommand);
