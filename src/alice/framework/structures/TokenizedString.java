@@ -110,6 +110,24 @@ public class TokenizedString {
 		tokens = parse(string);
 	}
 	
+	public int getIndex(String token) {
+		for( int f=0; f<tokens.length; f++ ) {
+			if( tokens[f].toString().equals(token) ) {
+				return f;
+			}
+		}
+		return -1;
+	}
+	
+	public int getIndexIgnoreCase(String token) {
+		for( int f=0; f<tokens.length; f++ ) {
+			if( tokens[f].toString().equalsIgnoreCase(token) ) {
+				return f;
+			}
+		}
+		return -1;
+	}
+	
 	public Token getToken(int index) {
 		return tokens[index];
 	}
