@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import discord4j.core.event.domain.message.MessageCreateEvent;
-
 /**
  * A String wrapper that automatically parses the given String in a variety of ways for easy access.
  * @author Auxiliatrix

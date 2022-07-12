@@ -12,6 +12,8 @@ public abstract class WrappingProxy implements InvocationHandler {
 	protected Object target;
 	
 	protected int recursions;
+	
+	protected Object lock;
 		
 	protected WrappingProxy(Object target) {
 		this.target = target;
@@ -22,25 +24,29 @@ public abstract class WrappingProxy implements InvocationHandler {
 		
 		recursions = 0;
 		
+		this.lock = new Object();
+		
 	}
 
 	// ERROR SEEMS TO BE CAUSED BY INVOCATION BEING CALLED TWICE
 	
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		recursions++;
 		InvocationPair ip = preprocess(proxy, method, args);
 		Object result = null;
-		try {
-			if( ip != null ) {
-				if( !methods.containsKey(getParameterizedName(ip.method)) ) {
-					System.err.println("Missing method: " + getParameterizedName(ip.method));
+		synchronized(lock) {
+			recursions++;
+			try {
+				if( ip != null ) {
+					if( !methods.containsKey(getParameterizedName(ip.method)) ) {
+						System.err.println("Missing method: " + getParameterizedName(ip.method));
+					}
+					result = methods.get(getParameterizedName(ip.method)).invoke(target, ip.args);
 				}
-				result = methods.get(getParameterizedName(ip.method)).invoke(target, ip.args);
+			} finally {
+				recursions--;
+				result = postprocess(proxy, method, args, result);
 			}
-		} finally {
-			result = postprocess(proxy, method, args, result);
-			recursions--;
 		}
 		return result;
 	}

@@ -1,11 +1,15 @@
 package alice.framework.utilities;
 
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Semaphore;
 
 public class ReadWriteReentrantLock {
 	
-	private ReentrantLock writerLock;
-	private ReentrantLock readerLock;
+	private Semaphore writerSemaphore;
+	private Semaphore readerSemaphore;
+//	
+//	private ReentrantLock writerLock;
+//	private ReentrantLock readerLock;
+	
 	private int readers;
 
 	public ReadWriteReentrantLock() {
@@ -13,40 +17,68 @@ public class ReadWriteReentrantLock {
 	}
 	
 	public ReadWriteReentrantLock(boolean fair) {
-		this.writerLock = new ReentrantLock(fair);
-		this.readerLock = new ReentrantLock(fair);
+//		this.writerLock = new ReentrantLock(fair);
+//		this.readerLock = new ReentrantLock(fair);
+//		
+		writerSemaphore = new Semaphore(1);
+		readerSemaphore = new Semaphore(1);
+		
 		this.readers = 0;
 	}
 	
 	public void lockWriter() {
-		writerLock.lock();
+		try {
+			writerSemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+//		writerLock.lock();
 	}
 	
 	public void unlockWriter() {
-		writerLock.unlock();
+		writerSemaphore.release();
+//		writerLock.unlock();
 	}
 	
 	public void lockReader() {
-		readerLock.lock();
+		try {
+			readerSemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+//		readerLock.lock();
 		try {
 			readers++;
 			if( readers == 1 ) {
-				lockWriter();
+				try {
+					writerSemaphore.acquire();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+//				writerLock.lock();
 			}
 		} finally {
-			readerLock.unlock();
+			readerSemaphore.release();
+//			readerLock.unlock();
 		}
 	}
 	
 	public void unlockReader() {
-		readerLock.lock();
+		try {
+			readerSemaphore.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+//		readerLock.lock();
 		try {
 			readers--;
 			if( readers == 0 ) {
-				unlockWriter();
+				writerSemaphore.release();
+//				unlockWriter();
 			}
 		} finally {
-			readerLock.unlock();
+			readerSemaphore.release();
+//			readerLock.unlock();
 		}
 	}
 	
