@@ -176,8 +176,9 @@ public class EmbedFactory {
 			}
 		};
 	}
-		
+	
 //	public static synchronized Consumer<EmbedCreateSpec> getHelpConstructor(User user) {
+	
 //		return c -> helpConstructor(c, user);
 //	}
 //	
