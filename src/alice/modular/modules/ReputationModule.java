@@ -30,11 +30,7 @@ import discord4j.rest.util.PermissionSet;
 import reactor.core.publisher.Mono;
 
 public class ReputationModule extends MessageModule {
-
-	public ReputationModule() {
-		super();
-	}
-
+	
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent, MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getChannel());

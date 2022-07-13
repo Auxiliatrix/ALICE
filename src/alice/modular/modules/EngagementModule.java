@@ -25,10 +25,6 @@ import reactor.core.publisher.Mono;
 
 public class EngagementModule extends MessageModule {
 	
-	public EngagementModule() {
-		super();
-	}
-	
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent, MessageChannel> mcdf = dfb.addDependency(mce -> mce.getMessage().getChannel());

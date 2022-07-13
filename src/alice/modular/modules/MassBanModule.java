@@ -16,10 +16,6 @@ import discord4j.rest.util.PermissionSet;
 import reactor.core.publisher.Mono;
 
 public class MassBanModule extends MessageModule {
-
-	public MassBanModule() {
-		super();
-	}
 	
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {

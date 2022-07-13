@@ -17,10 +17,6 @@ import discord4j.core.object.reaction.ReactionEmoji;
 
 public class DMModule extends MessageModule {
 
-	public DMModule() {
-		super();
-	}
-
 	@Override
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());

@@ -15,11 +15,7 @@ import discord4j.rest.util.Permission;
 import discord4j.rest.util.PermissionSet;
 
 public class RoomSetupModule extends MessageModule {
-
-	public RoomSetupModule() {
-		super();
-	}
-
+	
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.<MessageChannel>addDependency(mce -> mce.getMessage().getChannel());

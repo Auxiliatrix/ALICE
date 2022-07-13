@@ -9,10 +9,6 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import reactor.core.publisher.Mono;
 
 public class TestModule extends MessageModule {
-
-	public TestModule() {
-		super();
-	}
 	
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
 		DependencyFactory<MessageCreateEvent> df = dfb.build();

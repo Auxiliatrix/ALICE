@@ -13,10 +13,6 @@ import reactor.core.publisher.Mono;
 
 public class InviteGeneratorModule extends MessageModule {
 
-	public InviteGeneratorModule() {
-		super();
-	}
-
 	@Override
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent, InviteData> idef = dfb.addDependency(mce -> mce.getMessage().getRestChannel().createInvite(InviteCreateSpec.builder().maxUses(1).temporary(false).unique(true).build().asRequest(), "Generating"));

@@ -23,10 +23,6 @@ import reactor.core.publisher.Mono;
 
 public class RoleAssignModule extends MessageModule {
 
-	public RoleAssignModule() {
-		super();
-	}
-
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
 		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getChannel());

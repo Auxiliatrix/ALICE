@@ -17,10 +17,6 @@ import discord4j.core.object.entity.Guild;
 
 public class InviteTrackerModule extends MessageModule {
 
-	public InviteTrackerModule() {
-		super();
-	}
-
 	@Override
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
 		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
