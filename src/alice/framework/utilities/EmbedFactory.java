@@ -118,12 +118,12 @@ public class EmbedFactory {
 	}
 	
 	public static void applyBotHeader(EmbedCreateSpec.Builder builder) {
-		modSafeAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl()).accept(builder);;
+		modSafeAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.gateway.getSelf().block().getAvatarUrl()).accept(builder);;
 	}
 	
 	public static void applyCreditsFormat(EmbedCreateSpec.Builder builder) {
 		builder.color(Color.of(255, 192, 203));
-		modSafeAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl())
+		modSafeAuthor(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.gateway.getSelf().block().getAvatarUrl())
 			.andThen(modSafeTitle("Developed by Alina Kim"))
 			.andThen(modSafeDescription("Built using the [Java Discord4j Framework](https://github.com/Discord4J/Discord4J)"))
 			.andThen(modSafeAddField(":desktop: Developer", "[Alina Kim](https://www.github.com/Auxiliatrix)", false))

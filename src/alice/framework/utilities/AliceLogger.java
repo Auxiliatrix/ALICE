@@ -52,11 +52,11 @@ public class AliceLogger {
 	}
 	
 	public static void DMSay(String message, String userName) {
-		log(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMSAY_PREFIX, Brain.client.getSelf().block().getUsername(), userName)).toString());
+		log(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMSAY_PREFIX, Brain.gateway.getSelf().block().getUsername(), userName)).toString());
 	}
 	
 	public static void DMEcho(String message, String userName) {
-		log(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMECHO_PREFIX, userName, Brain.client.getSelf().block().getUsername())).toString());
+		log(buildLogStringBuilder(message, 0, String.format("%s [%s@%s]", DMECHO_PREFIX, userName, Brain.gateway.getSelf().block().getUsername())).toString());
 	}
 	
 	public static void say(String message, String guildName, String channelName) {

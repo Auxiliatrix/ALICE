@@ -34,7 +34,8 @@ import reactor.core.publisher.Mono;
 
 public class Brain {
 	
-	public static GatewayDiscordClient client = null;						// Discord client object
+	public static DiscordClient client = null;
+	public static GatewayDiscordClient gateway = null;						// Discord client object
 	public static AtomicBoolean ALIVE = new AtomicBoolean(true);			// Global variable to determine if shutdown is a restart command
 
 	public static MessageChannel reportChannel;								// Hard-coded text channel to send error messages to
@@ -43,6 +44,18 @@ public class Brain {
 		// TODO: move to constants file
 			
 	public static AtomicReference<String> token_ref = new AtomicReference<String>();
+	
+	public static final Intent[] INTENTS = new Intent[] {
+		Intent.DIRECT_MESSAGE_REACTIONS,
+		Intent.DIRECT_MESSAGES,
+		Intent.GUILD_BANS,
+		Intent.GUILD_INVITES,
+		Intent.GUILD_MEMBERS,
+		Intent.GUILD_MESSAGE_REACTIONS,
+		Intent.GUILD_MESSAGES,
+		Intent.GUILD_VOICE_STATES,
+		Intent.GUILDS
+	};
 	
 	public static void main(String[] args) {
 		String token = System.getenv("BOT_TOKEN");
@@ -64,13 +77,13 @@ public class Brain {
 				login(args[0]);			// Log in to server
 				reload();				// Reload guild data
 				
-				upkeepChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(757836189687349308L)).block();
-				reportChannel = (MessageChannel) Brain.client.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
+				upkeepChannel = (MessageChannel) Brain.gateway.getChannelById(Snowflake.of(757836189687349308L)).block();
+				reportChannel = (MessageChannel) Brain.gateway.getChannelById(Snowflake.of(768350880234733568L)).block();	// Hard-coded error message channel
 				
 				setup();
 								
-				client.onDisconnect().block();	// Wait until disconnected
-				client = null;
+				gateway.onDisconnect().block();	// Wait until disconnected
+				gateway = null;
 				
 				AliceLogger.info("Shutting down...");
 			} catch (Exception e) {
@@ -85,7 +98,7 @@ public class Brain {
 	 */
 	private static void reload() {
 		AliceLogger.info("Reloading save data...");
-		for( Guild guild : client.getGuilds().collectList().block() ) {
+		for( Guild guild : gateway.getGuilds().collectList().block() ) {
 			@SuppressWarnings("unused")
 			SyncedJSONObject guildData = SyncedSaveFile.ofGuild(guild.getId().asLong());
 		}
@@ -95,7 +108,7 @@ public class Brain {
 	 * Sets up hard-coded Discord channels for maintenance purposes
 	 */
 	private static void setup() {
-		client.on(ReadyEvent.class)
+		gateway.on(ReadyEvent.class)
 		.flatMap(
 				event -> Flux.defer( 
 						() -> upkeepChannel.createMessage("Running upkeep").and(Mono.delay(Duration.ofMinutes(5))).onErrorContinue((e, o) -> { e.printStackTrace(); }).repeat()
@@ -110,12 +123,18 @@ public class Brain {
 	 */
 	private static void login(String token) {
 		AliceLogger.info("Logging in...");
+		
 		client = DiscordClientBuilder.create(token)
 				.onClientResponse(ResponseFunction.emptyOnErrorStatus(RouteMatcher.any(), 1006))
-				.build().login().block();
-		client.updatePresence(ClientPresence.online(ClientActivity.listening("%help"))).block();
+				.build();
+		gateway = client.gateway().setEnabledIntents(IntentSet.of(INTENTS)).login().block();
+//		
+//		gateway = DiscordClientBuilder.create(token)
+//				.onClientResponse(ResponseFunction.emptyOnErrorStatus(RouteMatcher.any(), 1006))
+//				.build().login().block();
+		gateway.updatePresence(ClientPresence.online(ClientActivity.listening("%help"))).block();
 			// TODO: turn into a variable
-		client.on(ReadyEvent.class)	// Once the Ready event is received from the server
+		gateway.on(ReadyEvent.class)	// Once the Ready event is received from the server
 			.subscribe( event -> {
 				AliceLogger.info("Initializing Modules...", 1);
 				loadModules("alice.modular.modules");
@@ -164,7 +183,7 @@ public class Brain {
 	 * @param url to retrieve image from
 	 */
 	public static void updateAvatar(String url) {
-		client.edit(UserEditSpec.builder().avatar(Image.ofUrl(url).block()).build())
+		gateway.edit(UserEditSpec.builder().avatar(Image.ofUrl(url).block()).build())
 			.onErrorResume(error -> { error.printStackTrace(); return Mono.empty(); }).subscribe();
 	}
 	

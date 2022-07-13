@@ -109,6 +109,36 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 		};
 	}
 	
+	public static Function<MessageCreateEvent, Boolean> getRoleMentionsCondition(int count) {
+		return mce -> mce.getMessage().getRoleMentionIds().size() >= count; 
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getRoleMentionsCondition(Snowflake role) {
+		return mce -> mce.getMessage().getRoleMentionIds().contains(role); 
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getRoleMentionsAllCondition(Snowflake... roles) {
+		return mce -> {
+			for( Snowflake role : roles ) {
+				if( !mce.getMessage().getRoleMentionIds().contains(role) ) {
+					return false;
+				}
+			}
+			return true;
+		};
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getRoleMentionsAnyCondition(Snowflake... roles) {
+		return mce -> {
+			for( Snowflake role : roles ) {
+				if( mce.getMessage().getRoleMentionIds().contains(role) ) {
+					return true;
+				}
+			}
+			return false;
+		};
+	}
+	
 	public static Function<DependencyMap<MessageCreateEvent>, Boolean> getRoleCondition(DependencyManager<MessageCreateEvent,List<Role>> retriever, Role condition) {
 		return d -> {
 			List<Role> roles = retriever.requestFrom(d);
