@@ -47,7 +47,7 @@ public class InviteTrackerModule extends MessageModule {
 					SyncedJSONArray sai = sfi.getJSONArray("self_invites");
 					List<String> invites = g.getInvites().filter(ei -> 
 						Snowflake.of("367437754034028545").equals(ei.getInviterId().get())
-						|| Brain.client.getSelfId().equals(ei.getInviterId().get())
+						|| Brain.gateway.getSelfId().equals(ei.getInviterId().get())
 						).map(ei -> ei.getCode()).collectList().block();
 					System.out.println(invites.size());
 					for( String invite : invites ) {

@@ -31,7 +31,7 @@ public class InviteCreateModule extends Module<InviteCreateEvent> {
 				&& sfi.has("roleID")
 				&& sfi.has("invite_map")
 				&& sfi.has("self_invites")
-				&& (Snowflake.of("367437754034028545").equals(ice.getInviter().get().getId()) || Brain.client.getSelfId().equals(ice.getInviter().get().getId()))
+				&& (Snowflake.of("367437754034028545").equals(ice.getInviter().get().getId()) || Brain.gateway.getSelfId().equals(ice.getInviter().get().getId()))
 		);
 		command.withDependentSideEffect(cef.buildSideEffect(
 			code -> {

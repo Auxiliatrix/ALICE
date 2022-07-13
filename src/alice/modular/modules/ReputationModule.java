@@ -128,7 +128,7 @@ public class ReputationModule extends MessageModule {
 				}
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modListFormat("Reputation Leaderboard", Color.MOON_YELLOW, entries, true, true))
 						.withFooter(Footer.of(String.format("Cumulative Score: %d | Total Entries: %d", repTotal, entryTotal),null))
-						.withAuthor(Author.of(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.client.getSelf().block().getAvatarUrl())));
+						.withAuthor(Author.of(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.gateway.getSelf().block().getAvatarUrl())));
 			});
 			
 		});
