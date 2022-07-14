@@ -1,5 +1,7 @@
 package alice.framework.dependencies;
 
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -25,6 +27,18 @@ public class DependencyManager<E extends Event, T> {
 	
 	public Function<DependencyMap<E>, Boolean> buildCondition(Function<T,Boolean> spec) {
 		return d -> spec.apply(d.<T>request(retriever));
+	}
+	
+	public Function<DependencyMap<E>, Mono<?>> buildEffect(BiFunction<E,T,Mono<?>> spec) {
+		return d -> spec.apply(d.getEvent(), d.<T>request(retriever));
+	}
+	
+	public Consumer<DependencyMap<E>> buildSideEffect(BiConsumer<E,T> spec) {
+		return d -> spec.accept(d.getEvent(), d.<T>request(retriever));
+	}
+	
+	public Function<DependencyMap<E>, Boolean> buildCondition(BiFunction<E,T,Boolean> spec) {
+		return d -> spec.apply(d.getEvent(), d.<T>request(retriever));
 	}
 	
 	public T requestFrom(DependencyMap<E> dependency) {

@@ -9,8 +9,9 @@ import alice.framework.main.Constants;
 import alice.framework.utilities.AliceLogger;
 import alice.framework.utilities.FileIO;
 import alice.framework.utilities.ReadWriteReentrantLock;
+import discord4j.common.util.Snowflake;
 
-public interface SyncedSaveFile extends SyncedJSONObject {
+public interface SaveFiles extends SyncedJSONObject {
 
 	public static SyncedJSONObject of(String key) {
 		if( !SaveSyncProxy.lockMap.containsKey(key) ) {
@@ -32,5 +33,9 @@ public interface SyncedSaveFile extends SyncedJSONObject {
 	
 	public static SyncedJSONObject ofGuild(long guildID) {
 		return of(String.format("%s%s%s%s%s.json", Constants.TEMP_DATA_DIRECTORY, File.separator, Constants.GUILD_DATA_SUBDIRECTORY, File.separator, guildID));
+	}
+	
+	public static SyncedJSONObject ofGuild(Snowflake guildID) {
+		return ofGuild(guildID.asLong());
 	}
 }
