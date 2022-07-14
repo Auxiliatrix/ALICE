@@ -6,8 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import alice.framework.dependencies.DependencyMap;
+import alina.structures.TokenizedString;
 import alice.framework.dependencies.DependencyManager;
-import alice.framework.structures.TokenizedString;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Role;
