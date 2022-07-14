@@ -1,4 +1,4 @@
-package alice.framework.utilities;
+package alina.structures;
 
 import java.util.concurrent.Semaphore;
 

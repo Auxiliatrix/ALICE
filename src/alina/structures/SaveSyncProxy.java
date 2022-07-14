@@ -1,4 +1,4 @@
-package alice.framework.database;
+package alina.structures;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,8 +16,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import alice.framework.utilities.FileIO;
-import alice.framework.utilities.ReadWriteReentrantLock;
+import alina.utilities.FileIO;
 import alina.utilities.WrappingProxy;
 
 public class SaveSyncProxy extends WrappingProxy {
@@ -58,15 +57,15 @@ public class SaveSyncProxy extends WrappingProxy {
 		SAItoList,
 	};
 	
-	protected static Map<String, ReadWriteReentrantLock> lockMap = new HashMap<String, ReadWriteReentrantLock>();
-	protected static Map<String, SyncedJSONObject> cache = new HashMap<String, SyncedJSONObject>();
+	public static Map<String, ReadWriteReentrantLock> lockMap = new HashMap<String, ReadWriteReentrantLock>();
+	public static Map<String, SyncedJSONObject> cache = new HashMap<String, SyncedJSONObject>();
 	
 	protected Map<JSONObject, SyncedJSONObject> recursiveCache;
 	protected Map<JSONArray, SyncedJSONArray> recursiveArrayCache;
 	
 	protected String key;
 	
-	protected SaveSyncProxy(String key, JSONObject target) {
+	public SaveSyncProxy(String key, JSONObject target) {
 		super(target);
 		this.key = key;
 		recursiveCache = new HashMap<JSONObject, SyncedJSONObject>();

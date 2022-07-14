@@ -1,4 +1,4 @@
-package alice.framework.utilities;
+package alina.utilities;
 
 import java.io.BufferedReader;
 import java.io.File;

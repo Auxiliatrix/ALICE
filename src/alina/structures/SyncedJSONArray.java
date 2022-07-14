@@ -1,4 +1,4 @@
-package alice.framework.database;
+package alina.structures;
 
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -12,11 +12,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import alice.framework.database.SaveSyncProxy.RecursiveLock;
-import alice.framework.database.SaveSyncProxy.RedirectType;
-import alice.framework.database.SaveSyncProxy.Redirects;
-import alice.framework.database.SaveSyncProxy.ReturnsSelf;
-import alice.framework.database.SaveSyncProxy.WriteLock;
+import alina.structures.SaveSyncProxy.RecursiveLock;
+import alina.structures.SaveSyncProxy.RedirectType;
+import alina.structures.SaveSyncProxy.Redirects;
+import alina.structures.SaveSyncProxy.ReturnsSelf;
+import alina.structures.SaveSyncProxy.WriteLock;
 
 public interface SyncedJSONArray {
 

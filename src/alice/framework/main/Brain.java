@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.reflections.Reflections;
 
-import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SaveFiles;
 import alice.framework.modules.Module;
 import alice.framework.utilities.AliceLogger;
+import alice.framework.utilities.SaveFiles;
+import alina.structures.SyncedJSONObject;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;

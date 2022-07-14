@@ -1,4 +1,4 @@
-package alice.configuration.references;
+package alina.references;
 
 /**
  * A reference file containing synonyms for various commands. Use only to infer commands, not as a primary command structure.

@@ -1,4 +1,4 @@
-package alice.framework.database;
+package alice.framework.utilities;
 
 import java.io.File;
 import java.lang.reflect.Proxy;
@@ -6,9 +6,10 @@ import java.lang.reflect.Proxy;
 import org.json.JSONObject;
 
 import alice.framework.main.Constants;
-import alice.framework.utilities.AliceLogger;
-import alice.framework.utilities.FileIO;
-import alice.framework.utilities.ReadWriteReentrantLock;
+import alina.structures.ReadWriteReentrantLock;
+import alina.structures.SaveSyncProxy;
+import alina.structures.SyncedJSONObject;
+import alina.utilities.FileIO;
 import discord4j.common.util.Snowflake;
 
 public interface SaveFiles extends SyncedJSONObject {

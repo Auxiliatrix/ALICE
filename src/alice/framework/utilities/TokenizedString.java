@@ -1,4 +1,4 @@
-package alice.framework.structures;
+package alice.framework.utilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;

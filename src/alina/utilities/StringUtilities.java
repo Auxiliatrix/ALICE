@@ -1,4 +1,4 @@
-package alice.framework.utilities;
+package alina.utilities;
 
 public class StringUtilities {
 	
