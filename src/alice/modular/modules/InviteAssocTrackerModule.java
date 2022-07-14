@@ -6,7 +6,7 @@ import java.util.Map;
 
 import alice.framework.database.SyncedJSONArray;
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyFactory.Builder;
@@ -26,45 +26,48 @@ public class InviteAssocTrackerModule extends Module<MemberJoinEvent> {
 
 	@Override
 	public Command<MemberJoinEvent> buildCommand(Builder<MemberJoinEvent> dfb) {
-		DependencyManager<MemberJoinEvent, List<ExtendedInvite>> idf = dfb.addDependency(mje -> mje.getGuild().flatMap(g -> g.getInvites().collectList()));
+		DependencyManager<MemberJoinEvent, List<ExtendedInvite>> idm = dfb.addDependency(mje -> mje.getGuild().flatMap(g -> g.getInvites().collectList()));
 		DependencyFactory<MemberJoinEvent> df = dfb.build();
 		
 		Command<MemberJoinEvent> command = new Command<MemberJoinEvent>(df);
-		command.withCondition(mje -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mje.getGuildId().asLong());
-			return ssf.has("%assoc_lists") && ssf.has("%assoc_roles") && ssf.has("%assoc_counts");
-		});
-		command.withDependentEffect(d -> {
-			Member m = d.getEvent().getMember();
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().asLong());
-			List<ExtendedInvite> invites = idf.requestFrom(d);
-			Map<String, Integer> inviteCounts = new HashMap<String, Integer>();
-			for( ExtendedInvite i : invites ) {
-				inviteCounts.put(i.getCode(), i.getUses());
+		command.withCondition(
+			mje -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mje.getGuildId().asLong());
+				return ssf.has("%assoc_lists") && ssf.has("%assoc_roles") && ssf.has("%assoc_counts");
 			}
-			SyncedJSONObject assoc_counts = ssf.getJSONObject("%assoc_counts");
-			String code = "";
-			for( String key : assoc_counts.keySet() ) {
-				if( inviteCounts.containsKey(key) ) {
-					if( inviteCounts.get(key) > assoc_counts.getInt(key) ) {
-						assoc_counts.put(key, inviteCounts.get(key));
-						code = key;
-						SyncedJSONObject assoc_lists = ssf.getJSONObject("%assoc_lists");
-						SyncedJSONArray list = assoc_lists.getJSONArray(code);
-						list.put(m.getId().asString());
-						break;
+		);
+		command.withDependentEffect(idm.buildEffect(
+			(mje, invites) -> {
+				Member m = mje.getMember();
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mje.getGuildId().asLong());
+				Map<String, Integer> inviteCounts = new HashMap<String, Integer>();
+				for( ExtendedInvite i : invites ) {
+					inviteCounts.put(i.getCode(), i.getUses());
+				}
+				SyncedJSONObject assoc_counts = ssf.getJSONObject("%assoc_counts");
+				String code = "";
+				for( String key : assoc_counts.keySet() ) {
+					if( inviteCounts.containsKey(key) ) {
+						if( inviteCounts.get(key) > assoc_counts.getInt(key) ) {
+							assoc_counts.put(key, inviteCounts.get(key));
+							code = key;
+							SyncedJSONObject assoc_lists = ssf.getJSONObject("%assoc_lists");
+							SyncedJSONArray list = assoc_lists.getJSONArray(code);
+							list.put(m.getId().asString());
+							break;
+						}
 					}
 				}
-			}
-			if( !code.isEmpty() ) {
-				SyncedJSONObject assoc_roles = ssf.getJSONObject("%assoc_roles");
-				if( assoc_roles.has(code) ) {
-					String role = assoc_roles.getString(code);
-					return m.addRole(Snowflake.of(role));
+				if( !code.isEmpty() ) {
+					SyncedJSONObject assoc_roles = ssf.getJSONObject("%assoc_roles");
+					if( assoc_roles.has(code) ) {
+						String role = assoc_roles.getString(code);
+						return m.addRole(Snowflake.of(role));
+					}
 				}
+				return Mono.fromRunnable(() -> {});
 			}
-			return Mono.fromRunnable(() -> {});
-		});
+		));
 		
 		return command;
 	}

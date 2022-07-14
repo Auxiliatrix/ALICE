@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyFactory.Builder;
@@ -42,150 +42,156 @@ public class ReputationModule extends MessageModule {
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withCondition(MessageModule.getInvokedCondition("%rep"));
-		command.withDependentEffect(d -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-			if( !ssf.has("%rep_map") ) {
-				ssf.putJSONObject("%rep_map");
+		command.withDependentEffect(mcdm.buildEffect(
+			(mce, mc) -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+				if( !ssf.has("%rep_map") ) {
+					ssf.putJSONObject("%rep_map");
+				}
+				if( !ssf.has("%rep_last") ) {
+					ssf.putJSONObject("%rep_last");
+				}
+				SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
+				User targetUser = mce.getMessage().getAuthor().get();
+				Snowflake s = mce.getMessage().getAuthor().get().getId();
+				if( !rep_map.has(s.asString()) ) {
+					rep_map.put(s.asString(), 0);
+				}
+				
+				return mc.createMessage(
+						EmbedCreateSpec.builder()
+							.description(String.format("This user has :scroll:%s reputation!", rep_map.get(s.asString())))
+							.color(Color.YELLOW)
+							.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
+							.build());
 			}
-			if( !ssf.has("%rep_last") ) {
-				ssf.putJSONObject("%rep_last");
-			}
-			SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
-			MessageChannel mc = mcdm.requestFrom(d);
-			User targetUser = d.getEvent().getMessage().getAuthor().get();
-			Snowflake s = d.getEvent().getMessage().getAuthor().get().getId();
-			if( !rep_map.has(s.asString()) ) {
-				rep_map.put(s.asString(), 0);
-			}
-			
-			return mc.createMessage(
-					EmbedCreateSpec.builder()
-						.description(String.format("This user has :scroll:%s reputation!", rep_map.get(s.asString())))
-						.color(Color.YELLOW)
-						.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
-						.build());
-		});
+		));
 		
 		Command<MessageCreateEvent> arg = command.addSubcommand();
 		arg.withCondition(MessageModule.getArgumentsCondition(2));
 		
 		Command<MessageCreateEvent> setup = arg.addSubcommand();
-		setup.withCondition(mce -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
-			return !ssf.has("%rep_map") && !ssf.has("%rep_last");
-		});
-		setup.withSideEffect(mce -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
-			if( !ssf.has("%rep_map") ) {
-				ssf.putJSONObject("%rep_map");
+		setup.withCondition(
+			mce -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+				return !ssf.has("%rep_map") && !ssf.has("%rep_last");
 			}
-			if( !ssf.has("%rep_last") ) {
-				ssf.putJSONObject("%rep_last");
+		);
+		setup.withSideEffect(
+			mce -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+				if( !ssf.has("%rep_map") ) {
+					ssf.putJSONObject("%rep_map");
+				}
+				if( !ssf.has("%rep_last") ) {
+					ssf.putJSONObject("%rep_last");
+				}
 			}
-		});
+		);
 		
 		Command<MessageCreateEvent> leadCommand = arg.addSubcommand();
 		leadCommand.withCondition(MessageModule.getArgumentCondition(1, "lead"));
-		leadCommand.withDependentEffect(d -> {
-			MessageChannel mc = mcdm.requestFrom(d);
-			Guild g = gdm.requestFrom(d);
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-			SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
-			List<Mono<Member>> orderedMembers = new ArrayList<Mono<Member>>();
-			for( String key : rep_map.keySet() ) {
-				orderedMembers.add(g.getMemberById(Snowflake.of(key)));
-			}
-			
-			return Mono.zip(orderedMembers, ms -> {
-				List<Member> om = new ArrayList<Member>();
-				for( Object m : ms ) {
-					om.add((Member) m);
-				}
-				return om;
-			}).flatMap(oms -> {
-				PriorityQueue<SimpleEntry<String,Integer>> pq = new PriorityQueue<SimpleEntry<String,Integer>>((se1,se2) -> {return se2.getValue()-se1.getValue();});
-				int entryTotal = 0;
-				int repTotal = 0;
-				boolean first = true;
-				for( Member member : oms ) {
-					String key = member.getId().asString();
-					int score = rep_map.getInt(key);
-					pq.add(new SimpleEntry<String,Integer>(member.getUsername() + (first ? " :star:" : ""), score));
-					first = false;
-					entryTotal++;
-					repTotal += score;
+		leadCommand.withDependentEffect(mcdm.with(gdm).buildEffect(
+			(mce, mc, g) -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+				SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
+				List<Mono<Member>> orderedMembers = new ArrayList<Mono<Member>>();
+				for( String key : rep_map.keySet() ) {
+					orderedMembers.add(g.getMemberById(Snowflake.of(key)));
 				}
 				
-				List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();
-				int counter = 0;
-				while( !pq.isEmpty() ) {
-					if( counter == 12 ) {
-						break;
+				return Mono.zip(orderedMembers, ms -> {
+					List<Member> om = new ArrayList<Member>();
+					for( Object m : ms ) {
+						om.add((Member) m);
 					}
-					SimpleEntry<String,Integer> polled = pq.poll();
-					entries.add(new SimpleEntry<String,String>(polled.getKey(),String.format("Reputation: :scroll:%d", polled.getValue())));
-					counter++;
-				}
-				return mc.createMessage(EmbedFactory.build(EmbedFactory.modListFormat("Reputation Leaderboard", Color.MOON_YELLOW, entries, true, true))
-						.withFooter(Footer.of(String.format("Cumulative Score: %d | Total Entries: %d", repTotal, entryTotal),null))
-						.withAuthor(Author.of(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.gateway.getSelf().block().getAvatarUrl())));
-			});
-			
-		});
+					return om;
+				}).flatMap(oms -> {
+					PriorityQueue<SimpleEntry<String,Integer>> pq = new PriorityQueue<SimpleEntry<String,Integer>>((se1,se2) -> {return se2.getValue()-se1.getValue();});
+					int entryTotal = 0;
+					int repTotal = 0;
+					boolean first = true;
+					for( Member member : oms ) {
+						String key = member.getId().asString();
+						int score = rep_map.getInt(key);
+						pq.add(new SimpleEntry<String,Integer>(member.getUsername() + (first ? " :star:" : ""), score));
+						first = false;
+						entryTotal++;
+						repTotal += score;
+					}
+					
+					List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();
+					int counter = 0;
+					while( !pq.isEmpty() ) {
+						if( counter == 12 ) {
+							break;
+						}
+						SimpleEntry<String,Integer> polled = pq.poll();
+						entries.add(new SimpleEntry<String,String>(polled.getKey(),String.format("Reputation: :scroll:%d", polled.getValue())));
+						counter++;
+					}
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modListFormat("Reputation Leaderboard", Color.MOON_YELLOW, entries, true, true))
+							.withFooter(Footer.of(String.format("Cumulative Score: %d | Total Entries: %d", repTotal, entryTotal),null))
+							.withAuthor(Author.of(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.gateway.getSelf().block().getAvatarUrl())));
+				});
+				
+			}
+		));
 		
 		Command<MessageCreateEvent> repCommand = arg.addSubcommand();
 		repCommand.withCondition(MessageModule.getMentionsCondition(1));
-		repCommand.withDependentEffect(d -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-			SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
-			SyncedJSONObject rep_last = ssf.getJSONObject("%rep_last");
-			boolean admin = psdm.requestFrom(d).contains(Permission.ADMINISTRATOR);
-			MessageChannel mc = mcdm.requestFrom(d);
-			Snowflake s = d.getEvent().getMessage().getAuthor().get().getId();
-			User targetUser = d.getEvent().getMessage().getUserMentions().get(0);
-			Snowflake target = d.getEvent().getMessage().getUserMentionIds().get(0);
-			
-			if( !rep_map.has(target.asString()) ) {
-				rep_map.put(target.asString(), 0);
-			}
-			if( !rep_map.has(s.asString()) ) {
-				rep_map.put(s.asString(), 0);
-			}
-			if( s.equals(target) && !admin ) {
-				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("You cannot give reputation to yourself!", EmbedFactory.ERR_PERMISSION)));
-			} else {
-				if( rep_last.has(s.asString()) ) {
-					long last = rep_last.getLong(s.asString());
-					long current = System.currentTimeMillis();
-					long dif = current - last;
-					if( dif < 14400000 && !admin ) {
-						if( (14400000-dif) > 60000 ) {
-							return mc.createMessage(
-									EmbedCreateSpec.builder()
-										.description(String.format("This user has :scroll:%s reputation!", rep_map.get(target.asString())))
-										.color(Color.YELLOW)
-										.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
-										.footer(String.format("You can rep someone again in %d minute(s)!", (14400000-dif) / 60000), null)
-										.build());
-						} else {
-							return mc.createMessage(
-									EmbedCreateSpec.builder()
-										.description(String.format("This user has :scroll:%s reputation!", rep_map.get(target.asString())))
-										.color(Color.YELLOW)
-										.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
-										.footer(String.format("You can rep someone again in %d second(s)!", (14400000-dif) / 1000), null)
-										.build());
+		repCommand.withDependentEffect(mcdm.with(psdm).buildEffect(
+			(mce, mc, ps) -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+				SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
+				SyncedJSONObject rep_last = ssf.getJSONObject("%rep_last");
+				boolean admin = ps.contains(Permission.ADMINISTRATOR);
+				Snowflake s = mce.getMessage().getAuthor().get().getId();
+				User targetUser = mce.getMessage().getUserMentions().get(0);
+				Snowflake target = mce.getMessage().getUserMentionIds().get(0);
+				
+				if( !rep_map.has(target.asString()) ) {
+					rep_map.put(target.asString(), 0);
+				}
+				if( !rep_map.has(s.asString()) ) {
+					rep_map.put(s.asString(), 0);
+				}
+				if( s.equals(target) && !admin ) {
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("You cannot give reputation to yourself!", EmbedFactory.ERR_PERMISSION)));
+				} else {
+					if( rep_last.has(s.asString()) ) {
+						long last = rep_last.getLong(s.asString());
+						long current = System.currentTimeMillis();
+						long dif = current - last;
+						if( dif < 14400000 && !admin ) {
+							if( (14400000-dif) > 60000 ) {
+								return mc.createMessage(
+										EmbedCreateSpec.builder()
+											.description(String.format("This user has :scroll:%s reputation!", rep_map.get(target.asString())))
+											.color(Color.YELLOW)
+											.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
+											.footer(String.format("You can rep someone again in %d minute(s)!", (14400000-dif) / 60000), null)
+											.build());
+							} else {
+								return mc.createMessage(
+										EmbedCreateSpec.builder()
+											.description(String.format("This user has :scroll:%s reputation!", rep_map.get(target.asString())))
+											.color(Color.YELLOW)
+											.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
+											.footer(String.format("You can rep someone again in %d second(s)!", (14400000-dif) / 1000), null)
+											.build());
+							}
 						}
 					}
+					return Mono.fromRunnable(() -> {
+						rep_map.increment(target.asString());
+						rep_map.increment(s.asString());
+						
+						rep_last.put(s.asString(), System.currentTimeMillis());
+					}).then(mc.createMessage(EmbedCreateSpec.builder().description(String.format("This user now has :scroll:%s reputation!", rep_map.getInt(target.asString())+1)).color(Color.YELLOW).author(targetUser.getUsername(), null, targetUser.getAvatarUrl()).build()));
 				}
-				return Mono.fromRunnable(() -> {
-					rep_map.increment(target.asString());
-					rep_map.increment(s.asString());
-					
-					rep_last.put(s.asString(), System.currentTimeMillis());
-				}).then(mc.createMessage(EmbedCreateSpec.builder().description(String.format("This user now has :scroll:%s reputation!", rep_map.getInt(target.asString())+1)).color(Color.YELLOW).author(targetUser.getUsername(), null, targetUser.getAvatarUrl()).build()));
 			}
-		});
+		));
 		
 		return command;
 	}

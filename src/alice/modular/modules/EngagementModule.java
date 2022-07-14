@@ -6,7 +6,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyFactory.Builder;
@@ -27,155 +27,153 @@ public class EngagementModule extends MessageModule {
 	
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
-		DependencyManager<MessageCreateEvent, MessageChannel> mcdf = dfb.addDependency(mce -> mce.getMessage().getChannel());
-		DependencyManager<MessageCreateEvent, PermissionSet> psdf = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
+		DependencyManager<MessageCreateEvent, MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getChannel());
+		DependencyManager<MessageCreateEvent, PermissionSet> psdm = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getHumanCondition());
 		
-		Command<MessageCreateEvent> invokedCommand = new Command<MessageCreateEvent>(df);
+		Command<MessageCreateEvent> invokedCommand = command.addSubcommand();
 		invokedCommand.withCondition(MessageModule.getInvokedCondition("%engagement"));
-		invokedCommand.withDependentCondition(MessageModule.getPermissionCondition(psdf, Permission.ADMINISTRATOR));
+		invokedCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
 		
-		Command<MessageCreateEvent> setupCommand = new Command<MessageCreateEvent>(df);
+		Command<MessageCreateEvent> setupCommand = invokedCommand.addSubcommand();
 		setupCommand.withCondition(MessageModule.getArgumentCondition(1, "setup"));
-		setupCommand.withDependentEffect(d -> {
-			MessageChannel mc = mcdf.requestFrom(d);
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-			
-			return Mono.fromRunnable(() -> {
-				if( !ssf.has("%engagement_daily_messages") ) {
-					ssf.putJSONObject("%engagement_daily_messages");
-				}
-				if( !ssf.has("%engagement_daily_firsts") ) {
-					ssf.putJSONObject("%engagement_daily_firsts");
-				}
-				if( !ssf.has("%engagement_daily_uniques") ) {
-					ssf.putJSONObject("%engagement_daily_uniques");
-				}
-				if( !ssf.has("%engagement_lasts") ) {
-					ssf.putJSONObject("%engagement_lasts");
-				}
-			}).and(mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Setup completed successfully! Now tracking engagement metrics for this server."))));
-		});
+		setupCommand.withDependentEffect(mcdm.buildEffect(
+			(mce, mc) -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get());
+				
+				return Mono.fromRunnable(() -> {
+					if( !ssf.has("%engagement_daily_messages") ) {
+						ssf.putJSONObject("%engagement_daily_messages");
+					}
+					if( !ssf.has("%engagement_daily_firsts") ) {
+						ssf.putJSONObject("%engagement_daily_firsts");
+					}
+					if( !ssf.has("%engagement_daily_uniques") ) {
+						ssf.putJSONObject("%engagement_daily_uniques");
+					}
+					if( !ssf.has("%engagement_lasts") ) {
+						ssf.putJSONObject("%engagement_lasts");
+					}
+				}).and(mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Setup completed successfully! Now tracking engagement metrics for this server."))));
+			}
+		));
 		
 		@SuppressWarnings("unchecked")
 		Command<MessageCreateEvent> usageCommand = new Command<MessageCreateEvent>(df,
 			new Command<MessageCreateEvent>(df)
 				.withCondition(MessageModule.getArgumentCondition(1, "messages"))
-				.withDependentEffect(d -> {
-					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
-					MessageChannel mc = mcdf.requestFrom(d);
-					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					return mc.createMessage(daily_messages.has(key) ? EmbedFactory.build(EmbedFactory.modSuccessFormat(daily_messages.get(key)+" messages sent!")) : EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
-				}),
+				.withDependentEffect(mcdm.buildEffect(
+					(mce, mc) -> {
+						SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get());
+						SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
+						String key = MessageModule.tokenizeMessage(mce).getString(2);
+						return mc.createMessage(daily_messages.has(key) ? EmbedFactory.build(EmbedFactory.modSuccessFormat(daily_messages.get(key)+" messages sent!")) : EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
+					}
+				)),
 			new Command<MessageCreateEvent>(df)
 				.withCondition(MessageModule.getArgumentCondition(1, "firsts"))
-				.withDependentEffect(d -> {
-					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-					SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
-					MessageChannel mc = mcdf.requestFrom(d);
-					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					return mc.createMessage(daily_firsts.has(key) ? EmbedFactory.build(EmbedFactory.modSuccessFormat(daily_firsts.get(key)+" first messages!")) : EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
-				}),
+				.withDependentEffect(mcdm.buildEffect(
+					(mce, mc) -> {
+						SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get());
+						SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
+						String key = MessageModule.tokenizeMessage(mce).getString(2);
+						return mc.createMessage(daily_firsts.has(key) ? EmbedFactory.build(EmbedFactory.modSuccessFormat(daily_firsts.get(key)+" first messages!")) : EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
+					}
+				)),
 			new Command<MessageCreateEvent>(df)
 				.withCondition(MessageModule.getArgumentCondition(1, "uniques"))
-				.withDependentEffect(d -> {
-					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-					SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
-					MessageChannel mc = mcdf.requestFrom(d);
-					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					return mc.createMessage(daily_uniques.has(key) ? EmbedFactory.build(EmbedFactory.modSuccessFormat(daily_uniques.get(key)+" unique users engaged!")) : EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
-				}),
+				.withDependentEffect(mcdm.buildEffect(
+					(mce, mc) -> {
+						SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get());
+						SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
+						String key = MessageModule.tokenizeMessage(mce).getString(2);
+						return mc.createMessage(daily_uniques.has(key) ? EmbedFactory.build(EmbedFactory.modSuccessFormat(daily_uniques.get(key)+" unique users engaged!")) : EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
+					}
+				)),
 			new Command<MessageCreateEvent>(df)
 				.withCondition(MessageModule.getArgumentCondition(1, "report"))
-				.withDependentEffect(d -> {
-					MessageChannel mc = mcdf.requestFrom(d);
-
-					String key = MessageModule.tokenizeMessage(d.getEvent()).getString(2);
-					SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-					SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
-					SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
-					SyncedJSONObject daily_uniques = ssf.getJSONObject("%engagement_daily_uniques");
-					if( daily_messages.has(key) && daily_firsts.has(key) && daily_uniques.has(key) ) {
-						int dms = daily_messages.getInt(key);
-						int dfs = daily_firsts.getInt(key);
-						int dus = daily_uniques.getInt(key);
-						
-//						List<SimpleEntry<String,String>> entries = new ArrayList<SimpleEntry<String,String>>();
-//						entries.add(new SimpleEntry<String,String>(String.format("Messages Sent: %d",dms),""));
-//						entries.add(new SimpleEntry<String,String>(String.format("Active Users: %d",dfs),""));
-//						entries.add(new SimpleEntry<String,String>(String.format("Unique Users: %d",dus),""));
-//						entries.add(new SimpleEntry<String,String>(String.format("Messages/User: %.2f",(double)dms/dus),""));
-//						return mc.createMessage(EmbedBuilders.applyListFormat(String.format("Engagement Report for %s", key), Color.GREEN, entries, false, false));
-						String report = String.format("**Messages Sent**: %d\n**Active Users**: %d\n**Unique Users**: %d\n**Messages/User**: %.2f", dms,dfs,dus,(double)dms/dus);
-						return mc.createMessage(EmbedCreateSpec.builder().description(report).color(Color.GREEN).title(String.format("Engagement Report [%s]", key)).build());
-					} else {
-						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
-					}
-				})
+				.withDependentEffect(mcdm.buildEffect(
+					(mce, mc) -> {
+						String key = MessageModule.tokenizeMessage(mce).getString(2);
+						SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+						SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
+						SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
+						SyncedJSONObject daily_uniques = ssf.getJSONObject("%engagement_daily_uniques");
+						if( daily_messages.has(key) && daily_firsts.has(key) && daily_uniques.has(key) ) {
+							int dms = daily_messages.getInt(key);
+							int dfs = daily_firsts.getInt(key);
+							int dus = daily_uniques.getInt(key);
+							
+							String report = String.format("**Messages Sent**: %d\n**Active Users**: %d\n**Unique Users**: %d\n**Messages/User**: %.2f", dms,dfs,dus,(double)dms/dus);
+							return mc.createMessage(EmbedCreateSpec.builder().description(report).color(Color.GREEN).title(String.format("Engagement Report [%s]", key)).build());
+						} else {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
+						}
+					}))
 		);
 		usageCommand.withCondition(MessageModule.getArgumentsCondition(3));
-		usageCommand.withCondition(mce -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
-			return ssf.has("%engagement_daily_messages") // KEY: YYYY-MM-DD, VALUE: # OF MESSAGES
-					&& ssf.has("%engagement_daily_firsts") // KEY: YYYY-MM-DD, VALUE: # OF FIRST SENDS
-					&& ssf.has("%engagement_daily_uniques")
-					&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
-		});
-		
-		invokedCommand.withSubcommand(setupCommand);
+		usageCommand.withCondition(
+			mce -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get());
+				return ssf.has("%engagement_daily_messages") // KEY: YYYY-MM-DD, VALUE: # OF MESSAGES
+						&& ssf.has("%engagement_daily_firsts") // KEY: YYYY-MM-DD, VALUE: # OF FIRST SENDS
+						&& ssf.has("%engagement_daily_uniques")
+						&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
+			}
+		);
 		invokedCommand.withSubcommand(usageCommand);
 		
-		Command<MessageCreateEvent> passiveCommand = new Command<MessageCreateEvent>(df);
-		passiveCommand.withCondition(mce -> {
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
-			return ssf.has("%engagement_daily_messages") // KEY: YYYY-MM-DD, VALUE: # OF MESSAGES
-					&& ssf.has("%engagement_daily_firsts") // KEY: YYYY-MM-DD, VALUE: # OF FIRST SENDS
-					&& ssf.has("%engagement_daily_uniques")
-					&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
-		});
-		passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdf, Permission.ADMINISTRATOR).andThen(b -> !b));
-		passiveCommand.withDependentSideEffect(d -> {
-			Member m = d.getEvent().getMember().get();
-			String ID = m.getId().asString();
-			LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
-			String dateString = Constants.SDF.format(Date.valueOf(ldt.toLocalDate()));
-			SyncedJSONObject ssf = SyncedSaveFile.ofGuild(d.getEvent().getGuildId().get().asLong());
-			SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
-			SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
-			SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
-			SyncedJSONObject lasts = ssf.getJSONObject("%engagement_lasts");
-			
-			if( !daily_messages.has(dateString) ) {
-				daily_messages.put(dateString, 0);
+		Command<MessageCreateEvent> passiveCommand = command.addSubcommand();
+		passiveCommand.withCondition(
+			mce -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get());
+				return ssf.has("%engagement_daily_messages") // KEY: YYYY-MM-DD, VALUE: # OF MESSAGES
+						&& ssf.has("%engagement_daily_firsts") // KEY: YYYY-MM-DD, VALUE: # OF FIRST SENDS
+						&& ssf.has("%engagement_daily_uniques")
+						&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
 			}
-			if( !daily_firsts.has(dateString) ) {
-				daily_firsts.put(dateString, 0);
-			}
-			if( !daily_uniques.has(dateString) ) {
-				daily_uniques.put(dateString, 0);
-			}
-			
-			daily_messages.put(dateString, daily_messages.getInt(dateString)+1);
-
-			if( !lasts.has(ID) ) {
-				daily_firsts.put(dateString, daily_firsts.getInt(dateString)+1);
-				daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
-			} else {
-				if( !lasts.getString(ID).equals(dateString) ) {
-					daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
+		);
+		passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR).andThen(b -> !b));
+		passiveCommand.withSideEffect(
+			mce -> {
+				Member m = mce.getMember().get();
+				String ID = m.getId().asString();
+				LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
+				String dateString = Constants.SDF.format(Date.valueOf(ldt.toLocalDate()));
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+				SyncedJSONObject daily_messages = ssf.getJSONObject("%engagement_daily_messages");
+				SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
+				SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
+				SyncedJSONObject lasts = ssf.getJSONObject("%engagement_lasts");
+				
+				if( !daily_messages.has(dateString) ) {
+					daily_messages.put(dateString, 0);
 				}
+				if( !daily_firsts.has(dateString) ) {
+					daily_firsts.put(dateString, 0);
+				}
+				if( !daily_uniques.has(dateString) ) {
+					daily_uniques.put(dateString, 0);
+				}
+				
+				daily_messages.put(dateString, daily_messages.getInt(dateString)+1);
+	
+				if( !lasts.has(ID) ) {
+					daily_firsts.put(dateString, daily_firsts.getInt(dateString)+1);
+					daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
+				} else {
+					if( !lasts.getString(ID).equals(dateString) ) {
+						daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
+					}
+				}
+				
+				lasts.put(ID, dateString);
 			}
-			
-			lasts.put(ID, dateString);
-		});
-		
-		command.withSubcommand(invokedCommand);
-		command.withSubcommand(passiveCommand);
+		);
 		
 		return command;
 	}

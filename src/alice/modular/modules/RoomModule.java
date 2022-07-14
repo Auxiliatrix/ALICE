@@ -2,7 +2,7 @@ package alice.modular.modules;
 
 import alice.framework.database.SyncedJSONArray;
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
@@ -24,31 +24,31 @@ public class RoomModule extends Module<VoiceStateUpdateEvent> {
 
 	@Override
 	public Command<VoiceStateUpdateEvent> buildCommand(Builder<VoiceStateUpdateEvent> dfb) {
-		DependencyManager<VoiceStateUpdateEvent,VoiceChannel> ccef = dfb.<VoiceChannel>addDependency(vsue -> vsue.getCurrent().getChannel());
-		DependencyManager<VoiceStateUpdateEvent,VoiceChannel> ocef = dfb.<VoiceChannel>addDependency(vsue -> vsue.getOld().get().getChannel());
-		DependencyManager<VoiceStateUpdateEvent,Member> cmef = dfb.<Member>addDependency(vsue -> vsue.getCurrent().getMember());
-		DependencyManager<VoiceStateUpdateEvent,Long> cef = dfb.<Long>addDependency(vsue -> vsue.getOld().get().getChannel().flatMap(vc -> vc.getVoiceStates().count()));
+		DependencyManager<VoiceStateUpdateEvent,VoiceChannel> ccdm = dfb.<VoiceChannel>addDependency(vsue -> vsue.getCurrent().getChannel());
+		DependencyManager<VoiceStateUpdateEvent,VoiceChannel> ocdm = dfb.<VoiceChannel>addDependency(vsue -> vsue.getOld().get().getChannel());
+		DependencyManager<VoiceStateUpdateEvent,Member> cmdm = dfb.<Member>addDependency(vsue -> vsue.getCurrent().getMember());
+		DependencyManager<VoiceStateUpdateEvent,Long> cdm = dfb.<Long>addDependency(vsue -> vsue.getOld().get().getChannel().flatMap(vc -> vc.getVoiceStates().count()));
 		
 		DependencyFactory<VoiceStateUpdateEvent> df = dfb.build();
 		
 		Command<VoiceStateUpdateEvent> command = new Command<VoiceStateUpdateEvent>(df);
-		command.withDependentCondition(ccef.with(ocef).buildCondition((vc,oc) -> vc != oc));
+		command.withDependentCondition(ccdm.with(ocdm).buildCondition((vc,oc) -> vc != oc));
 		command.withCondition(
 			vsue -> {
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(vsue.getCurrent().getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(vsue.getCurrent().getGuildId().asLong());
 				return sf.has("%room_nexus") && sf.has("%room_temps");
 			}
 		);
 		
 		Command<VoiceStateUpdateEvent> joinCommand = new Command<VoiceStateUpdateEvent>(df);
-		joinCommand.withDependentCondition(ccef.buildCondition(vc -> vc != null));
-		joinCommand.withDependentCondition(ccef.buildCondition(
+		joinCommand.withDependentCondition(ccdm.buildCondition(vc -> vc != null));
+		joinCommand.withDependentCondition(ccdm.buildCondition(
 			vc -> {
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(vc.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(vc.getGuildId().asLong());
 				return vc.getId().asString().equals(sf.getString("%room_nexus"));
 			}
 		));
-		joinCommand.withDependentEffect(ccef.with(cmef).buildEffect(
+		joinCommand.withDependentEffect(ccdm.with(cmdm).buildEffect(
 			(cc,cm) ->
 				cc.getGuild()
 					.flatMap(g -> g.createVoiceChannel(
@@ -64,7 +64,7 @@ public class RoomModule extends Module<VoiceStateUpdateEvent> {
 							.build()
 						)
 						.and(Mono.fromRunnable(() -> {
-							SyncedJSONObject sf = SyncedSaveFile.ofGuild(cc.getGuildId().asLong());
+							SyncedJSONObject sf = SaveFiles.ofGuild(cc.getGuildId().asLong());
 							SyncedJSONArray temps = sf.getJSONArray("%room_temps");
 							temps.put(vc.getId().asString());
 						}))
@@ -72,16 +72,16 @@ public class RoomModule extends Module<VoiceStateUpdateEvent> {
 		));
 		
 		Command<VoiceStateUpdateEvent> leaveCommand = new Command<VoiceStateUpdateEvent>(df);
-		leaveCommand.withDependentCondition(ocef.buildCondition(vc -> vc != null));
-		leaveCommand.withDependentCondition(
-			d -> {
-				long count = cef.requestFrom(d);
-				return count == 0 || count == 1 && d.getEvent().isMoveEvent();
+		leaveCommand.withDependentCondition(ocdm.buildCondition(vc -> vc != null));
+		leaveCommand.withDependentCondition(cdm.buildCondition(
+			(mce, cd) -> {
+				long count = cd;
+				return count == 0 || count == 1 && mce.isMoveEvent();
 			}
-		);
-		leaveCommand.withDependentCondition(ocef.buildCondition(
+		));
+		leaveCommand.withDependentCondition(ocdm.buildCondition(
 			oc -> {
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(oc.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(oc.getGuildId().asLong());
 				SyncedJSONArray temps = sf.getJSONArray("%room_temps");
 				for( int f=0; f<temps.length(); f++ ) {
 					if( temps.get(f).toString().equals(oc.getId().asString()) ) {
@@ -91,9 +91,9 @@ public class RoomModule extends Module<VoiceStateUpdateEvent> {
 				return false;
 			}
 		));
-		leaveCommand.withDependentSideEffect(ocef.buildSideEffect(
+		leaveCommand.withDependentSideEffect(ocdm.buildSideEffect(
 			oc -> {
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(oc.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(oc.getGuildId().asLong());
 				SyncedJSONArray temps = sf.getJSONArray("%room_temps");
 				int index = -1;
 				for( int f=0; f<temps.length(); f++ ) {
@@ -107,7 +107,7 @@ public class RoomModule extends Module<VoiceStateUpdateEvent> {
 				}
 			}
 		));
-		leaveCommand.withDependentEffect(ocef.buildEffect(oc -> oc.delete()));
+		leaveCommand.withDependentEffect(ocdm.buildEffect(oc -> oc.delete()));
 
 		command.withSubcommand(leaveCommand);
 		command.withSubcommand(joinCommand);

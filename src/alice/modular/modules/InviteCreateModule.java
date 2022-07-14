@@ -2,7 +2,7 @@ package alice.modular.modules;
 
 import alice.framework.database.SyncedJSONArray;
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
@@ -20,9 +20,9 @@ public class InviteCreateModule extends Module<InviteCreateEvent> {
 
 	@Override
 	public Command<InviteCreateEvent> buildCommand(DependencyFactory.Builder<InviteCreateEvent> dfb) {
-		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
+		SyncedJSONObject sfi = SaveFiles.of("lab/invite_user.csv");
 		
-		DependencyManager<InviteCreateEvent,String> cef = dfb.addWrappedDependency(ice -> ice.getCode());
+		DependencyManager<InviteCreateEvent,String> cdm = dfb.addWrappedDependency(ice -> ice.getCode());
 		
 		DependencyFactory<InviteCreateEvent> df = dfb.build();
 		Command<InviteCreateEvent> command = new Command<InviteCreateEvent>(df);
@@ -33,7 +33,7 @@ public class InviteCreateModule extends Module<InviteCreateEvent> {
 				&& sfi.has("self_invites")
 				&& (Snowflake.of("367437754034028545").equals(ice.getInviter().get().getId()) || Brain.gateway.getSelfId().equals(ice.getInviter().get().getId()))
 		);
-		command.withDependentSideEffect(cef.buildSideEffect(
+		command.withDependentSideEffect(cdm.buildSideEffect(
 			code -> {
 				SyncedJSONArray inviteList = sfi.getJSONArray("self_invites");
 				inviteList.put(code);

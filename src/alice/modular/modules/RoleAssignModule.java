@@ -4,7 +4,7 @@ import java.util.List;
 
 import alice.framework.database.SyncedJSONArray;
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
@@ -25,18 +25,18 @@ public class RoleAssignModule extends MessageModule {
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
-		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getChannel());
-		DependencyManager<MessageCreateEvent,Member> mef = dfb.addWrappedDependency(mce -> mce.getMember().get());
+		DependencyManager<MessageCreateEvent,MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getChannel());
+		DependencyManager<MessageCreateEvent,Member> mdm = dfb.addWrappedDependency(mce -> mce.getMember().get());
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getInvokedCondition("%role"));
 		
-		Command<MessageCreateEvent> sideCommand = new Command<MessageCreateEvent>(df);
+		Command<MessageCreateEvent> sideCommand = command.addSubcommand();
 		sideCommand.withSideEffect(
 			mce -> {
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(mce.getGuildId().get().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
 				if( !sf.has("%role_allowed") ) {
 					sf.putJSONArray("%role_allowed");
 				}
@@ -50,18 +50,13 @@ public class RoleAssignModule extends MessageModule {
 		DependencyManager<MessageCreateEvent,List<Role>> luref = dfb.addDependency(mce -> mce.getMember().get().getRoles().collectList());
 		DependencyFactory<MessageCreateEvent> dfs = dfb.build();
 		
-		Command<MessageCreateEvent> getCommand = new Command<MessageCreateEvent>(dfs);
+		Command<MessageCreateEvent> getCommand = command.addSubcommand(dfs);
 		getCommand.withCondition(MessageModule.getArgumentCondition(1, "add"));
 		getCommand.withCondition(MessageModule.getArgumentsCondition(3));
-		getCommand.withDependentEffect(
-			d -> {
-				MessageChannel mc = mcef.requestFrom(d);
-				Member m = mef.requestFrom(d);
-				List<Role> lr = lref.requestFrom(d);
-				MessageCreateEvent mce = d.getEvent();
+		getCommand.withDependentEffect(mcdm.with(lref).with(mdm).buildEffect(
+			(mce, mc, lr, m) -> {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
-				
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(m.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
 				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
 				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
 							
@@ -83,21 +78,16 @@ public class RoleAssignModule extends MessageModule {
 				}
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("I don't recognize that as an assignable role!")));
 			}
-		);
+		));
 		
-		Command<MessageCreateEvent> removeCommand = new Command<MessageCreateEvent>(dfs);
+		Command<MessageCreateEvent> removeCommand = command.addSubcommand(dfs);
 		removeCommand.withCondition(MessageModule.getArgumentCondition(1, "remove"));
 		removeCommand.withCondition(MessageModule.getArgumentsCondition(3));
-		removeCommand.withDependentEffect(
-			d -> {
-				MessageChannel mc = mcef.requestFrom(d);
-				Member m = mef.requestFrom(d);
-				List<Role> lr = lref.requestFrom(d);
-				List<Role> lur = luref.requestFrom(d);
-				MessageCreateEvent mce = d.getEvent();
+		removeCommand.withDependentEffect(mcdm.with(mdm).with(lref).with(luref).buildEffect(
+			(mce, mc, m, lr, lur) -> {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
 				
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(m.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
 				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
 				
@@ -124,27 +114,22 @@ public class RoleAssignModule extends MessageModule {
 				}
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("I don't recognize that as an unassignable role!")));
 			}
-		);
+		));
 		
 		DependencyManager<MessageCreateEvent,PermissionSet> psef = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
 		DependencyFactory<MessageCreateEvent> dfa = dfb.build();
 		
-		Command<MessageCreateEvent> allowCommand = new Command<MessageCreateEvent>(dfa);
+		Command<MessageCreateEvent> allowCommand = command.addSubcommand(dfa);
 		allowCommand.withCondition(MessageModule.getArgumentCondition(1, "allow"));
 		allowCommand.withCondition(MessageModule.getArgumentsCondition(4));
 		allowCommand.withDependentCondition(MessageModule.getPermissionCondition(psef, Permission.ADMINISTRATOR));
 		
-		Command<MessageCreateEvent> allowAddCommand = new Command<MessageCreateEvent>(dfa);
+		Command<MessageCreateEvent> allowAddCommand = allowCommand.addSubcommand();
 		allowAddCommand.withCondition(MessageModule.getArgumentCondition(2, "add"));
-		allowAddCommand.withDependentEffect(
-			d -> {
-				MessageChannel mc = mcef.requestFrom(d);
-				Member m = mef.requestFrom(d);
-				List<Role> lr = lref.requestFrom(d);
-	
-				MessageCreateEvent mce = d.getEvent();
+		allowAddCommand.withDependentEffect(mcdm.with(mdm).with(lref).buildEffect(
+			(mce, mc, m, lr) -> {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(m.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				
 				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
 				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
@@ -168,19 +153,14 @@ public class RoleAssignModule extends MessageModule {
 				
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role added to allowed list successfully."))).and(Mono.fromRunnable(() -> {allowed.put(ts.getString(3).toLowerCase());}));
 			}
-		);
+		));
 		
-		Command<MessageCreateEvent> allowRemoveCommand = new Command<MessageCreateEvent>(dfa);
+		Command<MessageCreateEvent> allowRemoveCommand = allowCommand.addSubcommand();
 		allowRemoveCommand.withCondition(MessageModule.getArgumentCondition(2, "remove"));
-		allowRemoveCommand.withDependentEffect(
-			d -> {
-				MessageChannel mc = mcef.requestFrom(d);
-				Member m = mef.requestFrom(d);
-				List<Role> lr = lref.requestFrom(d);
-	
-				MessageCreateEvent mce = d.getEvent();
+		allowRemoveCommand.withDependentEffect(mcdm.with(mdm).with(lref).buildEffect(
+			(mce, mc, m, lr) -> {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(m.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				
 				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
 				
@@ -204,27 +184,19 @@ public class RoleAssignModule extends MessageModule {
 					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is not on the allowed list.")));
 				}
 			}
-		);
+		));
 		
-		allowCommand.withSubcommand(allowAddCommand);
-		allowCommand.withSubcommand(allowRemoveCommand);
-		
-		Command<MessageCreateEvent> disallowCommand = new Command<MessageCreateEvent>(dfa);
+		Command<MessageCreateEvent> disallowCommand = command.addSubcommand(dfa);
 		disallowCommand.withCondition(MessageModule.getArgumentCondition(1, "disallow"));
 		disallowCommand.withCondition(MessageModule.getArgumentsCondition(4));
 		disallowCommand.withDependentCondition(MessageModule.getPermissionCondition(psef, Permission.ADMINISTRATOR));
 		
-		Command<MessageCreateEvent> disallowAddCommand = new Command<MessageCreateEvent>(dfa);
+		Command<MessageCreateEvent> disallowAddCommand = disallowCommand.addSubcommand();
 		disallowAddCommand.withCondition(MessageModule.getArgumentCondition(2, "add"));
-		disallowAddCommand.withDependentEffect(
-			d -> {
-				MessageChannel mc = mcef.requestFrom(d);
-				Member m = mef.requestFrom(d);
-				List<Role> lr = lref.requestFrom(d);
-	
-				MessageCreateEvent mce = d.getEvent();
+		disallowAddCommand.withDependentEffect(mcdm.with(mdm).with(lref).buildEffect(
+			(mce, mc, m, lr) -> {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(m.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				
 				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
 				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
@@ -248,19 +220,14 @@ public class RoleAssignModule extends MessageModule {
 				
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role added to disallowed list successfully."))).and(Mono.fromRunnable(() -> {disallowed.put(ts.getString(3).toLowerCase());}));
 			}
-		);
+		));
 		
-		Command<MessageCreateEvent> disallowRemoveCommand = new Command<MessageCreateEvent>(dfa);
+		Command<MessageCreateEvent> disallowRemoveCommand = disallowCommand.addSubcommand();
 		disallowRemoveCommand.withCondition(MessageModule.getArgumentCondition(2, "remove"));
-		disallowRemoveCommand.withDependentEffect(
-			d -> {
-				MessageChannel mc = mcef.requestFrom(d);
-				Member m = mef.requestFrom(d);
-				List<Role> lr = lref.requestFrom(d);
-	
-				MessageCreateEvent mce = d.getEvent();
+		disallowRemoveCommand.withDependentEffect(mcdm.with(mdm).with(lref).buildEffect(
+			(mce, mc, m, lr) -> {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
-				SyncedJSONObject sf = SyncedSaveFile.ofGuild(m.getGuildId().asLong());
+				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				
 				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
 				
@@ -284,16 +251,7 @@ public class RoleAssignModule extends MessageModule {
 					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is not on the disallowed list.")));
 				}
 			}
-		);
-		
-		disallowCommand.withSubcommand(disallowAddCommand);
-		disallowCommand.withSubcommand(disallowRemoveCommand);
-		
-		command.withSubcommand(sideCommand);
-		command.withSubcommand(getCommand);
-		command.withSubcommand(removeCommand);
-		command.withSubcommand(allowCommand);
-		command.withSubcommand(disallowCommand);
+		));
 		
 		return command;
 	}

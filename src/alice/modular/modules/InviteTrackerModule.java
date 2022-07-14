@@ -4,7 +4,7 @@ import java.util.List;
 
 import alice.framework.database.SyncedJSONArray;
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
@@ -19,16 +19,16 @@ public class InviteTrackerModule extends MessageModule {
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
-		SyncedJSONObject sfi = SyncedSaveFile.of("lab/invite_user.csv");
+		SyncedJSONObject sfi = SaveFiles.of("lab/invite_user.csv");
 
-		DependencyManager<MessageCreateEvent, Guild> gef = dfb.addDependency(mce -> mce.getGuild());
-		DependencyManager<MessageCreateEvent, TokenizedString> tsef = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
+		DependencyManager<MessageCreateEvent, Guild> gdm = dfb.addDependency(mce -> mce.getGuild());
+		DependencyManager<MessageCreateEvent, TokenizedString> tsdm = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
 		
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(getInvokedCondition("%invact"));
-		command.withDependentSideEffect(gef.with(tsef).buildSideEffect(
+		command.withDependentSideEffect(gdm.with(tsdm).buildSideEffect(
 			(g,ts) -> {
 				if( ts.size() > 1 ) {
 					if( !sfi.has("invite_map") ) {

@@ -19,15 +19,15 @@ public class DMModule extends MessageModule {
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand(DependencyFactory.Builder<MessageCreateEvent> dfb) {
-		DependencyManager<MessageCreateEvent,MessageChannel> mcef = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
-		DependencyManager<MessageCreateEvent,TokenizedString> tsef = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
-		DependencyManager<MessageCreateEvent,Message> mef = dfb.addWrappedDependency(mce -> mce.getMessage());
+		DependencyManager<MessageCreateEvent,MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getAuthor().get().getPrivateChannel());
+		DependencyManager<MessageCreateEvent,TokenizedString> tsdm = dfb.addWrappedDependency(mce -> tokenizeMessage(mce));
+		DependencyManager<MessageCreateEvent,Message> mdm = dfb.addWrappedDependency(mce -> mce.getMessage());
 		
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withCondition(MessageModule.getInvokedCondition("%tier"));
-		command.withDependentEffect(mcef.with(tsef).with(mef).buildEffect(
+		command.withDependentEffect(mcdm.with(tsdm).with(mdm).buildEffect(
 			(mc,ts,m) -> {
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat(lookup(ts.getString(1)))))
 						.and(m.addReaction(ReactionEmoji.unicode("\u2705")));

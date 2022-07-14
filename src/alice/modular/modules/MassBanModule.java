@@ -19,32 +19,32 @@ public class MassBanModule extends MessageModule {
 	
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
-		DependencyManager<MessageCreateEvent, MessageChannel> mcdf = dfb.addDependency(mce -> mce.getMessage().getChannel());
-		DependencyManager<MessageCreateEvent, PermissionSet> psdf = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
-		DependencyManager<MessageCreateEvent, Guild> gdf = dfb.addDependency(mce -> mce.getGuild());
+		DependencyManager<MessageCreateEvent, MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getChannel());
+		DependencyManager<MessageCreateEvent, PermissionSet> psdm = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
+		DependencyManager<MessageCreateEvent, Guild> gdm = dfb.addDependency(mce -> mce.getGuild());
 		
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getHumanCondition());
-		command.withDependentCondition(MessageModule.getPermissionCondition(psdf, Permission.ADMINISTRATOR));
+		command.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
 		command.withCondition(MessageModule.getArgumentsCondition(2));
 		command.withCondition(MessageModule.getInvokedCondition("%ban"));
-		command.withDependentEffect(d -> {
-			MessageChannel mc = mcdf.requestFrom(d);
-			Guild g = gdf.requestFrom(d);
-			Mono<?> ret = mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Initiating automatic bans.")));
-			TokenizedString ts = MessageModule.tokenizeMessage(d.getEvent());
-			TokenizedString ids = ts.getSubTokens(1);
-			for( int f=0; f<ids.size(); f++ ) {
-				try {
-					long id = Long.parseLong(ids.getToken(f).toString());
-					ret = ret.and(g.ban(Snowflake.of(id)));
-				} catch( NumberFormatException e ) {}
+		command.withDependentEffect(mcdm.with(gdm).buildEffect(
+			(mce, mc, g) -> {
+				Mono<?> ret = mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Initiating automatic bans.")));
+				TokenizedString ts = MessageModule.tokenizeMessage(mce);
+				TokenizedString ids = ts.getSubTokens(1);
+				for( int f=0; f<ids.size(); f++ ) {
+					try {
+						long id = Long.parseLong(ids.getToken(f).toString());
+						ret = ret.and(g.ban(Snowflake.of(id)));
+					} catch( NumberFormatException e ) {}
+				}
+				return ret;
 			}
-			return ret;
-		});
+		));
 		
 		return command;
 	}

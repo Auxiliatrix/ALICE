@@ -14,8 +14,8 @@ public class SayModule extends MessageModule {
 
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
-		DependencyManager<MessageCreateEvent, MessageChannel> mcdf = dfb.addDependency(mce -> mce.getMessage().getChannel());
-		DependencyManager<MessageCreateEvent, PermissionSet> psdf = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
+		DependencyManager<MessageCreateEvent, MessageChannel> mcdm = dfb.addDependency(mce -> mce.getMessage().getChannel());
+		DependencyManager<MessageCreateEvent, PermissionSet> psdm = dfb.addDependency(mce -> mce.getMember().get().getBasePermissions());
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
@@ -23,10 +23,12 @@ public class SayModule extends MessageModule {
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getInvokedCondition("%say"));
 		command.withCondition(MessageModule.getArgumentsCondition(2));
-		command.withDependentCondition(MessageModule.getPermissionCondition(psdf, Permission.ADMINISTRATOR));
-		command.withDependentEffect(d -> {
-			return d.getEvent().getMessage().delete().and(mcdf.requestFrom(d).createMessage(MessageModule.tokenizeMessage(d.getEvent()).getSubTokens(1).toString()));
-		});
+		command.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
+		command.withDependentEffect(mcdm.buildEffect(
+			(mce, mc) -> {
+				return mce.getMessage().delete().and(mc.createMessage(MessageModule.tokenizeMessage(mce).getSubTokens(1).toString()));
+			}
+		));
 		
 		return command;
 	}
