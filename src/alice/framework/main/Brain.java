@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.reflections.Reflections;
 
 import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SyncedSaveFile;
+import alice.framework.database.SaveFiles;
 import alice.framework.modules.Module;
 import alice.framework.utilities.AliceLogger;
 import discord4j.common.util.Snowflake;
@@ -100,7 +100,7 @@ public class Brain {
 		AliceLogger.info("Reloading save data...");
 		for( Guild guild : gateway.getGuilds().collectList().block() ) {
 			@SuppressWarnings("unused")
-			SyncedJSONObject guildData = SyncedSaveFile.ofGuild(guild.getId().asLong());
+			SyncedJSONObject guildData = SaveFiles.ofGuild(guild.getId().asLong());
 		}
 	}
 	
