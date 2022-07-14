@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import alice.framework.database.SyncedJSONArray;
-import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.Module;
+import alice.framework.utilities.SaveFiles;
+import alina.structures.SyncedJSONArray;
+import alina.structures.SyncedJSONObject;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.guild.MemberJoinEvent;
 import discord4j.core.object.ExtendedInvite;

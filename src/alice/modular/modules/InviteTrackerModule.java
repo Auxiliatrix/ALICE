@@ -2,15 +2,15 @@ package alice.modular.modules;
 
 import java.util.List;
 
-import alice.framework.database.SyncedJSONArray;
-import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.main.Brain;
 import alice.framework.modules.MessageModule;
-import alice.framework.structures.TokenizedString;
+import alice.framework.utilities.SaveFiles;
+import alina.structures.SyncedJSONArray;
+import alina.structures.SyncedJSONObject;
+import alina.structures.TokenizedString;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;

@@ -8,14 +8,14 @@ import reactor.core.publisher.Mono;
 import java.util.Comparator;
 import java.util.List;
 
-import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.main.Brain;
 import alice.framework.modules.Module;
-import alice.framework.utilities.FileIO;
+import alice.framework.utilities.SaveFiles;
+import alina.structures.SyncedJSONObject;
+import alina.utilities.FileIO;
 
 public class InviteDeleteModule extends Module<InviteDeleteEvent> {
 

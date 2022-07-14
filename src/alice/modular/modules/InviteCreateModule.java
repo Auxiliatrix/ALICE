@@ -1,14 +1,14 @@
 package alice.modular.modules;
 
-import alice.framework.database.SyncedJSONArray;
-import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.main.Brain;
 import alice.framework.modules.Module;
-import alice.framework.utilities.FileIO;
+import alice.framework.utilities.SaveFiles;
+import alina.structures.SyncedJSONArray;
+import alina.structures.SyncedJSONObject;
+import alina.utilities.FileIO;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.InviteCreateEvent;
 

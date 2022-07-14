@@ -1,13 +1,13 @@
 package alice.modular.modules;
 
-import alice.framework.database.SyncedJSONObject;
-import alice.framework.database.SaveFiles;
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
 import alice.framework.dependencies.DependencyFactory.Builder;
 import alice.framework.dependencies.DependencyManager;
 import alice.framework.modules.MessageModule;
 import alice.framework.utilities.EmbedFactory;
+import alice.framework.utilities.SaveFiles;
+import alina.structures.SyncedJSONObject;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.channel.MessageChannel;
