@@ -8,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import alice.framework.main.Brain;
 import alice.framework.main.Constants;
+import alina.utilities.StringUtilities;
 import discord4j.core.spec.EmbedCreateFields.Field;
 import discord4j.core.spec.EmbedCreateFields.Footer;
 import discord4j.core.spec.EmbedCreateSpec;
