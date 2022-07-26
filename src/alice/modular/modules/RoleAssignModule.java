@@ -1,6 +1,8 @@
 package alice.modular.modules;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import alice.framework.dependencies.Command;
 import alice.framework.dependencies.DependencyFactory;
@@ -43,6 +45,12 @@ public class RoleAssignModule extends MessageModule {
 				if( !sf.has("%role_disallowed") ) {
 					sf.putJSONArray("%role_disallowed");
 				}
+				if( !sf.has("%role_allow_all") ) {
+					sf.putJSONArray("%role_allow_all");
+				}
+				if( !sf.has("%role_disallow_all") ) {
+					sf.putJSONArray("%role_disallow_all");
+				}
 			}
 		);
 		
@@ -59,12 +67,25 @@ public class RoleAssignModule extends MessageModule {
 				SyncedJSONObject sf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
 				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
 				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
-							
+				
+				SyncedJSONArray allow_all = sf.getJSONArray("%role_allowed");
+				SyncedJSONArray disallow_all = sf.getJSONArray("%role_disallowed");
+				
 				for( Object da : disallowed.toList() ) {
 					if( da.toString().equalsIgnoreCase(ts.getString(2)) ) {
 						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("You're not allowed to have that role!")));
 					}
 				}
+				
+				for( Object dar : disallow_all.toList() ) {
+					String rule = dar.toString();
+					Pattern pattern = Pattern.compile(rule);
+					Matcher matcher = pattern.matcher(ts.getString(2));
+					if( matcher.matches() ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("You're not allowed to have that role!")));
+					}
+				}
+				
 				for( Object a : allowed.toList() ) {
 					if( a.toString().equalsIgnoreCase(ts.getString(2)) ) {
 						Role role = findRoleByName(lr, ts.getString(2));
@@ -76,6 +97,22 @@ public class RoleAssignModule extends MessageModule {
 						}
 					}
 				}
+				
+				for( Object ar : allow_all.toList() ) {
+					String rule = ar.toString();
+					Pattern pattern = Pattern.compile(rule);
+					Matcher matcher = pattern.matcher(ts.getString(2));
+					if( matcher.matches() ) {
+						Role role = findRoleByName(lr, ts.getString(2));
+						if( role != null ) {
+							return m.addRole(role.getId())
+									.and(mce.getMessage().addReaction(ReactionEmoji.unicode("\u2705")));
+						} else {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("It looks like that role doesn't exist!")));
+						}
+					}
+				}
+				
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("I don't recognize that as an assignable role!")));
 			}
 		));
@@ -131,27 +168,46 @@ public class RoleAssignModule extends MessageModule {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
 				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				
-				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
-				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
-				
-				Role role = findRoleByName(lr, ts.getString(3));
-				if( role == null ) {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("It looks like that role doesn't exist!")));
-				}
-				
-				for( Object a : allowed.toList() ) {
-					if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("A role by that name is already allowed.")));
+				if( ts.getToken(3).isCoded() ) {
+					SyncedJSONArray allow_all = sf.getJSONArray("%role_allow_all");
+					SyncedJSONArray disallow_all = sf.getJSONArray("%role_disallow_all");
+					
+					for( Object a : allow_all.toList() ) {
+						if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That rule is already allowed.")));
+						}
 					}
-				}
-				
-				for( Object da : disallowed.toList() ) {
-					if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is already on the disallowed list.")));
+					
+					for( Object da : disallow_all.toList() ) {
+						if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That rule is already disallowed.")));
+						}
 					}
+					
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Rule added to allowed patterns successfully."))).and(Mono.fromRunnable(() -> {allow_all.put(ts.getString(3).toLowerCase());}));
+				} else {
+					SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
+					SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
+					
+					Role role = findRoleByName(lr, ts.getString(3));
+					if( role == null ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("It looks like that role doesn't exist!")));
+					}
+					
+					for( Object a : allowed.toList() ) {
+						if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("A role by that name is already allowed.")));
+						}
+					}
+					
+					for( Object da : disallowed.toList() ) {
+						if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is already on the disallowed list.")));
+						}
+					}
+					
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role added to allowed list successfully."))).and(Mono.fromRunnable(() -> {allowed.put(ts.getString(3).toLowerCase());}));	
 				}
-				
-				return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role added to allowed list successfully."))).and(Mono.fromRunnable(() -> {allowed.put(ts.getString(3).toLowerCase());}));
 			}
 		));
 		
@@ -161,27 +217,46 @@ public class RoleAssignModule extends MessageModule {
 			(mce, mc, m, lr) -> {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
 				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
-				
-				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
-				
-				Role role = findRoleByName(lr, ts.getString(3));
-				if( role == null ) {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("Sorry, it looks like that role doesn't exist!")));
-				}
-				
-				int index = -1;
-				for( int f=0; f<allowed.length(); f++ ) {
-					if( allowed.get(f).toString().equalsIgnoreCase(ts.getString(3)) ) {
-						index = f;
-						break;
+								
+				if( ts.getToken(3).isCoded() ) {
+					SyncedJSONArray allow_all = sf.getJSONArray("%role_allow_all");
+
+					int index = -1;
+					for( int f=0; f<allow_all.length(); f++ ) {
+						if( allow_all.get(f).toString().equalsIgnoreCase(ts.getString(3)) ) {
+							index = f;
+							break;
+						}
 					}
-				}
-	
-				final int finalIndex = index;
-				if( index != -1 ) {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role removed from allowed list successfully."))).and(Mono.fromRunnable(() -> {allowed.remove(finalIndex);}));
+		
+					final int finalIndex = index;
+					if( index != -1 ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Rule removed from allowed patterns successfully."))).and(Mono.fromRunnable(() -> {allow_all.remove(finalIndex);}));
+					} else {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That rule is not on the allowed patterns.")));
+					}
 				} else {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is not on the allowed list.")));
+					SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
+
+					Role role = findRoleByName(lr, ts.getString(3));
+					if( role == null ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("Sorry, it looks like that role doesn't exist!")));
+					}
+					
+					int index = -1;
+					for( int f=0; f<allowed.length(); f++ ) {
+						if( allowed.get(f).toString().equalsIgnoreCase(ts.getString(3)) ) {
+							index = f;
+							break;
+						}
+					}
+		
+					final int finalIndex = index;
+					if( index != -1 ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role removed from allowed list successfully."))).and(Mono.fromRunnable(() -> {allowed.remove(finalIndex);}));
+					} else {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is not on the allowed list.")));
+					}
 				}
 			}
 		));
@@ -198,27 +273,46 @@ public class RoleAssignModule extends MessageModule {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
 				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				
-				SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
-				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
-				
-				Role role = findRoleByName(lr, ts.getString(3));
-				if( role == null ) {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("Sorry, it looks like that role doesn't exist!")));
-				}
-				
-				for( Object a : allowed.toList() ) {
-					if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is already on the allowed list.")));
+				if( ts.getToken(3).isCoded() ) {
+					SyncedJSONArray allow_all = sf.getJSONArray("%role_allowed");
+					SyncedJSONArray disallow_all = sf.getJSONArray("%role_disallowed");
+					
+					for( Object a : allow_all.toList() ) {
+						if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That rule is already allowed.")));
+						}
 					}
-				}
-				
-				for( Object da : disallowed.toList() ) {
-					if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
-						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("A role by that name is already disallowed.")));
+					
+					for( Object da : disallow_all.toList() ) {
+						if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That rule is already disallowed.")));
+						}
 					}
+					
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Rule added to disallowed patterns successfully."))).and(Mono.fromRunnable(() -> {disallow_all.put(ts.getString(3).toLowerCase());}));
+				} else {
+					SyncedJSONArray allowed = sf.getJSONArray("%role_allowed");
+					SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
+					
+					Role role = findRoleByName(lr, ts.getString(3));
+					if( role == null ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("Sorry, it looks like that role doesn't exist!")));
+					}
+					
+					for( Object a : allowed.toList() ) {
+						if( a.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is already on the allowed list.")));
+						}
+					}
+					
+					for( Object da : disallowed.toList() ) {
+						if( da.toString().equalsIgnoreCase(ts.getString(3)) ) {
+							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("A role by that name is already disallowed.")));
+						}
+					}
+					
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role added to disallowed list successfully."))).and(Mono.fromRunnable(() -> {disallowed.put(ts.getString(3).toLowerCase());}));
 				}
-				
-				return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role added to disallowed list successfully."))).and(Mono.fromRunnable(() -> {disallowed.put(ts.getString(3).toLowerCase());}));
 			}
 		));
 		
@@ -229,26 +323,44 @@ public class RoleAssignModule extends MessageModule {
 				TokenizedString ts = MessageModule.tokenizeMessage(mce);
 				SyncedJSONObject sf = SaveFiles.ofGuild(m.getGuildId().asLong());
 				
-				SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
-				
-				Role role = findRoleByName(lr, ts.getString(3));
-				if( role == null ) {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("Sorry, it looks like that role doesn't exist!")));
-				}
-				
-				int index = -1;
-				for( int f=0; f<disallowed.length(); f++ ) {
-					if( disallowed.get(f).toString().equalsIgnoreCase(ts.getString(3)) ) {
-						index = f;
-						break;
+				if( ts.getToken(3).isCoded() ) {
+					SyncedJSONArray disallow_all = sf.getJSONArray("%role_disallow_all");
+					int index = -1;
+					for( int f=0; f<disallow_all.length(); f++ ) {
+						if( disallow_all.get(f).toString().equalsIgnoreCase(ts.getString(3)) ) {
+							index = f;
+							break;
+						}
 					}
-				}
-	
-				final int finalIndex = index;
-				if( index != -1 ) {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role removed from disallowed list successfully."))).and(Mono.fromRunnable(() -> {disallowed.remove(finalIndex);}));
+		
+					final int finalIndex = index;
+					if( index != -1 ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Rule removed from disallowed patterns successfully."))).and(Mono.fromRunnable(() -> {disallow_all.remove(finalIndex);}));
+					} else {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That rule is not on the disallowed patterns.")));
+					}
+
 				} else {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is not on the disallowed list.")));
+					SyncedJSONArray disallowed = sf.getJSONArray("%role_disallowed");
+					Role role = findRoleByName(lr, ts.getString(3));
+					if( role == null ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("Sorry, it looks like that role doesn't exist!")));
+					}
+					
+					int index = -1;
+					for( int f=0; f<disallowed.length(); f++ ) {
+						if( disallowed.get(f).toString().equalsIgnoreCase(ts.getString(3)) ) {
+							index = f;
+							break;
+						}
+					}
+		
+					final int finalIndex = index;
+					if( index != -1 ) {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Role removed from disallowed list successfully."))).and(Mono.fromRunnable(() -> {disallowed.remove(finalIndex);}));
+					} else {
+						return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("That role is not on the disallowed list.")));
+					}
 				}
 			}
 		));
