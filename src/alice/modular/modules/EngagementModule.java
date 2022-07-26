@@ -58,6 +58,9 @@ public class EngagementModule extends MessageModule {
 					if( !ssf.has("%engagement_lasts") ) {
 						ssf.putJSONObject("%engagement_lasts");
 					}
+					if( !ssf.has("%rep_map") ) {
+						ssf.putJSONObject("%rep_map");
+					}
 				}).and(mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Setup completed successfully! Now tracking engagement metrics for this server."))));
 			}
 		));
@@ -149,7 +152,11 @@ public class EngagementModule extends MessageModule {
 				SyncedJSONObject daily_firsts = ssf.getJSONObject("%engagement_daily_firsts");
 				SyncedJSONObject daily_uniques= ssf.getJSONObject("%engagement_daily_uniques");
 				SyncedJSONObject lasts = ssf.getJSONObject("%engagement_lasts");
-				
+				if( !ssf.has("%rep_map") ) {
+					ssf.putJSONObject("%rep_map");
+				}
+				SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
+
 				if( !daily_messages.has(dateString) ) {
 					daily_messages.put(dateString, 0);
 				}
@@ -168,6 +175,10 @@ public class EngagementModule extends MessageModule {
 				} else {
 					if( !lasts.getString(ID).equals(dateString) ) {
 						daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
+						if( !rep_map.has(ID) ) {
+							rep_map.put(ID, 0);
+						}
+						rep_map.put(ID, rep_map.getInt(ID)+1);
 					}
 				}
 				
