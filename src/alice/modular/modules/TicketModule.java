@@ -29,7 +29,7 @@ import discord4j.rest.util.Permission;
 import discord4j.rest.util.PermissionSet;
 import reactor.core.publisher.Mono;
 
-public class ReputationModule extends MessageModule {
+public class TicketModule extends MessageModule {
 	
 	@Override
 	public Command<MessageCreateEvent> buildCommand(Builder<MessageCreateEvent> dfb) {
@@ -41,7 +41,7 @@ public class ReputationModule extends MessageModule {
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getHumanCondition());
-		command.withCondition(MessageModule.getInvokedCondition("%rep"));
+		command.withCondition(MessageModule.getInvokedCondition("%tkt"));
 		command.withDependentEffect(mcdm.buildEffect(
 			(mce, mc) -> {
 				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
@@ -60,7 +60,7 @@ public class ReputationModule extends MessageModule {
 				
 				return mc.createMessage(
 						EmbedCreateSpec.builder()
-							.description(String.format("This user has :scroll:%s reputation!", rep_map.get(s.asString())))
+							.description(String.format("This user has :tickets:%s tickets!", rep_map.get(s.asString())))
 							.color(Color.YELLOW)
 							.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
 							.build());
@@ -110,12 +110,10 @@ public class ReputationModule extends MessageModule {
 					PriorityQueue<SimpleEntry<String,Integer>> pq = new PriorityQueue<SimpleEntry<String,Integer>>((se1,se2) -> {return se2.getValue()-se1.getValue();});
 					int entryTotal = 0;
 					int repTotal = 0;
-					boolean first = true;
 					for( Member member : oms ) {
 						String key = member.getId().asString();
 						int score = rep_map.getInt(key);
-						pq.add(new SimpleEntry<String,Integer>(member.getUsername() + (first ? " :star:" : ""), score));
-						first = false;
+						pq.add(new SimpleEntry<String,Integer>(member.getUsername(), score));
 						entryTotal++;
 						repTotal += score;
 					}
@@ -127,11 +125,11 @@ public class ReputationModule extends MessageModule {
 							break;
 						}
 						SimpleEntry<String,Integer> polled = pq.poll();
-						entries.add(new SimpleEntry<String,String>(polled.getKey(),String.format("Reputation: :scroll:%d", polled.getValue())));
+						entries.add(new SimpleEntry<String,String>(polled.getKey() + (counter<2 ? " :star:" : ""),String.format("Tickets: :tickets:%d", polled.getValue())));
 						counter++;
 					}
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modListFormat("Reputation Leaderboard", Color.MOON_YELLOW, entries, true, true))
-							.withFooter(Footer.of(String.format("Cumulative Score: %d | Total Entries: %d", repTotal, entryTotal),null))
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modListFormat("Ticket Leaderboard", Color.MOON_YELLOW, entries, true, true))
+							.withFooter(Footer.of(String.format("Cumulative Tickets: %d | Total Entries: %d", repTotal, entryTotal),null))
 							.withAuthor(Author.of(String.format("[%s] %s", Constants.NAME, Constants.FULL_NAME), Constants.LINK, Brain.gateway.getSelf().block().getAvatarUrl())));
 				});
 				
@@ -157,7 +155,7 @@ public class ReputationModule extends MessageModule {
 					rep_map.put(s.asString(), 0);
 				}
 				if( s.equals(target) && !admin ) {
-					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("You cannot give reputation to yourself!", EmbedFactory.ERR_PERMISSION)));
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("You cannot give a ticket to yourself!", EmbedFactory.ERR_PERMISSION)));
 				} else {
 					if( rep_last.has(s.asString()) ) {
 						long last = rep_last.getLong(s.asString());
@@ -167,18 +165,18 @@ public class ReputationModule extends MessageModule {
 							if( (14400000-dif) > 60000 ) {
 								return mc.createMessage(
 										EmbedCreateSpec.builder()
-											.description(String.format("This user has :scroll:%s reputation!", rep_map.get(target.asString())))
+											.description(String.format("This user has :tickets:%s tickets!", rep_map.get(target.asString())))
 											.color(Color.YELLOW)
 											.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
-											.footer(String.format("You can rep someone again in %d minute(s)!", (14400000-dif) / 60000), null)
+											.footer(String.format("You can award someone again in %d minute(s)!", (14400000-dif) / 60000), null)
 											.build());
 							} else {
 								return mc.createMessage(
 										EmbedCreateSpec.builder()
-											.description(String.format("This user has :scroll:%s reputation!", rep_map.get(target.asString())))
+											.description(String.format("This user has :tickets:%s tickets!", rep_map.get(target.asString())))
 											.color(Color.YELLOW)
 											.author(targetUser.getUsername(), null, targetUser.getAvatarUrl())
-											.footer(String.format("You can rep someone again in %d second(s)!", (14400000-dif) / 1000), null)
+											.footer(String.format("You can award someone again in %d second(s)!", (14400000-dif) / 1000), null)
 											.build());
 							}
 						}
@@ -188,7 +186,7 @@ public class ReputationModule extends MessageModule {
 						rep_map.increment(s.asString());
 						
 						rep_last.put(s.asString(), System.currentTimeMillis());
-					}).then(mc.createMessage(EmbedCreateSpec.builder().description(String.format("This user now has :scroll:%s reputation!", rep_map.getInt(target.asString())+1)).color(Color.YELLOW).author(targetUser.getUsername(), null, targetUser.getAvatarUrl()).build()));
+					}).then(mc.createMessage(EmbedCreateSpec.builder().description(String.format("This user now has :tickets:%s tickets!", rep_map.getInt(target.asString())+1)).color(Color.YELLOW).author(targetUser.getUsername(), null, targetUser.getAvatarUrl()).build()));
 				}
 			}
 		));
