@@ -17,6 +17,7 @@ import alina.structures.SyncedJSONObject;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.channel.MessageChannel;
+import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
 import discord4j.rest.util.Permission;
@@ -141,7 +142,7 @@ public class EngagementModule extends MessageModule {
 			}
 		);
 		passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR).andThen(b -> !b));
-		passiveCommand.withSideEffect(
+		passiveCommand.withEffect(
 			mce -> {
 				Member m = mce.getMember().get();
 				String ID = m.getId().asString();
@@ -172,6 +173,8 @@ public class EngagementModule extends MessageModule {
 				if( !lasts.has(ID) ) {
 					daily_firsts.put(dateString, daily_firsts.getInt(dateString)+1);
 					daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
+					lasts.put(ID, dateString);
+					return mce.getMessage().addReaction(ReactionEmoji.unicode("\u1f39f"));
 				} else {
 					if( !lasts.getString(ID).equals(dateString) ) {
 						daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
@@ -180,9 +183,11 @@ public class EngagementModule extends MessageModule {
 						}
 						rep_map.put(ID, rep_map.getInt(ID)+1);
 					}
+					lasts.put(ID, dateString);
 				}
 				
-				lasts.put(ID, dateString);
+				
+				return Mono.fromRunnable(() -> {});
 			}
 		);
 		
