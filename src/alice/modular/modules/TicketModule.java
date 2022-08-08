@@ -15,6 +15,8 @@ import alice.framework.modules.MessageModule;
 import alice.framework.utilities.EmbedFactory;
 import alice.framework.utilities.SaveFiles;
 import alina.structures.SyncedJSONObject;
+import alina.structures.TokenizedString;
+import alina.structures.TokenizedString.Token;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Guild;
@@ -135,6 +137,33 @@ public class TicketModule extends MessageModule {
 				
 			}
 		));
+		
+		Command<MessageCreateEvent> rewardCommand = arg.addSubcommand();
+		rewardCommand.withCondition(MessageModule.getArgumentCondition(1, "reward"));
+		rewardCommand.withDependentEffect(mcdm.with(psdm).buildEffect(
+			(mce, mc, ps) -> {
+				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+				if( !ssf.has("%rep_reward") ) {
+					ssf.putJSONObject("%rep_reward");
+				}
+				SyncedJSONObject rep_reward = ssf.getJSONObject("%rep_reward");
+				TokenizedString ts = MessageModule.tokenizeMessage(mce);
+				if( ts.size() > 2 && ts.getToken(2).isInteger() ) {
+					Token token = ts.getToken(2);
+					int reward = token.asInteger();
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat(String.format("Rewards set up successfully for %d tickets!", reward))))
+							.and(Mono.fromRunnable(() -> {
+								rep_reward.put(mc.getId().asString(), reward);
+								ssf.putJSONObject("%" + String.format("rep_reward_%s", mc.getId().asString()));
+							}));
+				} else {
+					return mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Rewards set up successfully for 1 ticket!")))
+							.and(Mono.fromRunnable(() -> {
+								rep_reward.put(mc.getId().asString(), 1);
+								ssf.putJSONObject("%" + String.format("rep_reward_%s", mc.getId().asString()));
+							}));
+				}
+		}));
 		
 		Command<MessageCreateEvent> repCommand = arg.addSubcommand();
 		repCommand.withCondition(MessageModule.getMentionsCondition(1));

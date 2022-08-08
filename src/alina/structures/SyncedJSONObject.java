@@ -21,6 +21,8 @@ import alina.structures.SaveSyncProxy.WriteLock;
 
 public interface SyncedJSONObject {
 
+	// TODO: guarantee() function that just checks !has then create
+	
 //	@WriteLock
 //  public SaveFileInterface accumulate(String key, Object value) throws JSONException;
 	@WriteLock

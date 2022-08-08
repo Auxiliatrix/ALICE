@@ -141,7 +141,7 @@ public class EngagementModule extends MessageModule {
 						&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
 			}
 		);
-		passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR).andThen(b -> !b));
+		//passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR).andThen(b -> !b));
 		passiveCommand.withEffect(
 			mce -> {
 				Member m = mce.getMember().get();
@@ -156,7 +156,27 @@ public class EngagementModule extends MessageModule {
 				if( !ssf.has("%rep_map") ) {
 					ssf.putJSONObject("%rep_map");
 				}
+				if( !ssf.has("%rep_reward") ) {
+					ssf.putJSONObject("%rep_reward");
+				}
 				SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
+				SyncedJSONObject rep_reward = ssf.getJSONObject("%rep_reward");
+				String cID = mce.getMessage().getChannelId().asString();
+				
+				boolean awarded = false;
+				
+				if( rep_reward.has(cID) ) {
+					int reward = rep_reward.getInt(cID);
+					SyncedJSONObject rep_reward_channel = ssf.getJSONObject("%" + String.format("rep_reward_%s", cID));
+					if( !rep_reward_channel.has(ID) ) {
+						rep_reward_channel.put(ID, true);
+						if( !rep_map.has(ID) ) {
+							rep_map.put(ID, 0);
+						}
+						rep_map.put(ID, rep_map.getInt(ID)+reward);
+						awarded = true;
+					}
+				}
 
 				if( !daily_messages.has(dateString) ) {
 					daily_messages.put(dateString, 0);
@@ -174,7 +194,7 @@ public class EngagementModule extends MessageModule {
 					daily_firsts.put(dateString, daily_firsts.getInt(dateString)+1);
 					daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
 					lasts.put(ID, dateString);
-					return mce.getMessage().addReaction(ReactionEmoji.unicode("\u1f39f"));
+					awarded = true;
 				} else {
 					if( !lasts.getString(ID).equals(dateString) ) {
 						daily_uniques.put(dateString, daily_uniques.getInt(dateString)+1);
@@ -184,6 +204,10 @@ public class EngagementModule extends MessageModule {
 						rep_map.put(ID, rep_map.getInt(ID)+1);
 					}
 					lasts.put(ID, dateString);
+				}
+				
+				if( awarded ) {
+					return mce.getMessage().addReaction(ReactionEmoji.unicode("\u1f39f"));
 				}
 				
 				
