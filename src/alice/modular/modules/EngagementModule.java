@@ -141,7 +141,7 @@ public class EngagementModule extends MessageModule {
 						&& ssf.has("%engagement_lasts"); // KEY: YYYY-MM-DD, VALUE: # OF UNIQUES
 			}
 		);
-		//passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR).andThen(b -> !b));
+		passiveCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR).andThen(b -> !b));
 		passiveCommand.withEffect(
 			mce -> {
 				Member m = mce.getMember().get();
