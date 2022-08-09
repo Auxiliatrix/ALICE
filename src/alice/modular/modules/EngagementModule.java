@@ -112,7 +112,7 @@ public class EngagementModule extends MessageModule {
 							int dfs = daily_firsts.getInt(key);
 							int dus = daily_uniques.getInt(key);
 							
-							String report = String.format("**Messages Sent**: %d\n**Active Users**: %d\n**Unique Users**: %d\n**Messages/User**: %.2f", dms,dfs,dus,(double)dms/dus);
+							String report = String.format("**Messages Sent**: %d\n**Joined Users**: %d\n**Active Users**: %d\n**Messages/User**: %.2f", dms,dfs,dus,(double)dms/dus);
 							return mc.createMessage(EmbedCreateSpec.builder().description(report).color(Color.GREEN).title(String.format("Engagement Report [%s]", key)).build());
 						} else {
 							return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("No data collected for the given date!\n*Date Format: YYYY-MM-DD*")));
