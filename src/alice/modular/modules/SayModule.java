@@ -21,7 +21,7 @@ public class SayModule extends MessageModule {
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withCondition(MessageModule.getGuildCondition());
-		command.withCondition(MessageModule.getInvokedCondition("%say"));
+		command.withCondition(MessageModule.getInvokedCondition("say"));
 		command.withCondition(MessageModule.getArgumentsCondition(2));
 		command.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
 		command.withDependentEffect(mcdm.buildEffect(

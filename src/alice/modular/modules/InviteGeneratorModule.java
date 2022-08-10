@@ -23,7 +23,7 @@ public class InviteGeneratorModule extends MessageModule {
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		command.withCondition(getInvokedCondition("%gen"));
+		command.withCondition(getInvokedCondition("gen"));
 		command.withDependentEffect(iddm.with(mcdm).buildEffect(
 			(id,mc) -> mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("discord.gg/" + id.code())))
 		));

@@ -43,7 +43,7 @@ public class TicketModule extends MessageModule {
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getHumanCondition());
-		command.withCondition(MessageModule.getInvokedCondition("%tkt"));
+		command.withCondition(MessageModule.getInvokedCondition("tkt"));
 		command.withDependentEffect(mcdm.buildEffect(
 			(mce, mc) -> {
 				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());

@@ -37,7 +37,7 @@ public class EngagementModule extends MessageModule {
 		command.withCondition(MessageModule.getHumanCondition());
 		
 		Command<MessageCreateEvent> invokedCommand = command.addSubcommand();
-		invokedCommand.withCondition(MessageModule.getInvokedCondition("%engagement"));
+		invokedCommand.withCondition(MessageModule.getInvokedCondition("engagement"));
 		invokedCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
 		
 		Command<MessageCreateEvent> setupCommand = invokedCommand.addSubcommand();

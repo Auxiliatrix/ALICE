@@ -27,7 +27,7 @@ public class BlackboxModule extends MessageModule {
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
-		command.withCondition(MessageModule.getInvokedCondition("%blackbox"));
+		command.withCondition(MessageModule.getInvokedCondition("blackbox"));
 		command.withDependentEffect(mcdm.buildEffect(
 			(mce, mc) -> {
 				SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get());

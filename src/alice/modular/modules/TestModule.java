@@ -14,7 +14,7 @@ public class TestModule extends MessageModule {
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		command.withCondition(MessageModule.getInvokedCondition("%test"));
+		command.withCondition(MessageModule.getInvokedCondition("test"));
 		
 		Command<MessageCreateEvent> execOrder = command.addSubcommand();
 		command.withCondition(MessageModule.getArgumentCondition(1, "exor"));

@@ -33,7 +33,7 @@ public class InviteAssocModule extends MessageModule {
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
-		command.withCondition(MessageModule.getInvokedCondition("%assoc"));
+		command.withCondition(MessageModule.getInvokedCondition("assoc"));
 		
 		Command<MessageCreateEvent> args = command.addSubcommand();
 		command.withCondition(MessageModule.getArgumentsCondition(2));

@@ -30,7 +30,7 @@ public class MassBanModule extends MessageModule {
 		command.withCondition(MessageModule.getHumanCondition());
 		command.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
 		command.withCondition(MessageModule.getArgumentsCondition(2));
-		command.withCondition(MessageModule.getInvokedCondition("%ban"));
+		command.withCondition(MessageModule.getInvokedCondition("ban"));
 		command.withDependentEffect(mcdm.with(gdm).buildEffect(
 			(mce, mc, g) -> {
 				Mono<?> ret = mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat("Initiating automatic bans.")));

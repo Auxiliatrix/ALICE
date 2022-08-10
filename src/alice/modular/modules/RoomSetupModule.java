@@ -25,7 +25,7 @@ public class RoomSetupModule extends MessageModule {
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		command.withCondition(MessageModule.getInvokedCondition("%room"));
+		command.withCondition(MessageModule.getInvokedCondition("room"));
 		command.withCondition(MessageModule.getGuildCondition());
 		command.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
 		

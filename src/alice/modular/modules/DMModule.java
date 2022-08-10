@@ -26,7 +26,7 @@ public class DMModule extends MessageModule {
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getHumanCondition());
-		command.withCondition(MessageModule.getInvokedCondition("%tier"));
+		command.withCondition(MessageModule.getInvokedCondition("tier"));
 		command.withDependentEffect(mcdm.with(tsdm).with(mdm).buildEffect(
 			(mc,ts,m) -> {
 				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat(lookup(ts.getString(1)))))

@@ -33,7 +33,7 @@ public class RoleAssignModule extends MessageModule {
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
 		command.withCondition(MessageModule.getGuildCondition());
-		command.withCondition(MessageModule.getInvokedCondition("%role"));
+		command.withCondition(MessageModule.getInvokedCondition("role"));
 		
 		Command<MessageCreateEvent> sideCommand = command.addSubcommand();
 		sideCommand.withSideEffect(

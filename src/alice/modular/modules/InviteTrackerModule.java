@@ -27,7 +27,7 @@ public class InviteTrackerModule extends MessageModule {
 		DependencyFactory<MessageCreateEvent> df = dfb.build();
 		
 		Command<MessageCreateEvent> command = new Command<MessageCreateEvent>(df);
-		command.withCondition(getInvokedCondition("%invact"));
+		command.withCondition(getInvokedCondition("invact"));
 		command.withDependentSideEffect(gdm.with(tsdm).buildSideEffect(
 			(g,ts) -> {
 				if( ts.size() > 1 ) {
