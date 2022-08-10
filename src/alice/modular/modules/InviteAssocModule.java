@@ -53,9 +53,7 @@ public class InviteAssocModule extends MessageModule {
 				}
 			}
 		);
-		
-		// TODO: figure out some way to include Event by default
-		
+				
 		Command<MessageCreateEvent> add = args.addSubcommand();
 		add.withCondition(MessageModule.getArgumentCondition(1, "add"));
 		add.withCondition(MessageModule.getArgumentsCondition(3));
