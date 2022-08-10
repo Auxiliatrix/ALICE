@@ -18,9 +18,7 @@ public class DependencyFactory<E extends Event> {
 		protected Builder() {
 			retrievers = new ArrayList<Function<E2, Mono<?>>>();
 		}
-		
-		// TODO: Add multiple dependencies to create multieffect factories
-		
+				
 		public <T> DependencyManager<E2,T> addDependency(Function<E2, Mono<?>> dependency) {
 			retrievers.add(dependency);
 			return new DependencyManager<E2,T>(dependency);
