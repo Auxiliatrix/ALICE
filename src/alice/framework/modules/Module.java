@@ -21,14 +21,14 @@ public abstract class Module<E extends Event> {
 	
 	protected void load(Class<E> type) {
 		Brain.gateway.on(type).subscribe(e -> handle(e)
-				.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)).doBeforeRetry(rs -> {
-					AliceLogger.error(String.format("Error propagated. Retrying %d of %d...",rs.totalRetriesInARow()+1,5));
-				}))
-				.doOnError(f -> {
-					AliceLogger.error("Fatal error propagated during task execution:");
-					f.printStackTrace();
-					Brain.gateway.logout().block();
-				})
+//				.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)).doBeforeRetry(rs -> {
+//					AliceLogger.error(String.format("Error propagated. Retrying %d of %d...",rs.totalRetriesInARow()+1,5));
+//				}))
+//				.doOnError(f -> {
+//					AliceLogger.error("Fatal error propagated during task execution:");
+//					f.printStackTrace();
+//					Brain.gateway.logout().block();
+//				})
 				.block()
 			);
 	}
@@ -37,6 +37,6 @@ public abstract class Module<E extends Event> {
 		return command.apply(event);
 	}
 	
-	public abstract Command<E> buildCommand(DependencyFactory.Builder<E> dfb);	
+	public abstract Command<E> buildCommand(DependencyFactory.Builder<E> dfb);
 	
 }
