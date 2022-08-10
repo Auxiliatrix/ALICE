@@ -33,6 +33,11 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	protected List<List<?>> checkOrder;
 	protected List<List<?>> executeOrder;
 	
+	protected String usage;
+	protected String description;
+	
+	protected boolean transparent;
+	protected boolean passive;
 	
 	public Command(DependencyFactory<E> dependencies, @SuppressWarnings("unchecked") Command<E>...subcommands) {
 		this(dependencies);
@@ -56,9 +61,74 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		executeOrder = new ArrayList<List<?>>();
 		
 		subcommands = new ArrayList<Command<E>>();
+		
+		usage = "";
+		description = "";
+		transparent = false;
+		passive = false;
 	}
 	
 	// TODO: conditions with things to execute on a failure
+	
+	public Command<E> withDocumentation(String usage, String description) {
+		this.usage = usage;
+		this.description = description;
+		return this;
+	}
+	
+	public Command<E> withTransparent(boolean transparent) {
+		this.transparent = transparent;
+		return this;
+	}
+	
+	public String getUsage() {
+		return usage.length() > 0 ? usage : "<passive activation>";
+	}
+	
+	public String getDescription() {
+		return description.length() > 0 ? description : "<no description provided>";
+	}
+	
+	public List<Command<E>> getDocumentedSubcommands() {
+		List<Command<E>> cumulativeSubcommands = new ArrayList<Command<E>>();
+		for( Command<E> subcommand : subcommands ) {
+			if( subcommand.transparent ) {
+				for( Command<E> subsubcommand : subcommand.getDocumentedSubcommands() ) {
+					cumulativeSubcommands.add(subsubcommand);
+				}
+			} else if( subcommand.isDocumented() ) {
+				cumulativeSubcommands.add(subcommand);
+			}
+		}
+		return subcommands;
+	}
+	
+	public Command<E> getSubcommand(String usage) {
+		for( Command<E> subcommand : getDocumentedSubcommands() ) {
+			if( subcommand.getUsage().equals(usage) ) {
+				return subcommand;
+			} else {
+				Command<E> subsubcommand = subcommand.getSubcommand(usage);
+				if( subsubcommand != null ) {
+					return subsubcommand;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public Command<E> withPassive(boolean passive) {
+		this.passive = passive;
+		return this;
+	}
+	
+	public boolean isPassive() {
+		return passive;
+	}
+	
+	public boolean isDocumented() {
+		return !usage.isEmpty() || !description.isEmpty();
+	}
 	
 	public Command<E> addSubcommand() {
 		Command<E> subcommand = new Command<E>(dependencies);

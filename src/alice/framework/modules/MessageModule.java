@@ -16,6 +16,8 @@ import discord4j.rest.util.PermissionSet;
 
 public abstract class MessageModule extends Module<MessageCreateEvent> {
 
+	public static final String PREFIX = "%";
+	
 	public MessageModule() {
 		super(MessageCreateEvent.class);
 	}
@@ -25,7 +27,11 @@ public abstract class MessageModule extends Module<MessageCreateEvent> {
 	}
 	
 	public static Function<MessageCreateEvent, Boolean> getInvokedCondition(String invocation) {
-		return getArgumentCondition(0, invocation);
+		return getArgumentCondition(0, PREFIX+invocation);
+	}
+	
+	public static Function<MessageCreateEvent, Boolean> getInvokedCondition(String invocation, String prefix) {
+		return getArgumentCondition(0, prefix+invocation);
 	}
 	
 	public static Function<MessageCreateEvent, Boolean> getArgumentCondition(int position, String argument) {
