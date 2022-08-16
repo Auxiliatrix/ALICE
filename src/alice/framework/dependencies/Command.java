@@ -1,5 +1,6 @@
 package alice.framework.dependencies;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -7,9 +8,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import alice.framework.main.Brain;
 import alice.framework.utilities.AliceLogger;
 import discord4j.core.event.domain.Event;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 public class Command<E extends Event> implements Function<E, Mono<?>> {
 	
@@ -30,6 +33,11 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 	protected List<List<?>> checkOrder;
 	protected List<List<?>> executeOrder;
 	
+	protected String usage;
+	protected String description;
+	
+	protected boolean transparent;
+	protected boolean passive;
 	
 	public Command(DependencyFactory<E> dependencies, @SuppressWarnings("unchecked") Command<E>...subcommands) {
 		this(dependencies);
@@ -53,9 +61,74 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		executeOrder = new ArrayList<List<?>>();
 		
 		subcommands = new ArrayList<Command<E>>();
+		
+		usage = "";
+		description = "";
+		transparent = false;
+		passive = false;
 	}
 	
 	// TODO: conditions with things to execute on a failure
+	
+	public Command<E> withDocumentation(String usage, String description) {
+		this.usage = usage;
+		this.description = description;
+		return this;
+	}
+	
+	public Command<E> withTransparent(boolean transparent) {
+		this.transparent = transparent;
+		return this;
+	}
+	
+	public String getUsage() {
+		return usage.length() > 0 ? usage : "<passive activation>";
+	}
+	
+	public String getDescription() {
+		return description.length() > 0 ? description : "<no description provided>";
+	}
+	
+	public List<Command<E>> getDocumentedSubcommands() {
+		List<Command<E>> cumulativeSubcommands = new ArrayList<Command<E>>();
+		for( Command<E> subcommand : subcommands ) {
+			if( subcommand.transparent ) {
+				for( Command<E> subsubcommand : subcommand.getDocumentedSubcommands() ) {
+					cumulativeSubcommands.add(subsubcommand);
+				}
+			} else if( subcommand.isDocumented() ) {
+				cumulativeSubcommands.add(subcommand);
+			}
+		}
+		return subcommands;
+	}
+	
+	public Command<E> getSubcommand(String usage) {
+		for( Command<E> subcommand : getDocumentedSubcommands() ) {
+			if( subcommand.getUsage().equals(usage) ) {
+				return subcommand;
+			} else {
+				Command<E> subsubcommand = subcommand.getSubcommand(usage);
+				if( subsubcommand != null ) {
+					return subsubcommand;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public Command<E> withPassive(boolean passive) {
+		this.passive = passive;
+		return this;
+	}
+	
+	public boolean isPassive() {
+		return passive;
+	}
+	
+	public boolean isDocumented() {
+		return !usage.isEmpty() || !description.isEmpty();
+	}
 	
 	public Command<E> addSubcommand() {
 		Command<E> subcommand = new Command<E>(dependencies);
@@ -249,7 +322,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 				try {
 					int dependentEffectIndex = dependentEffectsCounter++;
 					Mono<?> wrapped = Mono.just(0).flatMap((c) -> dependentEffects.get(dependentEffectIndex).apply(dependency.block()));
-					result = result.then(wrapped);
+					result = result.then(applyErrorHandler(wrapped));
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building dependent effect:"); e.printStackTrace();});
 					break;
@@ -259,7 +332,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 				try {
 					int independentEffectIndex = independentEffectsCounter++;
 					Mono<?> wrapped = Mono.just(0).flatMap((c) -> independentEffects.get(independentEffectIndex).apply(t));
-					result = result.then(wrapped);
+					result = result.then(applyErrorHandler(wrapped));
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building independent effect:"); e.printStackTrace();});
 					break;
@@ -268,7 +341,7 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 			if( effectList.equals(dependentSideEffects) ) {
 				try {
 					Consumer<DependencyMap<E>> dependentSideEffect = dependentSideEffects.get(dependentSideEffectsCounter++);
-					result = result.then(Mono.fromRunnable(() -> {dependentSideEffect.accept(dependency.block());}));
+					result = result.then(applyErrorHandler(Mono.fromRunnable(() -> {dependentSideEffect.accept(dependency.block());})));
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building dependent side-effect:"); e.printStackTrace();});
 					break;
@@ -277,14 +350,14 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 			if( effectList.equals(independentSideEffects) ) {
 				try {
 					Consumer<E> independentSideEffect = independentSideEffects.get(independentSideEffectsCounter++);
-					result = result.then(Mono.fromRunnable(() -> {independentSideEffect.accept(t);}));
+					result = result.then(applyErrorHandler(Mono.fromRunnable(() -> {independentSideEffect.accept(t);})));
 				} catch (Exception e) {
 					result = Mono.fromRunnable(() -> {AliceLogger.error("Error occured while building independent side-effect:"); e.printStackTrace();});
 					break;
 				}
 			}
 			if( effectList.equals(suppliers) ) {
-				result = result.then(suppliers.get(suppliersCounter++).get());
+				result = result.then(applyErrorHandler(suppliers.get(suppliersCounter++).get()));
 			}
 		}
 		
@@ -309,6 +382,18 @@ public class Command<E extends Event> implements Function<E, Mono<?>> {
 		}
 		
 		return result;
+	}
+	
+	public Mono<?> applyErrorHandler(Mono<?> mono) {
+		return mono.retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(5)).doBeforeRetry(rs -> {
+			AliceLogger.error(String.format("Error propagated. Retrying %d of %d...",rs.totalRetriesInARow()+1,5));
+		}))
+		.doOnError(f -> {
+			AliceLogger.error("Fatal error propagated during task execution:");
+			f.printStackTrace();
+			Brain.gateway.logout().block();
+		})
+		.onErrorStop();
 	}
 	
 }
