@@ -39,6 +39,8 @@ public abstract class Module<E extends Event> {
 	
 	public abstract Command<E> buildCommand(DependencyFactory.Builder<E> dfb);
 	
+	// TODO: migrate this to Brain so that we can figure out how to look for which module to check for help
+	
 	public EmbedCreateSpec helpEmbed(Command<E> command) {
 		if( command == null ) {
 			return EmbedFactory.build(EmbedFactory.modErrorFormat("Command not found!"));
