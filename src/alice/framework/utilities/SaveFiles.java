@@ -2,6 +2,8 @@ package alice.framework.utilities;
 
 import java.io.File;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 
@@ -38,5 +40,35 @@ public interface SaveFiles extends SyncedJSONObject {
 	
 	public static SyncedJSONObject ofGuild(Snowflake guildID) {
 		return ofGuild(guildID.asLong());
+	}
+	
+	public static SyncedJSONObject navigate(SyncedJSONObject root, List<String> path, List<String> index) {
+		return navigate(root, root, path, index);
+	}
+	
+	public static SyncedJSONObject navigate(SyncedJSONObject root, SyncedJSONObject current, List<String> path, List<String> index) {
+		String next = path.remove(0);
+		switch( next ) {
+			case "~":
+				index.clear();
+				index.add("~");
+				return navigate(root, root, path, index);
+			case ".":
+				if( index.size() == 1 ) {
+					return null;
+				} else {
+					index.remove(index.size()-1);
+					return navigate(root, navigate(root, index, new ArrayList<String>()), path, index);
+				}
+			case "..":
+				return navigate(root, current, path, index);
+			default:
+				if( current.has(next) ) {
+					index.add(next);
+					return navigate(root, current.getJSONObject(next), path, index);
+				} else {
+					return null;
+				}
+		}
 	}
 }
