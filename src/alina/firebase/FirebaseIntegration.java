@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public class FirebaseIntegration {
@@ -47,6 +48,32 @@ public class FirebaseIntegration {
 				public void onDataChange(DataSnapshot dataSnapshot) {
 					T value = (T) dataSnapshot.getValue(new GenericTypeIndicator<T>() {});
 					ms.success(value);
+				}
+
+				@Override
+				public void onCancelled(DatabaseError error) {}
+			});
+		});
+	}
+	
+	public <T> Flux<T> subscribeData(String databasePath) {
+		if( !currentURL.equals(dbURL) ) {
+			try {
+				initialize();
+			} catch (IOException e) {
+				return null;
+			}
+		}
+		currentURL = dbURL;
+		
+		return Flux.create(fs -> {
+			DatabaseReference ref = FirebaseDatabase.getInstance().getReference(databasePath);
+			
+			ref.addValueEventListener(new ValueEventListener() {
+				@Override
+				public void onDataChange(DataSnapshot dataSnapshot) {
+					T value = (T) dataSnapshot.getValue(new GenericTypeIndicator<T>() {});
+					fs.next(value);
 				}
 
 				@Override
