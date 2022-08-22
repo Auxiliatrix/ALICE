@@ -42,7 +42,11 @@ public class FirebaseModule extends MessageModule {
 			
 			String query = String.join("/", ts.getStrings());
 			
-			return firebase.<String>getData(query, String.class).flatMap(s -> mc.createMessage(s));			
+			try {
+				return firebase.<String>getData(query, String.class).flatMap(s -> mc.createMessage(s));
+			} catch (InterruptedException e) {
+				return mc.createMessage(EmbedFactory.build(EmbedFactory.modErrorFormat("Interrupted during request!")));
+			}			
 		}));
 		
 		return command;
