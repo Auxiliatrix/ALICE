@@ -36,6 +36,7 @@ public class Constants {
 			"alice.framework.features",
 	};
 	
-	
+	public static String FIREBASE_URL = "https://emerge-3fc95-default-rtdb.firebaseio.com";
+	public static String CREDENTIAL_PATH = "../emerge-3fc95-firebase-adminsdk-ikm88-b2397c34dc.json";
 	public static long REPUTATION_INTERVAL = 4 * 60 * 60 * 1000;
 }
