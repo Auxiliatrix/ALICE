@@ -80,13 +80,15 @@ public class RegisterModule extends MessageModule {
 									try {
 										LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
 										String dateString = Constants.SDF.format(Date.valueOf(ldt.toLocalDate()));
-										if( !last_map.has(key) || !last_map.getString(key).equals(dateString) ) {	// if not seen yet or last seen a day ago
+										if( !last_map.has(key) ) {
+											last_map.put(key, "NEW");
+										} else if( !last_map.getString(key).equals(dateString) ) {	// if not seen yet or last seen a day ago
 											if( !rep_map.has(key) ) {
 												rep_map.put(key, 0);
 											}
 											rep_map.put(key, rep_map.getInt(key) + reward);
+											last_map.put(key, dateString);
 										}
-										last_map.put(key, dateString);
 									} catch(Exception e) {
 										e.printStackTrace();
 									}
@@ -136,7 +138,6 @@ public class RegisterModule extends MessageModule {
 									continue;
 								}
 								if( entry.getValue().equalsIgnoreCase(ts.getString(1)) ) {	// if the emails match
-									System.out.println("Matched");
 									return Mono.fromRunnable(() -> {
 										try {
 											String path = String.join("/", "users", entry.getKey(), "lastSeenTimestampHeadset");
@@ -148,13 +149,15 @@ public class RegisterModule extends MessageModule {
 												try {
 													LocalDateTime ldt = LocalDateTime.now(ZoneId.ofOffset("GMT", ZoneOffset.ofHours(-7)));
 													String dateString = Constants.SDF.format(Date.valueOf(ldt.toLocalDate()));
-													if( !last_map.has(userID) || !last_map.getString(userID).equals(dateString) ) {	// if not seen yet or last seen a day ago
+													if( !last_map.has(userID) ) {
+														last_map.put(userID, "NEW");
+													} else if( !last_map.getString(userID).equals(dateString) ) {	// if not seen yet or last seen a day ago
 														if( !rep_map.has(userID) ) {
 															rep_map.put(userID, 0);
 														}
 														rep_map.put(userID, rep_map.getInt(userID) + reward);
+														last_map.put(userID, dateString);
 													}
-													last_map.put(userID, dateString);
 												} catch(Exception e) {
 													e.printStackTrace();
 												}
