@@ -68,7 +68,6 @@ public class RegisterModule extends MessageModule {
 					SyncedJSONObject last_map = ssf.getJSONObject("%register_last");
 					SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
 					Map<String, ValueEventListener> listeners = listenerMap.get(mce.getGuildId().get().asString());
-					int reward = ssf.getInt("%register_reward");
 					
 					FirebaseIntegration firebase;
 					try {
@@ -86,7 +85,7 @@ public class RegisterModule extends MessageModule {
 											if( !rep_map.has(key) ) {
 												rep_map.put(key, 0);
 											}
-											rep_map.put(key, rep_map.getInt(key) + reward);
+											rep_map.put(key, rep_map.getInt(key) + ssf.getInt("%register_reward"));
 											last_map.put(key, dateString);
 										}
 									} catch(Exception e) {
