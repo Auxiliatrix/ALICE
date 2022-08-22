@@ -134,29 +134,7 @@ public class FirebaseIntegration {
 		});
 	}
 	
-	public <T> void addChangeListener(String databasePath, Class<T> type, Consumer<T> consumer) throws InterruptedException {
-		lock.acquire();
-		try {
-			initialize();
-		} catch(IOException e) {
-			lock.release();
-		}
-		// TODO: how to remove these to avoid exploitation
-		DatabaseReference ref = FirebaseDatabase.getInstance().getReference(databasePath);
-		ref.addValueEventListener(new ValueEventListener() {
-			@Override
-			public void onDataChange(DataSnapshot dataSnapshot) {
-				T value = dataSnapshot.getValue(type);
-				consumer.accept(value);
-			}
-
-			@Override
-			public void onCancelled(DatabaseError error) {}
-		});
-		lock.release();
-	}
-	
-	public <T> void addChangeListener(String databasePath, GenericTypeIndicator<T> type, Consumer<T> consumer) throws InterruptedException {
+	public void removeListener(String databasePath, ValueEventListener listener) throws InterruptedException {
 		lock.acquire();
 		try {
 			initialize();
@@ -165,7 +143,20 @@ public class FirebaseIntegration {
 		}
 		
 		DatabaseReference ref = FirebaseDatabase.getInstance().getReference(databasePath);
-		ref.addValueEventListener(new ValueEventListener() {
+		ref.removeEventListener(listener);
+		
+		lock.release();
+	}
+	
+	public <T> ValueEventListener addChangeListener(String databasePath, Class<T> type, Consumer<T> consumer) throws InterruptedException {
+		lock.acquire();
+		try {
+			initialize();
+		} catch(IOException e) {
+			lock.release();
+		}
+		DatabaseReference ref = FirebaseDatabase.getInstance().getReference(databasePath);
+		ValueEventListener listener = new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				T value = dataSnapshot.getValue(type);
@@ -174,8 +165,33 @@ public class FirebaseIntegration {
 
 			@Override
 			public void onCancelled(DatabaseError error) {}
-		});
+		};
+		ref.addValueEventListener(listener);
 		lock.release();
+		return listener;
+	}
+	
+	public <T> ValueEventListener addChangeListener(String databasePath, GenericTypeIndicator<T> type, Consumer<T> consumer) throws InterruptedException {
+		lock.acquire();
+		try {
+			initialize();
+		} catch(IOException e) {
+			lock.release();
+		}
+		DatabaseReference ref = FirebaseDatabase.getInstance().getReference(databasePath);
+		ValueEventListener listener = new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				T value = dataSnapshot.getValue(type);
+				consumer.accept(value);
+			}
+
+			@Override
+			public void onCancelled(DatabaseError error) {}
+		};
+		ref.addValueEventListener(listener);
+		lock.release();
+		return listener;
 	}
 	
 	protected boolean initialize() throws IOException {
