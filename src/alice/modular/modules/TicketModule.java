@@ -220,6 +220,25 @@ public class TicketModule extends MessageModule {
 			}
 		));
 		
+		Command<MessageCreateEvent> raffleCommand = arg.addSubcommand();
+		raffleCommand.withCondition(MessageModule.getArgumentCondition(1, "raffle"));
+		raffleCommand.withDependentCondition(MessageModule.getPermissionCondition(psdm, Permission.ADMINISTRATOR));
+		raffleCommand.withDependentEffect(mcdm.with(gdm).buildEffect((mce, mc, g) -> {
+			SyncedJSONObject ssf = SaveFiles.ofGuild(mce.getGuildId().get().asLong());
+			SyncedJSONObject rep_map = ssf.getJSONObject("%rep_map");
+			List<String> tickets = new ArrayList<String>();
+			for( String key : rep_map.keySet() ) {
+				for( int f=0; f<rep_map.getInt(key); f++ ) {
+					tickets.add(key);
+				}
+			}
+			int rand = (int) (Math.random()*tickets.size()) + 1;
+			String result = "";
+			for( int f=0; f<rand; f++ ) {
+				result = tickets.remove(0);
+			}
+			return g.getMemberById(Snowflake.of(result)).flatMap(m -> mc.createMessage(EmbedFactory.build(EmbedFactory.modSuccessFormat(String.format("The winner is %s#%s!", m.getUsername(), m.getDiscriminator())))));
+		}));
 		return command;
 	}
 	
