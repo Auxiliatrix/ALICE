@@ -34,6 +34,10 @@ public interface SaveFiles extends SyncedJSONObject {
 		}
 	}
 	
+	public static SyncedJSONObject of(String...args) {
+		return of(String.join(File.separator, args));
+	}
+	
 	public static SyncedJSONObject ofGuild(long guildID) {
 		return of(String.format("%s%s%s%s%s.json", Constants.TEMP_DATA_DIRECTORY, File.separator, Constants.GUILD_DATA_SUBDIRECTORY, File.separator, guildID));
 	}

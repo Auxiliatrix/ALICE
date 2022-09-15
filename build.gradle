@@ -12,10 +12,11 @@ run {
 }
 
 repositories {
-	jcenter()
+//	jcenter()
 	maven {
 		url  "https://jitpack.io"
 	}
+	google()
 	mavenCentral()
 }
 
