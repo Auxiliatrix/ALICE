@@ -35,7 +35,7 @@ sourceSets {
    }
 }
 
-tasks.withType(Tar)> {
+tasks.withType(Tar) {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
