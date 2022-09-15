@@ -35,7 +35,7 @@ public class DMMonitorModule extends MessageModule {
 			return ssf.getJSONArray("%dmm_channels").length() > 0;
 		});
 		report.withEffect(mce -> {
-			SyncedJSONObject ssf = SaveFiles.of("global");
+			SyncedJSONObject ssf = SaveFiles.of("tmp", "global");
 			Mono<?> ret = Mono.fromRunnable(() -> {});
 			SyncedJSONArray channels = ssf.getJSONArray("%dmm_channels");
 			for( int f=0; f<channels.length(); f++ ) {
@@ -61,7 +61,7 @@ public class DMMonitorModule extends MessageModule {
 		track.withCondition(MessageModule.getArgumentCondition(1, "track"));
 		track.withDependentEffect(mcdm.buildEffect(
 			(mce,mc) -> {
-				SyncedJSONObject ssf = SaveFiles.of("global");
+				SyncedJSONObject ssf = SaveFiles.of("tmp", "global");
 				if( !ssf.has("%dmm_channels") ) {
 					ssf.putJSONArray("%dmm_channels");
 				}
@@ -87,7 +87,7 @@ public class DMMonitorModule extends MessageModule {
 		untrack.withCondition(MessageModule.getArgumentCondition(1, "untrack"));
 		untrack.withDependentEffect(mcdm.buildEffect(
 				(mce,mc) -> {
-					SyncedJSONObject ssf = SaveFiles.of("global");
+					SyncedJSONObject ssf = SaveFiles.of("tmp", "global");
 					if( !ssf.has("%dmm_channels") ) {
 						ssf.putJSONArray("%dmm_channels");
 					}
