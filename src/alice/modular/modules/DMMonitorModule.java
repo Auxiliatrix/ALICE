@@ -28,8 +28,7 @@ public class DMMonitorModule extends MessageModule {
 		Command<MessageCreateEvent> report = command.addSubcommand();
 		report.withCondition(MessageModule.getDMCondition());
 		report.withCondition(mce -> {
-			// TODO: make this still go in the tmp folder
-			SyncedJSONObject ssf = SaveFiles.of("global");
+			SyncedJSONObject ssf = SaveFiles.of("tmp", "global");
 			if( !ssf.has("%dmm_channels") ) {
 				ssf.putJSONArray("%dmm_channels");
 			}
